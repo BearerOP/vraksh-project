@@ -1,6 +1,4 @@
-# Linktr.ee / Bento.me Clone Backend
-
-A complete Node.js backend implementation for a Linktr.ee / Bento.me clone with user authentication and referral system.
+# Vraksh - A Link-in-Bio web application.
 
 ## Features
 

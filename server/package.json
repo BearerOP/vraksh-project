@@ -1,9 +1,9 @@
 {
-  "name": "linkr-assignment",
+  "name": "vraksh-project-server",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
-  "author": "",
+  "author": "BearerOP",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
