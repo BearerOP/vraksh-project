@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
-const BioLink = require("./Branch");
 
 const UserSchema = new mongoose.Schema({
   username: {

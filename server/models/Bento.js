@@ -1,25 +1,41 @@
+const mongoose = require("mongoose");
+
 const BentoItemSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "Please add a title"],
+    trim: true,
   },
   type: {
     type: String,
     enum: ["link", "text", "image", "section-title"],
     required: [true, "Please add a type"],
   },
-  shape:{
+  shape: {
     type: String,
     default: "small-square",
     enum: ["small-square", "large-square", "wide-rectangle", "tall-rectangle"],
   },
   link: {
     type: String,
-    required: [true, "Please add a link"],
+    trim: true,
+    required: function () {
+      return this.type === "link";
+    },
+  },
+  text: {
+    type: String,
+    trim: true,
+    required: function () {
+      return this.type === "text";
+    },
   },
   imageUrl: {
     type: String,
-    required: [true, "Please add an image URL"],
+    trim: true,
+    required: function () {
+      return this.type === "image";
+    },
   },
 });
 

@@ -6,11 +6,11 @@ const BranchSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  branchName: {
+  name: {
     type: String,
     required: [true, "Please add a branch name"],
   },
-  branchDescription: {
+  description: {
     type: String,
     required: [true, "Please add a branch description"],
   },
