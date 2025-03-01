@@ -113,9 +113,9 @@ function BranchPath({ className }: { className?: string }) {
 }
 
 export default function HeroGeometric({
-  badge = "Vraksh",
+  badge = "Vraksh 🌱",
   title1 = "Grow Your",
-  title2 = "Digital Presence",
+  title2 = "Digital Presence 🌱",
 }: {
   badge?: string
   title1?: string
@@ -197,7 +197,7 @@ export default function HeroGeometric({
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/10 border border-white/[.25] mb-8 md:mb-12"
           >
             
-            <span className="text-sm text-white/60 tracking-wide ">{badge} 🌱</span>
+            <span className="text-sm text-white/60 tracking-wide ">{badge}</span>
           </motion.div>
 
           <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
@@ -206,7 +206,7 @@ export default function HeroGeometric({
               <br />
               <span
                 className={cn(
-                  "bg-clip-text text-transparent bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600",
+                  "bg-clip-text text-transparent bg-gradient-to-r from-green-600 via-emerald-800 to-teal-400",
                   "pacifico-regular"
                 )}
               >
