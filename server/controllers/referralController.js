@@ -1,5 +1,5 @@
-const User = require('../server/models/User');
-const Referral = require('../server/models/Referral');
+const User = require('../models/User');
+const Referral = require('../models/Referral');
 
 const getReferrals = async (req, res) => {
   try {

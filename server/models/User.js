@@ -43,6 +43,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  imageUrl: {
+    type: String,
+    default: "https://img.freepik.com/free-vector/user-blue-gradient_78370-4692.jpg?t=st=1740827218~exp=1740830818~hmac=134190902fcc76ab0a2f560dc706fde1f7f1bf9621107359140f356050a9f730&w=1480",
+  },
 });
 
 // Encrypt password using bcrypt

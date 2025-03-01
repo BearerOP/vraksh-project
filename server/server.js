@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const referralRoutes = require("./routes/referralRoutes");
+const brachRoutes = require("./routes/branchRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(express.json());
 // Routes
 app.use("/api", authRoutes);
 app.use("/api", referralRoutes);
+app.use("/api", brachRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
