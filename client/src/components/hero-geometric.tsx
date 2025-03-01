@@ -113,7 +113,7 @@ function BranchPath({ className }: { className?: string }) {
 }
 
 export default function HeroGeometric({
-  badge = "Vraksh 🌱",
+  badge = "✨ Introducing Vraksh 🌱",
   title1 = "Grow Your",
   title2 = "Digital Presence 🌱",
 }: {
