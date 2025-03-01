@@ -1,29 +1,27 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
+const BioLink = require("./Branch");
 
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, 'Please add a username'],
+    required: [true, "Please add a username"],
     unique: true,
     trim: true,
-    maxlength: [30, 'Username cannot be more than 30 characters'],
+    maxlength: [30, "Username cannot be more than 30 characters"],
   },
   email: {
     type: String,
-    required: [true, 'Please add an email'],
+    required: [true, "Please add an email"],
     unique: true,
-    match: [
-      /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-      'Please add a valid email',
-    ],
+    match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Please add a valid email"],
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    required: [true, "Please add a password"],
+    minlength: [6, "Password must be at least 6 characters"],
     select: false, // Don't return password in queries
   },
   referralCode: {
@@ -33,7 +31,7 @@ const UserSchema = new mongoose.Schema({
   },
   referredBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     default: null,
   },
   referralCount: {
@@ -49,8 +47,8 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Encrypt password using bcrypt
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     next();
   }
 
@@ -67,13 +65,13 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 // Generate and hash password token
 UserSchema.methods.getResetPasswordToken = function () {
   // Generate token
-  const resetToken = crypto.randomBytes(20).toString('hex');
+  const resetToken = crypto.randomBytes(20).toString("hex");
 
   // Hash token and set to resetPasswordToken field
   this.resetPasswordToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(resetToken)
-    .digest('hex');
+    .digest("hex");
 
   // Set expire
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
@@ -81,4 +79,4 @@ UserSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

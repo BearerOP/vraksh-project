@@ -6,7 +6,6 @@ const { sendEmail } = require('../utils/emailService');
 
 const register = async (req, res) => {
   const { username, email, password, referralCode } = req.body;
-
   try {
     const existingUser = await User.findOne({ 
       $or: [{ email }, { username }] 
