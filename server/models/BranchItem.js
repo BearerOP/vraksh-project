@@ -30,7 +30,6 @@ const BranchItemSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    required: [true, "Please add an image URL"],
     trim: true,
   },
   createdAt: {

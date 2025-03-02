@@ -1,12 +1,15 @@
 const Branch = require("../models/Branch");
 const User = require("../models/User");
+const BranchItem = require("../models/BranchItem");
 
 const getBranches = async (req, res) => {
   try {
     const userId = req.user._id;
-    const branches = await Branch.find({ userId }).populate(
-      { path: "userId", select: "username imageUrl", model: User }
-    );
+    const branches = await Branch.find({ userId }).populate({
+      path: "userId",
+      select: "username imageUrl description",
+      model: User,
+    });
     res.status(200).json({
       success: true,
       data: branches,
@@ -56,10 +59,14 @@ const createBranch = async (req, res) => {
 
 const updateBranch = async (req, res) => {
   try {
-    const branch = await Branch.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const branch = await Branch.findByIdAndUpdate(
+      req.params.branchId,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     res.status(200).json({
       success: true,
       data: branch,
@@ -74,10 +81,115 @@ const updateBranch = async (req, res) => {
 
 const deleteBranch = async (req, res) => {
   try {
-    await Branch.findByIdAndDelete(req.params.id);
+    await Branch.findByIdAndDelete(req.params.branchId);
     res.status(200).json({
       success: true,
       data: {},
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getItems = async (req, res) => {
+  try {
+    const branch = await Branch.findById(req.params.branchId);
+    res.status(200).json({
+      success: true,
+      data: branch.items,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getItem = async (req, res) => {
+  try {
+
+    const item = await BranchItem.findById(req.params.itemId);
+    {!item ? res.status(404).json({
+      success: false,
+      message: "Item not found",
+    }) 
+    : item}
+    res.status(200).json({
+      success: true,
+      data: item,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const createItem = async (req, res) => {
+  try {
+    const branch = await Branch.findById(req.params.branchId);
+    if (!branch) {
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
+    const itemCount = branch.items.length;
+    {
+      itemCount === 0 ? 0 : itemCount - 1;
+    }
+
+    const item = req.body;
+    const newItem = await BranchItem.create({
+      ...item,
+      branchId: branch._id,
+      index: itemCount,
+    });
+    branch.items.push(newItem);
+    await branch.save();
+    res.status(201).json({
+      success: true,
+      data: branch.items,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateItem = async (req, res) => {
+  try {
+    const branch = await Branch.findById(req.params.branchId);
+    const item = branch.items.id(req.params.itemId);
+    item.set(req.body);
+    await branch.save();
+    res.status(200).json({
+      success: true,
+      data: item,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const deleteItem = async (req, res) => {
+  try {
+    const branch = await Branch.findById(req.params.branchId);
+    branch.items.id(req.params.itemId).remove();
+    await branch.save();
+    res.status(200).json({
+      success: true,
+      data: branch.items,
     });
   } catch (error) {
     res.status(500).json({
@@ -93,4 +205,9 @@ module.exports = {
   createBranch,
   updateBranch,
   deleteBranch,
+  getItems,
+  getItem,
+  createItem,
+  updateItem,
+  deleteItem,
 };
