@@ -111,13 +111,15 @@ const getItems = async (req, res) => {
 
 const getItem = async (req, res) => {
   try {
-
     const item = await BranchItem.findById(req.params.itemId);
-    {!item ? res.status(404).json({
-      success: false,
-      message: "Item not found",
-    }) 
-    : item}
+    {
+      !item
+        ? res.status(404).json({
+            success: false,
+            message: "Item not found",
+          })
+        : item;
+    }
     res.status(200).json({
       success: true,
       data: item,
@@ -167,8 +169,13 @@ const createItem = async (req, res) => {
 const updateItem = async (req, res) => {
   try {
     const branch = await Branch.findById(req.params.branchId);
-    const item = branch.items.id(req.params.itemId);
-    item.set(req.body);
+    const item = await BranchItem.findByIdAndUpdate(
+      req.params.itemId,
+      req.body,
+      {
+        new: true,
+      }
+    );
     await branch.save();
     res.status(200).json({
       success: true,
@@ -185,7 +192,20 @@ const updateItem = async (req, res) => {
 const deleteItem = async (req, res) => {
   try {
     const branch = await Branch.findById(req.params.branchId);
-    branch.items.id(req.params.itemId).remove();
+    {!branch
+      ? res.status(404).json({
+          success: false,
+          message: "Branch not found",
+        })
+      : branch;
+    }
+
+    branch.items = branch.items.filter(item => item._id.toString() !== req.params.itemId);
+console.log(branch.items);
+
+    const removedItem = await BranchItem.findByIdAndDelete(req.params.itemId);
+    console.log(removedItem);
+    
     await branch.save();
     res.status(200).json({
       success: true,
