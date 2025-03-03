@@ -1,10 +1,8 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { cn } from "../lib/utils"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-
+import { motion } from "framer-motion";
+import { cn } from "../lib/utils";
+import { Button } from "../components/ui/button";
 function BranchLeaf({
   className,
   delay = 0,
@@ -13,12 +11,12 @@ function BranchLeaf({
   rotate = 0,
   gradient = "from-green-500/[0.15]",
 }: {
-  className?: string
-  delay?: number
-  width?: number
-  height?: number
-  rotate?: number
-  gradient?: string
+  className?: string;
+  delay?: number;
+  width?: number;
+  height?: number;
+  rotate?: number;
+  gradient?: string;
 }) {
   return (
     <motion.div
@@ -55,10 +53,20 @@ function BranchLeaf({
         }}
         className="relative"
       >
-        <svg viewBox="0 0 100 100" className={cn("absolute inset-0", "drop-shadow-[0_8px_32px_rgba(34,197,94,0.2)]")}>
+        <svg
+          viewBox="0 0 100 100"
+          className={cn(
+            "absolute inset-0",
+            "drop-shadow-[0_8px_32px_rgba(34,197,94,0.2)]"
+          )}
+        >
           <path
             d="M50,0 C70,25 95,40 95,65 C95,85 75,100 50,100 C25,100 5,85 5,65 C5,40 30,25 50,0 Z"
-            className={cn("fill-gradient-to-r to-transparent", gradient, "stroke-green-600/[0.3] stroke-2")}
+            className={cn(
+              "fill-gradient-to-r to-transparent",
+              gradient,
+              "stroke-green-600/[0.3] stroke-2"
+            )}
           />
           <path
             d="M50,100 C50,100 50,50 50,0"
@@ -68,7 +76,7 @@ function BranchLeaf({
         </svg>
       </motion.div>
     </motion.div>
-  )
+  );
 }
 
 function BranchPath({ className }: { className?: string }) {
@@ -79,7 +87,13 @@ function BranchPath({ className }: { className?: string }) {
       transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
       className={cn("absolute", className)}
     >
-      <svg width="300" height="300" viewBox="0 0 300 300" fill="none" className="absolute">
+      <svg
+        width="300"
+        height="300"
+        viewBox="0 0 300 300"
+        fill="none"
+        className="absolute"
+      >
         <motion.path
           d="M150,20 Q100,80 150,150 Q200,220 150,280"
           stroke="#4ade80"
@@ -109,7 +123,7 @@ function BranchPath({ className }: { className?: string }) {
         />
       </svg>
     </motion.div>
-  )
+  );
 }
 
 export default function HeroGeometric({
@@ -117,9 +131,9 @@ export default function HeroGeometric({
   title1 = "Grow Your",
   title2 = "Digital Presence 🌱",
 }: {
-  badge?: string
-  title1?: string
-  title2?: string
+  badge?: string;
+  title1?: string;
+  title2?: string;
 }) {
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -132,7 +146,7 @@ export default function HeroGeometric({
         ease: [0.25, 0.4, 0.25, 1],
       },
     }),
-  }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gray-100">
@@ -196,13 +210,21 @@ export default function HeroGeometric({
             animate="visible"
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/10 border border-white/[.25] mb-8 md:mb-12"
           >
-            
-            <span className="text-sm text-white/60 tracking-wide ">{badge}</span>
+            <span className="text-sm text-white/60 tracking-wide ">
+              {badge}
+            </span>
           </motion.div>
 
-          <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
+          <motion.div
+            custom={1}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-gray-800 to-gray-600">{title1}</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-gray-800 to-gray-600">
+                {title1}
+              </span>
               <br />
               <span
                 className={cn(
@@ -215,9 +237,15 @@ export default function HeroGeometric({
             </h1>
           </motion.div>
 
-          <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
+          <motion.div
+            custom={2}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-              One link to connect all your content, social profiles, and websites in a beautiful, customizable bio page.
+              One link to connect all your content, social profiles, and
+              websites in a beautiful, customizable bio page.
             </p>
           </motion.div>
 
@@ -228,13 +256,18 @@ export default function HeroGeometric({
             animate="visible"
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
           >
-            <div className="relative w-full sm:w-auto flex-1 max-w-md">
-              <Input
-                placeholder="vraksh.bio/yourname"
-                className="h-12 pl-4 pr-4 rounded-lg bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            <div className="flex justify-center items-center relative w-full sm:w-auto  max-w-md h-12 pl-4 pr-4 rounded-lg bg-white/5 border border-white/30">
+              <span className="text-white/70 tracking-wide">vraksh.bio /</span>
+              <input
+                placeholder="username"
+                className="min-w-18 ml-1 outline-none border-none text-white bg-transparent placeholder:text-white/50"
               />
             </div>
-            <Button size="lg" className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white">
+
+            <Button
+              size="lg"
+              className="cursor-pointer w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
+            >
               Claim Your Bio Link
             </Button>
           </motion.div>
@@ -243,6 +276,5 @@ export default function HeroGeometric({
 
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a2e0a] via-transparent to-[#0a2e0a]/80 pointer-events-none" />
     </div>
-  )
+  );
 }
-
