@@ -8,6 +8,8 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
+  console.log(process.env.EMAIL_FROM);
+  
 
   const mailOptions = {
     from: `${process.env.EMAIL_FROM}`,
