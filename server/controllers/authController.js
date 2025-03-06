@@ -6,7 +6,7 @@ const { generateToken } = require("../config/jwt");
 const { sendEmail } = require("../utils/emailService");
 const passport = require("passport");
 
-const checkUsername = async (req,res) => {
+const checkUsername = async (req, res) => {
   try {
     const username = req.query.username;
     const user = await Branch.findOne({ name: username });
@@ -331,27 +331,27 @@ const sendMagicLink = async (req, res) => {
     }
 
     // Generate magic token
-    const magicToken = crypto.randomInt(100000, 999999).toString();
+    const magicCode = crypto.randomInt(100000, 999999).toString();
 
     // Hash the token before storing
-    const hashedToken = crypto
+    const hashedCode = crypto
       .createHash("sha256")
-      .update(magicToken)
+      .update(magicCode)
       .digest("hex");
 
-    user.authKey = hashedToken;
+    user.authKey = hashedCode;
     user.authKeyExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     await user.save();
-    console.log("Generated Token:", magicToken);
-    console.log("Hashed Token (Stored in DB):", hashedToken);
+    console.log("Generated Token:", magicCode);
+    console.log("Hashed Token (Stored in DB):", hashedCode);
 
     // Send magic link
-    const magicLink = `${process.env.FRONTEND_URL}/auth?token=${magicToken}`;
+    const magicLink = `${process.env.FRONTEND_URL}/auth?code=${magicCode}`;
     const options = {
       to: user.email,
       subject: "Your Magic Login Link",
-      html: `Your magic code is ${magicToken} .
+      html: `Your magic code is ${magicCode} .
       In case you are'nt on same device try logging in at given link: ${magicLink} `,
     };
     await sendEmail(options);
@@ -367,19 +367,19 @@ const sendMagicLink = async (req, res) => {
 };
 
 const verifyMagicLink = async (req, res) => {
-  const { token } = req.query;
+  const { code } = req.query;
 
-  if (!token) {
-    return res.status(400).json({ message: "Invalid token" });
+  if (!code) {
+    return res.status(400).json({ message: "Invalid code" });
   }
 
   try {
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-    console.log("Received token:", token);
-    console.log("Computed Hash (For Lookup):", hashedToken);
+    const hashedCode = crypto.createHash("sha256").update(code).digest("hex");
+    console.log("Received token:", code);
+    console.log("Computed Hash (For Lookup):", hashedCode);
 
     const user = await User.findOne({
-      authKey: hashedToken,
+      authKey: hashedCode,
       authKeyExpire: { $gt: Date.now() },
     });
 
