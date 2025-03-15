@@ -113,46 +113,34 @@ const checkUsername = async (req, res) => {
 //   }
 // };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
+const login = async (req, res, email) => {
   try {
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({
+      return {
         success: false,
         message: "Invalid credentials",
-      });
-    }
-
-    const isMatch = await user.matchPassword(password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      }
     }
 
     const token = generateToken(user._id);
 
-    res.status(200).json({
+    return {
       success: true,
       token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        referralCode: user.referralCode,
       },
-    });
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return{
       success: false,
       message: "Server error",
-    });
+    }
   }
 };
 
@@ -323,13 +311,12 @@ const register = async (req, res) => {
 
 const sendMagicLink = async (req, res) => {
   const { email } = req.body;
-
   try {
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      const username = email.split("@")[0];
+      user = await User.create({ email, username });
     }
-
     // Generate magic token
     const magicCode = crypto.randomInt(100000, 999999).toString();
 
@@ -383,9 +370,12 @@ const verifyMagicLink = async (req, res) => {
       authKeyExpire: { $gt: Date.now() },
     });
 
+    
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
+    
+    await login(req, res, user.email);
 
     // Clear magic token (one-time use)
     user.authKey = null;
@@ -395,18 +385,20 @@ const verifyMagicLink = async (req, res) => {
     // Generate JWT
     const jwtToken = generateToken(user._id);
 
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
+    // res.cookie("token", jwtToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "Strict",
+    // });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Logged in successfully",
       token: jwtToken,
       success: true,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ message: "Internal server error", success: false });
   }
 };
