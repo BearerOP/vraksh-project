@@ -8,7 +8,7 @@ export interface Link {
   active: boolean;
 }
 
-export type TemplateType = 'default' | 'minimal' | 'gradient' | 'dark' | 'rounded';
+export type TemplateType = 'default' | 'minimal' | 'gradient' | 'dark' | 'rounded' | 'glass' | 'neon' | 'futuristic';
 
 export interface Page {
   id: string;
