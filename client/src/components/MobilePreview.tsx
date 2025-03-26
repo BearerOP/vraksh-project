@@ -37,8 +37,11 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
     <div className="relative w-full max-w-[293px] mx-auto">
       {/* Phone Frame */}
       <div
+      style = {{
+        boxShadow: '0 121px 49px #00000005,0 68px 41px #00000014,0 30px 30px #00000024,0 8px 17px #00000029'
+      }}
         className={cn(
-          "absolute inset-0 border-[8px] rounded-[50px] shadow-2xl z-10 pointer-events-none border-white"
+          "absolute inset-0 border-[8px] rounded-[50px] shadow-2xl z-10 pointer-events-none border-[#ebebeb]"
         )}
       ></div>
 

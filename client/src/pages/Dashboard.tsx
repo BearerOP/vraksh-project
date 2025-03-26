@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
       
       <main className="flex-1 min-w-full mx-auto flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#ededeb] p-4  min-h-screen overflow-y-auto border-r">
+        <aside className="w-64 bg-[#ededeb] p-4 sticky h-screen top-0 border-r">
           <div className="relative">
             <Button
               variant="outline"
@@ -100,7 +100,7 @@ const Dashboard: React.FC = () => {
         {/* Main Content View */}
         <section className="flex-1 bg-[#fbfbf9] p-6 pt-0">
           {activePage ? (
-            <Tabs defaultValue="links" className="w-full">
+            <Tabs defaultValue="links" className="w-full mt-0">
               <div className="flex py-3 justify-between items-start mb-6 sticky top-0 z-10  bg-[#fbfbf9] border-b">
                 <div>
                   <Input 

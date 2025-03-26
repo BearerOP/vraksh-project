@@ -75,7 +75,7 @@ export const templateConfigs: TemplateConfig[] = [
   { 
     id: 'glass', 
     name: 'Glassmorphism', 
-    className: 'bg-white/10 backdrop-blur-lg border border-white/20', 
+    className: 'bg-white/10 backdrop-blur-lg border border-black/20', 
     textClass: 'text-gray-900',
     linkClass: 'bg-white/30 hover:bg-white/40 backdrop-blur-md rounded-xl',
     profileClass: 'bg-white/30 backdrop-blur-md border border-white/40 text-gray-900',
