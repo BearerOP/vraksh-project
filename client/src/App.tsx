@@ -22,6 +22,7 @@ const App = () => (
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/preview/:pageId" element={<Preview />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

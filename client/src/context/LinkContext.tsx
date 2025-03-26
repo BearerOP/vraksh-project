@@ -8,7 +8,7 @@ export interface Link {
   active: boolean;
 }
 
-export type TemplateType = 'default' | 'minimal' | 'gradient' | 'dark' | 'rounded' | 'glass' | 'neon' | 'futuristic';
+export type TemplateType = 'default' | 'minimal' | 'gradient' | 'dark' | 'rounded' | 'glass' | 'neon' | 'futuristic' | 'pastel' | 'cyberpunk' | 'vintage' | 'aesthetic' | 'wood' | 'ocean' | 'retro' | 'holographic' | 'monochrome' | 'lava' | 'matrix' | 'winter' | 'golden' | 'metallic' | 'comic' | 'gothic' | 'sunset' | 'forest' | 'vaporwave' | 'royal';
 
 export interface Page {
   id: string;
@@ -17,6 +17,7 @@ export interface Page {
   theme: 'light' | 'dark';
   accentColor: string;
   template: TemplateType;
+  image: string;
 }
 
 interface LinkContextType {
@@ -47,6 +48,7 @@ const initialPages: Page[] = [
     theme: 'light',
     accentColor: '#0ea5e9',
     template: 'default',
+    image: 'https://images.unsplash.com/photo-1630480003494-4b3b3b3b3b3b',
   },
 ];
 

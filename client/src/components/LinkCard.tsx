@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link as LinkType } from '@/context/LinkContext';
 import { Edit, Trash2, X, Check, Link as LinkIcon, ExternalLink, GripVertical } from 'lucide-react';
+import { Switch } from './ui/switch';
 
 interface LinkCardProps {
   link: LinkType;
@@ -131,14 +132,10 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false })
             </Button>
             <Button
               size="icon"
-              variant="ghost"
+              className='bg-none'
               onClick={handleToggleActive}
-              className={cn(
-                "h-8 w-8",
-                link.active ? "text-green-500" : "text-muted-foreground"
-              )}
             >
-              <Check className="h-4 w-4" />
+              <Switch  className="scale-50" />
             </Button>
             <Button
               size="icon"
