@@ -99,7 +99,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
           {/* Footer */}
           <div className="mt-12 pt-6 border-t w-full text-center text-xs flex flex-col justify-center gap-1 items-center opacity-60">
             <img src="https://cdn.discordapp.com/attachments/1033057271971852399/1354352346141950052/icon_1.png?ex=67e4fa69&is=67e3a8e9&hm=15c70efcb97d6a01cde2ef7cc53e587e3d4bf7363cf7c0719f7a64b172dde7eb&" alt="icon" className="h-4 w-4 shadow-md" />
-            <p className="font-bold text-white">VRAKSH</p>
+            <p className="font-bold backdrop-contrast-200">VRAKSH</p>
           </div>
         </div>
       </div>
