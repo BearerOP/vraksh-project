@@ -257,7 +257,8 @@ const resetPassword = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
+    console.log(user);
+    
     res.status(200).json({
       success: true,
       user,

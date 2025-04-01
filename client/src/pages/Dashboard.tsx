@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLinks } from "@/context/LinkContext";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import Navbar from "@/components/Navbar";
 import LinksList from "@/components/LinksList";
 import LinkForm from "@/components/LinkForm";
 import MobilePreview from "@/components/MobilePreview";
 import TemplateSelector from "@/components/TemplateSelector";
+import { motion } from "motion/react";
 import {
   ChevronDown,
   PlusCircle,
@@ -16,14 +14,18 @@ import {
   Trash2,
   Palette,
   Share2,
-  PaintRoller,
   Eye,
   Paintbrush,
+  LayoutGridIcon,
+  LucideLayoutDashboard,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, replace, useNavigate } from "react-router-dom";
+import { getMe } from "@/lib/apis";
+import { useAuth } from "@/hooks/useAuth";
+import { User } from "@/types/User";
 
 const Dashboard: React.FC = () => {
+  const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
   const { pages, activePage, setActivePage, addPage, updatePage, deletePage } =
     useLinks();
 
@@ -54,17 +56,48 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const res = await getMe();
+        if (
+          res.status === 200 &&
+          res.data &&
+          typeof res.data === "object" &&
+          "user" in res.data
+        ) {
+          const userData = res.data.user as User;
+          console.log(userData);
+
+          if (userData) {
+            setUser(userData);
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
+        setUser(null);
+        window.location.href = import.meta.env.NEXT_APP_URL || "http://localhost:3000/auth/login"
+      }
+    }
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    console.log(user, "inside useEffect for user  check");
+  }, [user]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">
       {/* <Navbar /> */}
 
       <main className="flex-1 min-w-full mx-auto flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#ededeb] p-4 sticky h-screen top-0 border-r">
-          <div className="relative">
-            <Button
-              variant="outline"
-              className="w-full justify-between"
+        <aside className="w-64 bg-[#ededeb] py-4 sticky h-screen top-0 border-r flex flex-col">
+          <div className="relative px-4">
+            {/* Dropdown Button */}
+            <button
+              className="w-fit flex justify-between items-center p-3 text-sm bg-white rounded-lg shadow-sm"
               onClick={() => setShowDropdown(!showDropdown)}
             >
               {activePage ? activePage.title : "Select a page"}
@@ -73,16 +106,22 @@ const Dashboard: React.FC = () => {
                   showDropdown ? "rotate-180" : ""
                 }`}
               />
-            </Button>
+            </button>
 
+            {/* Dropdown Menu */}
             {showDropdown && (
-              <Card className="absolute w-full mt-1 z-10 p-1 animate-fade-in">
-                <div className="max-h-48 overflow-y-auto">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="absolute w-full mt-2 z-10 bg-white shadow-md rounded-lg border"
+              >
+                <div className="max-h-48 overflow-y-auto p-2">
                   {pages.map((page) => (
                     <Button
                       key={page.id}
                       variant="ghost"
-                      className="w-full justify-start px-3 py-2 h-auto my-1 text-left"
+                      className="w-full justify-start px-3 py-2 h-auto text-left rounded-md hover:bg-gray-100"
                       onClick={() => {
                         setActivePage(page);
                         setShowDropdown(false);
@@ -95,7 +134,7 @@ const Dashboard: React.FC = () => {
                 <hr className="my-1" />
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                  className="w-full justify-start text-blue-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-md"
                   onClick={() => {
                     navigate("/new-branch");
                   }}
@@ -103,20 +142,40 @@ const Dashboard: React.FC = () => {
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Create new Branch
                 </Button>
-              </Card>
+              </motion.div>
             )}
           </div>
+
+          {/* Sidebar Links */}
+          <div className="flex flex-col space-y-2 mt-4 px-4">
+            <Link to="/dashboard">
+              <Button variant="ghost" className="w-full justify-start">
+                <LayoutGridIcon className="h-4 w-4 mr-2" />
+                My Vraksh
+              </Button>
+            </Link>
+
+            <h3 className="text-sm text-muted-foreground mt-4">Tools</h3>
+
+            <Link to="/bento">
+              <Button variant="ghost" className="w-full justify-start">
+                <LucideLayoutDashboard className="h-4 w-4 mr-2" />
+                My Bento
+              </Button>
+            </Link>
+          </div>
         </aside>
+
         {/* Main Content View */}
         <section className="flex-1 bg-[#fbfbf9]  pt-0">
           {activePage ? (
             <Tabs defaultValue="links" className="w-full mt-0 ">
-              <div className="flex justify-between  sticky top-0 z-10 p-6 bg-[#fbfbf9] border-b">
-                <h2 className="text-xl font-bold text-center align-middle">
-                  My Vraksh Branch
+              <div className="flex justify-between  sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b">
+                <h2 className="text-xl font-bold text-center relative self-center">
+                  My Vraksh
                 </h2>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 ">
                   <Button
                     variant="outline"
                     size="sm"
@@ -160,10 +219,10 @@ const Dashboard: React.FC = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex-col flex xl:flex-row animate-fade-in px-6 justify-between gap-6 xl:gap-0 min-h-[800px]]">
+              <div className="flex-col flex xl:flex-row animate-fade-in justify-between gap-6 xl:gap-0 min-h-[800px]]">
                 <div className="space-y-4 shrink w-full xl:px-10 border-r min-h-screen">
                   <div className="flex items-center justify-between py-6">
-                    <h2 className="text-lg font-medium">Links</h2>
+                    <h2 className="text-lg font-medium">{activePage.title}</h2>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -189,8 +248,8 @@ const Dashboard: React.FC = () => {
                     <LinkForm pageId={activePage.id} />
                   </div>
                 </div>
-                <div className="min-w-[30rem] lg:block">
-                  <div className="sticky top-28">
+                <div className="min-w-[30rem] lg:block mx-auto p-6">
+                  <div className="sticky top-36">
                     <MobilePreview page={activePage} />
                   </div>
                 </div>

@@ -7,16 +7,19 @@ import { LinkProvider } from "@/context/LinkContext";
 import Dashboard from "./pages/Dashboard";
 import Preview from "./pages/Preview";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
+        <BrowserRouter>
   <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+
     <TooltipProvider>
       <LinkProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
           <Routes>
             {/* <Route path="/" element={<Index />} /> */}
             <Route path="/" element={<Navigate to="/dashboard" />} />
@@ -25,10 +28,11 @@ const App = () => (
             
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
       </LinkProvider>
     </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
+        </BrowserRouter>
 );
 
 export default App;
