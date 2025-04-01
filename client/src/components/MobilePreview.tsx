@@ -6,6 +6,7 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 // Import the template configurations from TemplateSelector
 import { templateConfigs } from "./TemplateSelector";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 interface MobilePreviewProps {
   page: Page;
@@ -14,7 +15,7 @@ interface MobilePreviewProps {
 const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [previewHeight, setPreviewHeight] = useState("100%");
-  const { user}  = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const adjustHeight = () => {
@@ -63,14 +64,14 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
       >
         <div
           ref={contentRef}
-          className="py-16 px-6 flex flex-col items-center h-full overflow-y-auto"
+          className="py-10 px-6 flex flex-col items-center h-full overflow-y-auto"
         >
           {/* Profile Section */}
           <div className="mb-8 text-center">
             <div
               className={`
               mx-auto mb-4 flex items-center justify-center text-2xl font-bold 
-              w-24 h-24 rounded-full bg-blue-500
+              size-16 rounded-full bg-blue-500
               ${templateConfig.profileClass || ""}
             `}
             >
@@ -84,14 +85,14 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                 page.title.charAt(0)
               )}
             </div>
-            <h1 className={`text-xl font-bold ${templateConfig.textClass}`}>
+            <h1 className={`text-sm font-bold ${templateConfig.textClass}`}>
               {page.title}
             </h1>
-            <p className="text-sm opacity-70">@{user?.username}</p>
+            <p className="text-xs opacity-70">@{user?.username}</p>
           </div>
 
           {/* Links Section */}
-          <div className="w-full space-y-3">
+          <div className="w-full space-y-3 pb-20">
             {page.links
               .filter((link) => link.active)
               .map((link: LinkType, index: number) => (
@@ -123,13 +124,15 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                 </a>
               ))}
           </div>
-
           {/* Footer */}
-          <div className="mt-12 pt-6 border-t w-full text-center text-xs flex flex-col justify-center gap-1 items-center opacity-60">
+          <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-md">
+            <Link to="/" className="text-xs text-white">
             <img src="/icon.svg" alt="icon" className="h-4 w-4 shadow-md" />
-            <p className="font-bold backdrop-contrast-200">VRAKSH</p>
+            </Link>
+            <p className="font-bold text-white">VRAKSH</p>
           </div>
         </div>
+        
       </div>
     </div>
   );
