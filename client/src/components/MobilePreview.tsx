@@ -5,7 +5,7 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 
 // Import the template configurations from TemplateSelector
 import { templateConfigs } from "./TemplateSelector";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 
 interface MobilePreviewProps {

@@ -5,3 +5,8 @@ export const getMe = async() => {
   return response;
 };
 
+
+export const checkUsername = async(username:string) => {
+  const response = await axiosInstance.get(`/api/check-username?username=${username}`);
+  return response;
+}

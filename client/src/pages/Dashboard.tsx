@@ -21,13 +21,12 @@ import {
 } from "lucide-react";
 import { Link, replace, useNavigate } from "react-router-dom";
 import { getMe } from "@/lib/apis";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { User } from "@/types/User";
 
 const Dashboard: React.FC = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
-  const { pages, activePage, setActivePage, addPage, updatePage, deletePage } =
-    useLinks();
+  const { pages, activePage, setActivePage, addPage, updatePage, deletePage } = useLinks();
 
   const [pageTitle, setPageTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);

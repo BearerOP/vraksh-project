@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Preview from "./pages/Preview";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
+import CreateBranch from "./pages/CreateBranch";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ const App = () => (
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/preview/:pageId" element={<Preview />} />
-            
+            <Route path="/new-branch" element={<CreateBranch />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
       </LinkProvider>
