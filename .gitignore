@@ -19,7 +19,12 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
-
+.env
+./client/.env
+.env.development
+./client/.env.development
+.env.production
+./client/.env.production
 # nyc test coverage
 .nyc_output
 .DS_Store
