@@ -20,7 +20,30 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
-app.use(cors());
+const allowedOrigins = process.env.ORIGINS;
+console.log(allowedOrigins);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log('Requested Origin:', origin);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(allowedOrigins);
+      
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Enable CORS
+app.use(cors(corsOptions));
+
+// CORS preflight
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Routes
@@ -39,9 +62,9 @@ app.get("/", (req, res) => {
 });
 
 if (process.env.NODE_ENV !== "test") {
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 8080;
   app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}`);
+    console.log(`Server running on port ${process.env.BASE_URL}`);
   });
 }
 
