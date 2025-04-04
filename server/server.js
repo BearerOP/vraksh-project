@@ -35,7 +35,7 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Referral API" });
+  res.json({ message: "Welcome to the Vraksh API!" });
 });
 
 if (process.env.NODE_ENV !== "test") {

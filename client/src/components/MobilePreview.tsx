@@ -2,8 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import { Page, Link as LinkType, TemplateType } from "@/context/LinkContext";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
-
-// Import the template configurations from TemplateSelector
 import { templateConfigs } from "./TemplateSelector";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
