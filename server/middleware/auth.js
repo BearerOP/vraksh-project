@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
       message: 'Not authorized to access this route' 
     });
   }
-  console.log(token);
+  // console.log(token);
   
   
   try {
