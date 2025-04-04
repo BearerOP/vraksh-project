@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
     console.log("User logged out");
     window.location.href =
-      import.meta.env.NEXT_APP_URL || "http://localhost:3000/auth/login";
+      import.meta.env.VITE_VRAKSH_URL+"/auth/login" || "https://vraksh.bearerop.tech/auth/login";
   };
 
   return (
