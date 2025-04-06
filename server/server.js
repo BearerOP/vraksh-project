@@ -5,7 +5,7 @@ const helmet = require("helmet");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const referralRoutes = require("./routes/referralRoutes");
-const brachRoutes = require("./routes/branchRoutes");
+const branchRoutes = require("./routes/branchRoutes");
 
 const app = express();
 
@@ -21,7 +21,6 @@ app.use(
   })
 );
 const allowedOrigins = process.env.ORIGINS;
-console.log(allowedOrigins);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -49,7 +48,7 @@ app.use(express.json());
 // Routes
 app.use("/api", authRoutes);
 app.use("/api", referralRoutes);
-app.use("/api", brachRoutes);
+app.use("/api", branchRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
