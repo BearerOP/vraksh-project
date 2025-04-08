@@ -20,7 +20,7 @@ import {
   LucideLayoutDashboard,
 } from "lucide-react";
 import { Link, replace, useNavigate } from "react-router-dom";
-import { getMe } from "@/lib/apis";
+import { getBranches, getMe } from "@/lib/apis";
 import { useAuth } from "@/hooks/use-auth";
 import { User } from "@/types/User";
 
@@ -76,15 +76,21 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         setIsAuthenticated(false);
         setUser(null);
-        window.location.href = import.meta.env.NEXT_APP_URL || "http://localhost:3000/auth/login"
+        window.location.href = import.meta.env.VITE_VRAKSH_APP_URL;
       }
     }
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    console.log(user, "inside useEffect for user  check");
-  }, [user]);
+  useEffect(()=>{
+    async function fetchUserBranches() {
+      const response =  await getBranches();
+      if (response.status==200) {
+        // setPages(response.data)
+      }
+      
+    }
+  })
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">

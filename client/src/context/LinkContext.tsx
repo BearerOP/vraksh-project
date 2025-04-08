@@ -82,6 +82,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
       theme: 'light',
       accentColor: '#0ea5e9',
       template: 'default',
+      image: '',
     };
     
     setPages([...pages, newPage]);
@@ -216,6 +217,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     pages,
     activePage,
     setActivePage,
+    setPages,
     addPage,
     updatePage,
     deletePage,

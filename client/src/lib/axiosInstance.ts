@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-const SERVER_URL = import.meta.env.VITE_VRAKSH_SERVER_URL || 'http://localhost:8080';
+const SERVER_URL = import.meta.env.VITE_VRAKSH_SERVER_URL;
 
 const axiosInstance = axios.create({
   baseURL: SERVER_URL,

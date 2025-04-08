@@ -10,3 +10,8 @@ export const checkUsername = async(username:string) => {
   const response = await axiosInstance.get(`/api/check-username?username=${username}`);
   return response;
 }
+
+export const getBranches =  async () => {
+  const response = await axiosInstance.get('/api/branches');
+  return response;
+}
