@@ -4,25 +4,17 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
-import { title } from "process";
 
 // Sample template config
 const sampleTemplate = {
   _id: "sample-template",
-  // className: "bg-gradient-to-b from-[#ffecd2] to-[#fcb69f]",
-  // titleClass: "text-[#fff]",
-  // textClass: "text-[#2e2e2e]",
-  // profileClass: "bg-white text-[#2e2e2e]",
-  // linkClass: "bg-[#fffbb9] text-[#2e2e2e] hover:bg-[#ffe5b4] rounded-xl",
   backgroundImage: "/template-bg/bg-07.png",
-  className: 'bg-gradient-to-r from-pink-500 via-red-500 to-orange-500', 
-  textClass: 'text-white',
-  linkClass: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg',
-  profileClass: 'bg-white/30 border border-white/40 text-white',
-  titleClass: 'text-white font-semibold',
-  
+  className: "bg-gradient-to-r from-pink-500 via-red-500 to-orange-500",
+  textClass: "text-white",
+  linkClass: "bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg",
+  profileClass: "bg-white/30 border border-white/40 text-white",
+  titleClass: "text-white font-semibold",
 };
-
 
 interface MobilePreviewProps {
   page: Page;
@@ -86,7 +78,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
           templateConfig.className
         )}
         style={{
-          height: previewHeight,
+          height: 525,
           backgroundImage: templateConfig.backgroundImage
             ? `url(${templateConfig.backgroundImage})`
             : undefined,
