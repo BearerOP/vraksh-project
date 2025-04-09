@@ -1,7 +1,6 @@
-
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLinks, Link, TemplateType } from '@/context/LinkContext';
+import { useLinks, Link } from '@/context/LinkContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
@@ -19,6 +18,9 @@ const Preview: React.FC = () => {
     if (!page && pages.length > 0) {
       navigate('/dashboard');
     }
+    console.log(page, "page");
+    console.log(pages, "pages");
+    
   }, [page, pages, navigate]);
   
   // If the page is still loading or not found, show a loading state
@@ -39,7 +41,7 @@ const Preview: React.FC = () => {
   };
   
   // Get background based on template
-  const getBackground = (template: TemplateType, theme: 'light' | 'dark') => {
+  const getBackground = (template: string) => {
     switch (template) {
       case 'gradient':
         return 'bg-gradient-to-br from-blue-400 to-purple-500';
@@ -49,21 +51,19 @@ const Preview: React.FC = () => {
       case 'rounded':
       case 'default':
       default:
-        return theme === 'dark' ? 'bg-gray-900' : 'bg-white';
+        return 'bg-white';
     }
   };
 
   // Get link styles based on template
-  const getLinkStyles = (template: TemplateType, theme: 'light' | 'dark') => {
+  const getLinkStyles = (template: string) => {
     const baseStyles = "block w-full p-4 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between";
     
     switch (template) {
       case 'minimal':
         return cn(
           baseStyles,
-          theme === 'dark' 
-            ? 'bg-transparent border border-gray-700 hover:border-gray-600 text-white' 
-            : 'bg-transparent border border-gray-300 hover:border-gray-400',
+          'bg-transparent border border-gray-300 hover:border-gray-400',
           'rounded-md'
         );
       case 'gradient':
@@ -81,25 +81,21 @@ const Preview: React.FC = () => {
       case 'rounded':
         return cn(
           baseStyles,
-          theme === 'dark' 
-            ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-            : 'bg-gray-100 hover:bg-gray-200',
+          'bg-gray-100 hover:bg-gray-200',
           'rounded-full'
         );
       case 'default':
       default:
         return cn(
           baseStyles,
-          theme === 'dark' 
-            ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-            : 'bg-gray-100 hover:bg-gray-200',
+          'bg-gray-100 hover:bg-gray-200',
           'rounded-xl'
         );
     }
   };
 
   // Profile image styles based on template
-  const getProfileStyles = (template: TemplateType) => {
+  const getProfileStyles = (template: string) => {
     const baseStyles = "mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold";
     
     switch (template) {
@@ -121,7 +117,7 @@ const Preview: React.FC = () => {
     <div 
       className={cn(
         "min-h-screen flex flex-col items-center",
-        getBackground(page.template, page.theme)
+        getBackground(page?.templateId)
       )}
     >
       <Button
@@ -130,7 +126,7 @@ const Preview: React.FC = () => {
         onClick={() => navigate('/dashboard')}
         className={cn(
           "absolute top-4 left-4 transition-all duration-200",
-          page.template === 'gradient' && "text-white hover:bg-white/10"
+          page.templateId === 'gradient' && "text-white hover:bg-white/10"
         )}
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -142,7 +138,7 @@ const Preview: React.FC = () => {
         <div className="mb-8 text-center">
           <div 
             className={cn(
-              getProfileStyles(page.template),
+              getProfileStyles(page.templateId),
               "animate-fade-in"
             )}
             style={{ 
@@ -153,13 +149,13 @@ const Preview: React.FC = () => {
           </div>
           <h1 className={cn(
             "text-2xl font-bold mb-1 animate-slide-up",
-            page.template === 'gradient' && "text-white"
+            page.templateId === 'gradient' && "text-white"
           )}>
             {page.title}
           </h1>
           <p className={cn(
             "text-sm opacity-70 animate-slide-up",
-            page.template === 'gradient' && "text-white/70"
+            page.templateId === 'gradient' && "text-white/70"
           )} 
             style={{ animationDelay: '0.1s' }}
           >
@@ -176,7 +172,7 @@ const Preview: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                getLinkStyles(page.template, page.theme),
+                getLinkStyles(page.templateId),
                 "animate-slide-up"
               )}
               style={{ 
@@ -185,7 +181,7 @@ const Preview: React.FC = () => {
               }}
             >
               <span className="font-medium">{link.title}</span>
-              {page.template === 'rounded' ? (
+              {page.templateId === 'rounded' ? (
                 <ExternalLink className="h-4 w-4 opacity-60" />
               ) : (
                 <ExternalLink className="h-4 w-4 opacity-60" />
@@ -196,7 +192,7 @@ const Preview: React.FC = () => {
           {page.links.filter(link => link.active).length === 0 && (
             <div className={cn(
               "text-center py-12 animate-fade-in",
-              page.template === 'gradient' ? "text-white/70" : "opacity-70"
+              page.templateId === 'gradient' ? "text-white/70" : "opacity-70"
             )}>
               <p>No active links to display</p>
               <Button
@@ -205,7 +201,7 @@ const Preview: React.FC = () => {
                 onClick={() => navigate('/dashboard')}
                 className={cn(
                   "mt-4",
-                  page.template === 'gradient' && "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  page.templateId === 'gradient' && "bg-white/10 hover:bg-white/20 text-white border-white/20"
                 )}
               >
                 <ArrowRight className="h-4 w-4 mr-2" />
@@ -218,7 +214,7 @@ const Preview: React.FC = () => {
         {/* Footer */}
         <div className={cn(
           "mt-12 pt-6 border-t w-full text-center text-xs animate-fade-in",
-          page.template === 'gradient' ? "border-white/10 text-white/60" : "opacity-60"
+          page.templateId === 'gradient' ? "border-white/10 text-white/60" : "opacity-60"
         )} style={{ animationDelay: '0.5s' }}>
           <p>Made with LinkTree Clone</p>
         </div>

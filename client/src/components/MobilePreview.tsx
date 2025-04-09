@@ -4,10 +4,11 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
+import { templateConfigs } from "./TemplateSelector";
 
 // Sample template config
 const sampleTemplate = {
-  _id: "sample-template",
+  id: "gothic",
   backgroundImage: "/template-bg/bg-07.png",
   className: "bg-gradient-to-r from-pink-500 via-red-500 to-orange-500",
   textClass: "text-white",
@@ -16,10 +17,10 @@ const sampleTemplate = {
   titleClass: "text-white font-semibold",
 };
 
-interface MobilePreviewProps {
+export interface MobilePreviewProps {
   page: Page;
   templateConfig?: {
-    _id: string;
+    id: string;
     className: string;
     textClass: string;
     profileClass: string;
@@ -29,35 +30,30 @@ interface MobilePreviewProps {
   };
 }
 
+
+
 const MobilePreview: React.FC<MobilePreviewProps> = ({
   page,
-  templateConfig,
+  // templateConfig,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [previewHeight, setPreviewHeight] = useState("100%");
   const { user } = useAuth();
+  
+  console.log(page, "page in mobile preview");
+  
+  const templateConfig = templateConfigs.find(
+    (template) => template.id === page.templateId
+  );
 
-  useEffect(() => {
-    const adjustHeight = () => {
-      if (contentRef.current) {
-        const minHeight = 500;
-        setPreviewHeight(
-          `${Math.max(contentRef.current.scrollHeight, minHeight)}px`
-        );
-      }
-    };
-
-    adjustHeight();
-    window.addEventListener("resize", adjustHeight);
-    return () => window.removeEventListener("resize", adjustHeight);
-  }, [page]);
+  console.log(templateConfig, "templateConfig in mobile preview");
+  
 
   const normalizeUrl = (url: string) =>
     url.startsWith("http://") || url.startsWith("https://")
       ? url
       : `https://${url}`;
 
-  templateConfig = templateConfig || sampleTemplate; // use sample for now
+  // templateConfig = templateConfig || sampleTemplate; // use sample for now
 
   return (
     <div className="relative w-full max-w-[293px] mx-auto">
@@ -100,9 +96,9 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
                 templateConfig.profileClass
               )}
             >
-              {page.image ? (
+              {page.imageUrl ? (
                 <img
-                  src={page?.image}
+                  src={page?.imageUrl}
                   alt="Profile"
                   className="w-full h-full rounded-full object-cover"
                 />
@@ -140,7 +136,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
                   }}
                 >
                   <span className="font-normal">{link.title}</span>
-                  {page.template === "rounded" ? (
+                  {page.templateId === "rounded" ? (
                     <ExternalLink className="h-4 w-4 opacity-60" />
                   ) : (
                     <ArrowUpRight className="h-4 w-4 opacity-60" />

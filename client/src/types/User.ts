@@ -25,7 +25,7 @@ export type BranchItem = {
   index: number;
   url: string;
   style: string;
-  status: string;
+  active: boolean;
   description: string;
   imageUrl: string;
   createdAt: Date;
@@ -42,4 +42,6 @@ export type Branch = {
     items: BranchItem[];
     createdAt: Date;
     updatedAt: Date;
+    templateId: string;
+    imageUrl: string;
   };

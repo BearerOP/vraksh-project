@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface Link {
@@ -14,16 +13,16 @@ export interface Page {
   id: string;
   title: string;
   links: Link[];
-  theme: 'light' | 'dark';
   accentColor: string;
-  template: TemplateType;
-  image: string;
+  imageUrl: string;
+  templateId?: string; // Optional, for future use
 }
 
 interface LinkContextType {
   pages: Page[];
   activePage: Page | null;
   setActivePage: (page: Page) => void;
+  setPages: (pages: Page[]) => void;
   addPage: (title: string) => void;
   updatePage: (pageId: string, updates: Partial<Omit<Page, 'id'>>) => void;
   deletePage: (pageId: string) => void;
@@ -35,28 +34,14 @@ interface LinkContextType {
 
 const LinkContext = createContext<LinkContextType | undefined>(undefined);
 
-// Sample initial data
-const initialPages: Page[] = [
-  {
-    id: '1',
-    title: 'My Personal Links',
-    links: [
-      { id: '1', title: 'Portfolio', url: 'https://example.com/portfolio', active: true },
-      { id: '2', title: 'LinkedIn', url: 'https://linkedin.com', active: true },
-      { id: '3', title: 'Twitter', url: 'https://twitter.com', active: true },
-    ],
-    theme: 'light',
-    accentColor: '#0ea5e9',
-    template: 'default',
-    image: 'https://images.unsplash.com/photo-1630480003494-4b3b3b3b3b3b',
-  },
-];
-
 export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initialize state from localStorage or use default data
   const [pages, setPages] = useState<Page[]>(() => {
-    const savedPages = localStorage.getItem('pages');
-    return savedPages ? JSON.parse(savedPages) : initialPages;
+    if (typeof window !== 'undefined') {
+      const savedPages = localStorage.getItem('pages');
+      return savedPages ? JSON.parse(savedPages) : [];
+    }
+    return [];
   });
   
   const [activePage, setActivePage] = useState<Page | null>(null);
@@ -70,7 +55,9 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Save to localStorage whenever pages change
   useEffect(() => {
-    localStorage.setItem('pages', JSON.stringify(pages));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pages', JSON.stringify(pages));
+    }
   }, [pages]);
 
   // Add a new page
@@ -79,10 +66,9 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: Date.now().toString(),
       title,
       links: [],
-      theme: 'light',
       accentColor: '#0ea5e9',
-      template: 'default',
-      image: '',
+      templateId: 'default',
+      imageUrl: '',
     };
     
     setPages([...pages, newPage]);
@@ -147,6 +133,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateLink = (pageId: string, linkId: string, updates: Partial<Omit<Link, 'id'>>) => {
     const updatedPages = pages.map(page => {
       if (page.id === pageId) {
+        console.log(page.links, "page links");
         return {
           ...page,
           links: page.links.map(link => 

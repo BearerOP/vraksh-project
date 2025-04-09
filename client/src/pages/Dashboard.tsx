@@ -19,14 +19,22 @@ import {
   LayoutGridIcon,
   LucideLayoutDashboard,
 } from "lucide-react";
-import { Link, replace, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getBranches, getMe } from "@/lib/apis";
 import { useAuth } from "@/hooks/use-auth";
-import { User } from "@/types/User";
+import { Branch, BranchItem, User } from "@/types/User";
 
 const Dashboard: React.FC = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
-  const { pages, activePage, setActivePage, addPage, updatePage, deletePage } = useLinks();
+  const {
+    pages,
+    activePage,
+    setActivePage,
+    addPage,
+    updatePage,
+    deletePage,
+    setPages,
+  } = useLinks();
 
   const [pageTitle, setPageTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -76,21 +84,44 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         setIsAuthenticated(false);
         setUser(null);
-        window.location.href = import.meta.env.VITE_VRAKSH_URL+'/auth/login';
+        window.location.href = import.meta.env.VITE_VRAKSH_URL + "/auth/login";
       }
     }
     fetchUserData();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     async function fetchUserBranches() {
-      const response =  await getBranches();
-      if (response.status==200) {
-        // setPages(response.data)
+      const response = await getBranches();
+      if (response.status === 200) {
+        const data = response.data as { branches: Branch[] };
+        const branches = data.branches;
+        console.log("branches", branches);
+
+        const mappedPages = branches.map((branch: Branch) => ({
+          id: branch._id,
+          title: branch.name,
+          links:
+            branch.items?.map((item: BranchItem) => ({
+              id: item._id,
+              title: item.title,
+              url: item.url,
+              active: item.active,
+            })) || [],
+          accentColor: "#0ea5e9", // default or from branch if available
+          templateId: branch.templateId, // default or from branch if available
+          imageUrl: "", // default or from branch if available
+        }));
+
+        setPages(mappedPages);
+        if (mappedPages.length > 0) {
+          setActivePage(mappedPages[0]);
+        }
       }
-      
     }
-  })
+
+    fetchUserBranches();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">

@@ -10,7 +10,6 @@ import {
   Trash2,
   X,
   Check,
-  Link as LinkIcon,
   ExternalLink,
   GripVertical,
 } from "lucide-react";
@@ -20,6 +19,7 @@ interface LinkCardProps {
   link: LinkType;
   pageId: string;
   isDragging?: boolean;
+  active?: boolean;
 }
 
 const LinkCard: React.FC<LinkCardProps> = ({
@@ -28,8 +28,8 @@ const LinkCard: React.FC<LinkCardProps> = ({
   isDragging = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(link.title);
-  const [url, setUrl] = useState(link.url);
+  const [title, setTitle] = useState(link.title || "");
+  const [url, setUrl] = useState(link.url || "");
   const { updateLink, deleteLink } = useLinks();
 
   const handleSave = () => {
@@ -40,12 +40,14 @@ const LinkCard: React.FC<LinkCardProps> = ({
   };
 
   const handleCancel = () => {
-    setTitle(link.title);
-    setUrl(link.url);
+    setTitle(link.title || "");
+    setUrl(link.url || "");
     setIsEditing(false);
   };
 
   const handleToggleActive = () => {
+    console.log(link,"link----------");
+    
     updateLink(pageId, link.id, { active: !link.active });
   };
 
@@ -53,8 +55,10 @@ const LinkCard: React.FC<LinkCardProps> = ({
     deleteLink(pageId, link.id);
   };
 
-  // Ensure URL has protocol
-  const normalizeUrl = (url: string) => {
+  // Ensure URL has protocol and handle undefined/null values
+  const normalizeUrl = (url: string | undefined | null): string => {
+    if (!url) return "#"; // Return a fallback for empty URLs
+
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       return `https://${url}`;
     }
@@ -122,14 +126,18 @@ const LinkCard: React.FC<LinkCardProps> = ({
               <GripVertical className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-medium line-clamp-1">{link.title}</h3>
+              <h3 className="font-medium line-clamp-1">
+                {link.title || "Untitled"}
+              </h3>
               <a
                 href={normalizeUrl(link.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-blue-500 transition-colors flex items-center gap-1"
               >
-                <span className="truncate max-w-[180px]">{link.url}</span>
+                <span className="truncate max-w-[180px]">
+                  {link.url || "No URL"}
+                </span>
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>
@@ -145,7 +153,8 @@ const LinkCard: React.FC<LinkCardProps> = ({
             </Button>
 
             <Switch
-              onClick={() => handleToggleActive()}
+              checked={!!link.active}
+              onCheckedChange={handleToggleActive}
               className="scale-75 shadow-md"
             />
             <Button
