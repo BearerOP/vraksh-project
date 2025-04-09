@@ -16,6 +16,7 @@ const getBranches = async (req, res) => {
       "createdAt",
       "style",
       "active",
+      "templateId"
     ]);
     res.status(200).json({
       success: true,

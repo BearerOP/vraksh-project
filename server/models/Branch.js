@@ -13,7 +13,7 @@ const SocialIcon = {
     type: String,
     required: [true, "Please add a social icon"],
   },
-}
+};
 
 const BranchSchema = new mongoose.Schema({
   userId: {
@@ -29,7 +29,7 @@ const BranchSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add a branch description"],
   },
-  socialIcons:{
+  socialIcons: {
     type: Array,
     default: [SocialIcon],
   },
@@ -39,6 +39,10 @@ const BranchSchema = new mongoose.Schema({
       ref: "BranchItem",
     },
   ],
+  templateId: {
+    type: String,
+    default: "default",
+  },
   createdAt: {
     type: Date,
     default: Date.now,
