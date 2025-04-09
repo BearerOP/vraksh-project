@@ -11,13 +11,13 @@ import {
   ChevronDown,
   PlusCircle,
   Settings,
-  Trash2,
   Palette,
   Share2,
   Eye,
   Paintbrush,
   LayoutGridIcon,
   LucideLayoutDashboard,
+  Ellipsis,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBranches, getMe } from "@/lib/apis";
@@ -25,6 +25,19 @@ import { useAuth } from "@/hooks/use-auth";
 import { Branch, BranchItem, User } from "@/types/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Snapchat } from "@/components/create-branch/steps/social-icons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  MailIcon,
+  SnapchatIcon,
+  TiKTokIcon,
+  WhatsappIcon,
+  XIcon,
+  YouTubeIcon,
+} from "@/components/ui/social-icons";
 
 const Dashboard: React.FC = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
@@ -65,15 +78,27 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleCopyLink = (url) => {
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success('Vraksh Url copied!', {
-        description: `Copied: ${url}`,
+  const handleChangeDescription = (description: string) => {
+    if (activePage) {
+      toast.success("Page description updated!", {
+        description: `Updated: ${description}`,
         duration: 3000,
       });
-    }).catch(() => {
-      toast.error('Failed to copy link.');
-    });
+      updatePage(activePage.id, { description });
+    }
+  };
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success("Vraksh Url copied!", {
+          description: `Copied: ${url}`,
+          duration: 3000,
+        });
+      })
+      .catch(() => {
+        toast.error("Failed to copy link.");
+      });
   };
 
   useEffect(() => {
@@ -124,6 +149,11 @@ const Dashboard: React.FC = () => {
           accentColor: "#0ea5e9", // default or from branch if available
           templateId: branch.templateId, // default or from branch if available
           imageUrl: "", // default or from branch if available
+          createdAt: branch.createdAt,
+          updatedAt: branch.updatedAt,
+          userId: branch.userId,
+          description: branch.description,
+          socialLinks: branch.socialIcons,
         }));
 
         setPages(mappedPages);
@@ -270,36 +300,140 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="flex-col flex xl:flex-row animate-fade-in justify-between gap-6 xl:gap-0 min-h-[800px]]">
                 <div className="space-y-4 shrink w-full xl:px-10 border-r min-h-screen">
-                  <Card className=" mt-4 mb-4 rounded-3xl flex items-center justify-between" >
+                  <Card className=" mt-4 mb-4 border-none shadow-lg rounded-3xl flex items-center justify-between bg-emerald-100">
                     <CardHeader className="">
                       <CardTitle className="text-sm font-medium">
                         Your Vraksh is live:{" "}
-                        <Link className="underline text-muted-foreground" to={`/${activePage.title}`}>
-                        {import.meta.env.VITE_VRAKSH_DOMAIN}/{activePage.title}</Link>
+                        <Link
+                          className="underline text-muted-foreground"
+                          to={`/${activePage.title}`}
+                        >
+                          {import.meta.env.VITE_VRAKSH_DOMAIN}/
+                          {activePage.title}
+                        </Link>
                       </CardTitle>
-                      
                     </CardHeader>
-                      <CardContent className="flex items-center justify-center pt-6">
-                        <Button onClick={()=>{
-                          handleCopyLink(`${import.meta.env.VITE_VRAKSH_APP_URL}/${activePage.title}`);}}
-                          variant="outline" size="lg" className="rounded-2xl text-base">
-                          Claim your Vraksh URL
+                    <CardContent className="flex items-center justify-center pt-6">
+                      <Button
+                        onClick={() => {
+                          handleCopyLink(
+                            `${import.meta.env.VITE_VRAKSH_APP_URL}/${
+                              activePage.title
+                            }`
+                          );
+                        }}
+                        variant="outline"
+                        size="lg"
+                        className="rounded-2xl text-base hover:bg-emerald-50 transition-all duration-300"
+                      >
+                        Claim your Vraksh URL
+                      </Button>
+                    </CardContent>
+                  </Card>
+                  <div className="flex items-center justify-between p-6 px-10">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="border border-muted-foreground/20 size-14">
+                        <AvatarImage src={activePage?.imageUrl} />
+                        <AvatarFallback>
+                          {(activePage?.title?.[0] || "") +
+                            (activePage?.title?.[1] || "")}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex flex-col gap-1 items-start">
+                        <Button
+                          variant="link"
+                          className="text-black underline p-0 h-auto"
+                        >
+                          @{activePage?.title || "username"}
                         </Button>
-                      </CardContent>
-                    </Card>
-                  <div className="flex items-center justify-between py-6">
-                    <h2 className="text-lg font-medium">{activePage.title}</h2>
+
+                        <Button
+                          variant="link"
+                          className="text-muted-foreground hover:underline-offset-1 p-0 h-auto"
+                        >
+                          {activePage?.description || "Add description"}
+                        </Button>
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="instagram"
+                          >
+                            <InstagramIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="snapchat"
+                          >
+                            <SnapchatIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="twitter"
+                          >
+                            <XIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="tiktok"
+                          >
+                            <TiKTokIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="facebook"
+                          >
+                            <FacebookIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="whatsapp"
+                          >
+                            <WhatsappIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="youtube"
+                          >
+                            <YouTubeIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="linkedin"
+                          >
+                            <LinkedinIcon />
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-muted-foreground p-0 h-auto"
+                            aria-label="mail"
+                          >
+                            <MailIcon />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground"
+                      size="icon"
+                      className="text-muted-foreground rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200"
+                      onClick={() => {}}
                     >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
+                      <Ellipsis />
                     </Button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 px-6">
                     {activePage.links.length > 0 ? (
                       <LinksList
                         pageId={activePage.id}

@@ -16,6 +16,7 @@ export interface Page {
   accentColor: string;
   imageUrl: string;
   templateId?: string; // Optional, for future use
+  description?: string; // Optional, for future use
 }
 
 interface LinkContextType {
