@@ -41,10 +41,9 @@ const BranchItemSchema = new mongoose.Schema({
     default: "classic",
     enum: ["classic", "featured"],
   },
-  status: {
-    type: String,
-    default: "active",
-    enum: ["active", "inactive"],
+  active: {
+    type: Boolean,
+    default: true,
   },
 });
 

@@ -5,14 +5,21 @@ const BranchItem = require("../models/BranchItem");
 const getBranches = async (req, res) => {
   try {
     const userId = req.user._id;
-    const branches = await Branch.find({ userId }).populate({
-      path: "userId",
-      select: "username imageUrl description",
-      model: User,
-    });
+    const branches = await Branch.find({ userId }).populate("items", [
+      "_id",
+      "branchId",
+      "title",
+      "index",
+      "url",
+      "description",
+      "imageUrl",
+      "createdAt",
+      "style",
+      "active",
+    ]);
     res.status(200).json({
       success: true,
-      data: branches,
+      branches,
     });
   } catch (error) {
     res.status(500).json({
