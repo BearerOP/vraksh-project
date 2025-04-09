@@ -281,7 +281,7 @@ const Dashboard: React.FC = () => {
                     </CardHeader>
                       <CardContent className="flex items-center justify-center pt-6">
                         <Button onClick={()=>{
-                          handleCopyLink(`${import.meta.env.VITE_VRAKSH_DOMAIN}/${activePage.title}`);}}
+                          handleCopyLink(`${import.meta.env.VITE_VRAKSH_APP_URL}/${activePage.title}`);}}
                           variant="outline" size="lg" className="rounded-2xl text-base">
                           Claim your Vraksh URL
                         </Button>
