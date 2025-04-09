@@ -1,13 +1,20 @@
-
-import React, { useState } from 'react';
-import { useLinks } from '@/context/LinkContext';
-import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Link as LinkType } from '@/context/LinkContext';
-import { Edit, Trash2, X, Check, Link as LinkIcon, ExternalLink, GripVertical } from 'lucide-react';
-import { Switch } from './ui/switch';
+import React, { useState } from "react";
+import { useLinks } from "@/context/LinkContext";
+import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Link as LinkType } from "@/context/LinkContext";
+import {
+  Edit,
+  Trash2,
+  X,
+  Check,
+  Link as LinkIcon,
+  ExternalLink,
+  GripVertical,
+} from "lucide-react";
+import { Switch } from "./ui/switch";
 
 interface LinkCardProps {
   link: LinkType;
@@ -15,7 +22,11 @@ interface LinkCardProps {
   isDragging?: boolean;
 }
 
-const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false }) => {
+const LinkCard: React.FC<LinkCardProps> = ({
+  link,
+  pageId,
+  isDragging = false,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(link.title);
   const [url, setUrl] = useState(link.url);
@@ -44,20 +55,22 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false })
 
   // Ensure URL has protocol
   const normalizeUrl = (url: string) => {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
       return `https://${url}`;
     }
     return url;
   };
 
   return (
-    <Card className={cn(
-      "overflow-hidden relative transition-all duration-300 group",
-      "border border-border hover:shadow-md",
-      "transform hover:-translate-y-1",
-      !link.active && "opacity-60",
-      isDragging && "shadow-lg"
-    )}>
+    <Card
+      className={cn(
+        "overflow-hidden relative transition-all duration-300 group",
+        "border border-border hover:shadow-md",
+        "transform hover:-translate-y-1",
+        !link.active && "opacity-60",
+        isDragging && "shadow-lg"
+      )}
+    >
       {isEditing ? (
         <div className="p-4 space-y-3">
           <div className="space-y-2">
@@ -110,9 +123,9 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false })
             </div>
             <div>
               <h3 className="font-medium line-clamp-1">{link.title}</h3>
-              <a 
-                href={normalizeUrl(link.url)} 
-                target="_blank" 
+              <a
+                href={normalizeUrl(link.url)}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-blue-500 transition-colors flex items-center gap-1"
               >
@@ -121,7 +134,7 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false })
               </a>
             </div>
           </div>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-center items-center">
             <Button
               size="icon"
               variant="ghost"
@@ -130,13 +143,11 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, pageId, isDragging = false })
             >
               <Edit className="h-4 w-4" />
             </Button>
-            <Button
-              size="icon"
-              className='bg-none'
-              onClick={handleToggleActive}
-            >
-              <Switch  className="scale-50" />
-            </Button>
+
+            <Switch
+              onClick={() => handleToggleActive()}
+              className="scale-75 shadow-md"
+            />
             <Button
               size="icon"
               variant="ghost"

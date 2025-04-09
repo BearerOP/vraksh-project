@@ -1,16 +1,46 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Page, Link as LinkType, TemplateType } from "@/context/LinkContext";
+import { Page, Link as LinkType } from "@/context/LinkContext";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
-import { templateConfigs } from "./TemplateSelector";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
+import { title } from "process";
+
+// Sample template config
+const sampleTemplate = {
+  _id: "sample-template",
+  // className: "bg-gradient-to-b from-[#ffecd2] to-[#fcb69f]",
+  // titleClass: "text-[#fff]",
+  // textClass: "text-[#2e2e2e]",
+  // profileClass: "bg-white text-[#2e2e2e]",
+  // linkClass: "bg-[#fffbb9] text-[#2e2e2e] hover:bg-[#ffe5b4] rounded-xl",
+  backgroundImage: "/template-bg/bg-07.png",
+  className: 'bg-gradient-to-r from-pink-500 via-red-500 to-orange-500', 
+  textClass: 'text-white',
+  linkClass: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg',
+  profileClass: 'bg-white/30 border border-white/40 text-white',
+  titleClass: 'text-white font-semibold',
+  
+};
+
 
 interface MobilePreviewProps {
   page: Page;
+  templateConfig?: {
+    _id: string;
+    className: string;
+    textClass: string;
+    profileClass: string;
+    linkClass: string;
+    backgroundImage?: string;
+    titleClass: string;
+  };
 }
 
-const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
+const MobilePreview: React.FC<MobilePreviewProps> = ({
+  page,
+  templateConfig,
+}) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [previewHeight, setPreviewHeight] = useState("100%");
   const { user } = useAuth();
@@ -35,9 +65,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
       ? url
       : `https://${url}`;
 
-  const currentTemplate = templateConfigs.find((t) => t.id === page.template);
-  const templateConfig =
-    currentTemplate || templateConfigs.find((t) => t.id === "default")!;
+  templateConfig = templateConfig || sampleTemplate; // use sample for now
 
   return (
     <div className="relative w-full max-w-[293px] mx-auto">
@@ -51,14 +79,22 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
           "absolute inset-0 border-[8px] rounded-[50px] shadow-2xl z-10 pointer-events-none border-[#ebebeb]"
         )}
       ></div>
-
       {/* Mobile Preview Content */}
       <div
         className={cn(
           "relative z-0 overflow-hidden rounded-[51px] transition-colors duration-300",
           templateConfig.className
         )}
-        style={{ height: "500px" }} // Fixed height to ensure scrolling works properly
+        style={{
+          height: previewHeight,
+          backgroundImage: templateConfig.backgroundImage
+            ? `url(${templateConfig.backgroundImage})`
+            : undefined,
+          backgroundSize: templateConfig.backgroundImage ? "cover" : undefined,
+          backgroundPosition: templateConfig.backgroundImage
+            ? "center"
+            : undefined,
+        }}
       >
         <div
           ref={contentRef}
@@ -67,11 +103,10 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
           {/* Profile Section */}
           <div className="mb-8 text-center">
             <div
-              className={`
-              mx-auto mb-4 flex items-center justify-center text-2xl font-bold 
-              size-16 rounded-full bg-blue-500
-              ${templateConfig.profileClass || ""}
-            `}
+              className={cn(
+                "mx-auto mb-4 flex items-center justify-center text-2xl font-bold size-16 rounded-full",
+                templateConfig.profileClass
+              )}
             >
               {page.image ? (
                 <img
@@ -83,10 +118,12 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                 page.title.charAt(0)
               )}
             </div>
-            <h1 className={`text-sm font-bold ${templateConfig.textClass}`}>
+            <h1 className={cn("text-sm font-bold", templateConfig.titleClass)}>
               {page.title}
             </h1>
-            <p className="text-xs opacity-70">@{user?.username}</p>
+            <p className="text-xs opacity-70">
+              @{user?.username || "username"}
+            </p>
           </div>
 
           {/* Links Section */}
@@ -99,14 +136,11 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                   href={normalizeUrl(link.url)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`
-                     w-full p-3 transition-all duration-300 transform hover:scale-[1.02] 
-                    active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center
-                    ${
-                      templateConfig.linkClass ||
-                      "bg-gray-100 hover:bg-gray-200 rounded-xl"
-                    }
-                  `}
+                  className={cn(
+                    `w-full p-3 transition-all duration-300 transform hover:scale-[1.02] 
+                    active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center`,
+                    templateConfig.linkClass
+                  )}
                   style={{
                     animationDelay: `${(index * 0.1).toFixed(1)}s`,
                     boxShadow:
@@ -122,15 +156,15 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                 </a>
               ))}
           </div>
+
           {/* Footer */}
-          <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-md">
+          <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t-[1.25] w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-md">
             <Link to="/" className="text-xs text-white">
-            <img src="/icon.svg" alt="icon" className="h-4 w-4 shadow-md" />
+              <img src="/icon.svg" alt="icon" className="h-4 w-4 shadow-md" />
             </Link>
             <p className="font-bold text-white">VRAKSH</p>
           </div>
         </div>
-        
       </div>
     </div>
   );
