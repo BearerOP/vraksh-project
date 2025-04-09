@@ -23,6 +23,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { getBranches, getMe } from "@/lib/apis";
 import { useAuth } from "@/hooks/use-auth";
 import { Branch, BranchItem, User } from "@/types/User";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 const Dashboard: React.FC = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
@@ -61,6 +63,17 @@ const Dashboard: React.FC = () => {
     if (activePage) {
       deletePage(activePage.id);
     }
+  };
+
+  const handleCopyLink = (url) => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Vraksh Url copied!', {
+        description: `Copied: ${url}`,
+        duration: 3000,
+      });
+    }).catch(() => {
+      toast.error('Failed to copy link.');
+    });
   };
 
   useEffect(() => {
@@ -129,7 +142,7 @@ const Dashboard: React.FC = () => {
 
       <main className="flex-1 min-w-full mx-auto flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#ededeb] py-4 sticky h-screen top-0 border-r flex flex-col">
+        <aside className="w-56 bg-[#ededeb] py-4 sticky h-screen top-0 border-r flex flex-col">
           <div className="relative px-4">
             {/* Dropdown Button */}
             <button
@@ -257,6 +270,23 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="flex-col flex xl:flex-row animate-fade-in justify-between gap-6 xl:gap-0 min-h-[800px]]">
                 <div className="space-y-4 shrink w-full xl:px-10 border-r min-h-screen">
+                  <Card className=" mt-4 mb-4 rounded-3xl flex items-center justify-between" >
+                    <CardHeader className="">
+                      <CardTitle className="text-sm font-medium">
+                        Your Vraksh is live:{" "}
+                        <Link className="underline text-muted-foreground" to={`/${activePage.title}`}>
+                        {import.meta.env.VITE_VRAKSH_DOMAIN}/{activePage.title}</Link>
+                      </CardTitle>
+                      
+                    </CardHeader>
+                      <CardContent className="flex items-center justify-center pt-6">
+                        <Button onClick={()=>{
+                          handleCopyLink(`${import.meta.env.VITE_VRAKSH_DOMAIN}/${activePage.title}`);}}
+                          variant="outline" size="lg" className="rounded-2xl text-base">
+                          Claim your Vraksh URL
+                        </Button>
+                      </CardContent>
+                    </Card>
                   <div className="flex items-center justify-between py-6">
                     <h2 className="text-lg font-medium">{activePage.title}</h2>
                     <Button
