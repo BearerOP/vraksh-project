@@ -44,65 +44,6 @@ interface TemplateStepProps {
 
 const templates = templateConfigs;
 
-// const templates = [
-//   {
-//     id: "template1",
-//     name: "Emmy Chen",
-//     description: "Pet sitter & dog walker",
-//     color: "bg-[#f8d0c9]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template2",
-//     name: "Lexie Candis",
-//     description: "Pastel artist from Melbourne",
-//     color: "bg-[#e8edf1]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template3",
-//     name: "Holly Clyde",
-//     description: "✧ Healers never went out of style ✧",
-//     color: "bg-[#8b5a3c]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template4",
-//     name: "Newlove Store",
-//     description: "Vintage fashion store",
-//     color: "bg-[#fff2cc]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template5",
-//     name: "Tranquil",
-//     description: "Wellness in the desert",
-//     color: "bg-[#d2c0a0]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template6",
-//     name: "Tea it Up",
-//     description: "Bubble tea for all",
-//     color: "bg-[#e6d7f2]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template7",
-//     name: "Tatiana Reine",
-//     description: "Indie pop and indoor plants",
-//     color: "bg-[#c5d5db]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-//   {
-//     id: "template8",
-//     name: "Saika Ruslan",
-//     description: "Reading my way through Brooklyn",
-//     color: "bg-[#f5f5f5]",
-//     image: "/placeholder.svg?height=80&width=80",
-//   },
-// ]
-
 export default function TemplateStep({ form }: TemplateStepProps) {
   return (
     <div className="space-y-6">
@@ -120,7 +61,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
               <RadioGroup
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                className="grid grid-cols-2 md:grid-cols-3 gap-6"
               >
                 {templates.map((template) => (
                   <FormItem key={template.id}>
@@ -133,24 +74,29 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                     </FormControl>
                     <FormLabel htmlFor={template.id} className="cursor-pointer">
                       <Card
-                        className={`overflow-hidden border-2 transition-all ${
-                          field.value === template.id
-                            ? "border-primary"
-                            : "border-transparent hover:border-muted"
-                        }`}
+                        className={` 
+                          ${template.className}
+                          aspect-[261/441]
+                          border-8 overflow-hidden  transition-all duration-300 ease-in-out rounded-[36px] shadow-[0_6px_16px_rgba(0,0,0,0.08),_0_4px_6px_rgba(0,0,0,0.06)] 
+                            ${
+                              field.value === template.id
+                                ? "shadow-[0px_10px_20px_10px_#868686] scale-105 border-blue-200"
+                                : "hover:shadow-[0px_10px_15px_10px_rgba(0,0,0,0.2)]"
+                            }
+                            `}
                       >
                         <CardContent className={`p-0`}>
                           <div
-                            className={`${template.className} p-6 flex flex-col items-center text-center h-[300px]`}
+                            className={`${template.className}  p-6 flex flex-col items-center text-center h-screen`}
                             style={{
                               backgroundImage: `url(${template.backgroundImage})`,
                               backgroundSize: "cover",
                               backgroundPosition: "center",
                             }}
                           >
-                            <div className="relative w-16 h-16 rounded-full overflow-hidden mb-3">
+                            <div className="relative size-8  md:size-16 rounded-full overflow-hidden mb-3">
                               <img
-                                src={"placeholder.svg"}
+                                src={"placeholder-profile.jpg"}
                                 alt={template.name}
                                 className="object-cover"
                               />
