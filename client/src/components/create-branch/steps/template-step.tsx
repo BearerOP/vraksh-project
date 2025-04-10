@@ -46,7 +46,7 @@ const templates = templateConfigs;
 
 export default function TemplateStep({ form }: TemplateStepProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col items-center md:items-start">
       <div>
         <h2 className="text-2xl font-bold">Choose a template</h2>
         <p className="text-muted-foreground">Select a style for your branch.</p>
@@ -56,12 +56,12 @@ export default function TemplateStep({ form }: TemplateStepProps) {
         control={form.control}
         name="template"
         render={({ field }) => (
-          <FormItem className="space-y-3">
+          <FormItem className="space-y-3 mx-auto w-full">
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                className="grid grid-cols-2 md:grid-cols-3 gap-6"
+                className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 gap-y-12 "
               >
                 {templates.map((template) => (
                   <FormItem key={template.id}>
@@ -77,7 +77,9 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                         className={` 
                           ${template.className}
                           aspect-[261/441]
-                          border-8 overflow-hidden  transition-all duration-300 ease-in-out rounded-[36px] shadow-[0_6px_16px_rgba(0,0,0,0.08),_0_4px_6px_rgba(0,0,0,0.06)] 
+                          border-[10px] overflow-hidden  transition-all duration-300 ease-in-out rounded-[36px] shadow-[0_6px_16px_rgba(0,0,0,0.08),_0_4px_6px_rgba(0,0,0,0.06)] 
+                          max-h-[425px]
+                          mx-auto
                             ${
                               field.value === template.id
                                 ? "shadow-[0px_10px_20px_10px_#868686] scale-105 border-blue-200"
@@ -94,7 +96,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                               backgroundPosition: "center",
                             }}
                           >
-                            <div className="relative size-8  md:size-16 rounded-full overflow-hidden mb-3">
+                            <div className="relative size-8  md:size-16 rounded-full overflow-hidden mb-1 md:mb-2">
                               <img
                                 src={
                                   "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Fplaceholder-profile.jpg?alt=media&token=6da1c298-4481-4596-bd7b-95c20b26fd31"
@@ -112,10 +114,16 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                             >
                               Your description{" "}
                             </p>
-                            <div className="flex space-x-2 mb-4">
-                              <InstagramIcon />
-                              <XIcon />
-                              <SnapchatIcon />
+                            <div className="flex space-x-2 mb-4 ">
+                            <div className="transform scale-75 sm:scale-90 md:scale-100">
+                                <InstagramIcon />
+                              </div>
+                              <div className="transform scale-75 sm:scale-90 md:scale-100">
+                                <XIcon />
+                              </div>
+                              <div className="transform scale-75 sm:scale-90 md:scale-100">
+                                <SnapchatIcon />
+                              </div>
                             </div>
                             <div
                               className={`${template.linkClass} py-2 px-4 w-full mb-2 text-xs text-center`}
