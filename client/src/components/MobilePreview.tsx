@@ -145,7 +145,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
           {/* Footer */}
           <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t-[1.25] w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-md">
             <Link to="/" className="text-xs text-white">
-              <img src="/icon.svg" alt="icon" className="h-4 w-4 shadow-md" />
+              <img src="https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Ficon.svg?alt=media&token=6ca793eb-5cb4-452f-aad8-be22a13f0d9b" loading="lazy" alt="icon" className="h-4 w-4 shadow-md" />
             </Link>
             <p className="font-bold text-white">VRAKSH</p>
           </div>

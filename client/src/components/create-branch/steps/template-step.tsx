@@ -96,9 +96,12 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                           >
                             <div className="relative size-8  md:size-16 rounded-full overflow-hidden mb-3">
                               <img
-                                src={"placeholder-profile.jpg"}
+                                src={
+                                  "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Fplaceholder-profile.jpg?alt=media&token=6da1c298-4481-4596-bd7b-95c20b26fd31"
+                                }
                                 alt={template.name}
                                 className="object-cover"
+                                loading="lazy"
                               />
                             </div>
                             <h3 className={`${template.titleClass}`}>
