@@ -30,23 +30,20 @@ export interface MobilePreviewProps {
   };
 }
 
-
-
 const MobilePreview: React.FC<MobilePreviewProps> = ({
   page,
   // templateConfig,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  
+
   console.log(page, "page in mobile preview");
-  
+
   const templateConfig = templateConfigs.find(
     (template) => template.id === page.templateId
   );
 
   console.log(templateConfig, "templateConfig in mobile preview");
-  
 
   const normalizeUrl = (url: string) =>
     url.startsWith("http://") || url.startsWith("https://")
