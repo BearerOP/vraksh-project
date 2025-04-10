@@ -96,7 +96,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                               backgroundPosition: "center",
                             }}
                           >
-                            <div className="relative size-8  md:size-16 rounded-full overflow-hidden mb-1 md:mb-2">
+                            <div className="relative size-16 rounded-full overflow-hidden mb-1 md:mb-2">
                               <img
                                 src={
                                   "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Fplaceholder-profile.jpg?alt=media&token=6da1c298-4481-4596-bd7b-95c20b26fd31"
