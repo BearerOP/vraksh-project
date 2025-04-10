@@ -81,6 +81,23 @@ const Dashboard: React.FC = () => {
   const [croppedBackgroundImage, setCroppedBackgroundImage] =
     useState<Blob | null>(null);
 
+    const fonts = [
+      "Inter",
+      "Roboto",
+      "Roboto Flex",
+      "Roboto Serif",
+      "Roboto Mono",
+      "Poppins",
+      "Open Sans",
+      "Lato",
+      "Playfair Display",
+      "Pacifico",
+      "Electrolize",
+      "Comic Neue",
+      "Bebas Neue",
+    ];
+    
+
   // Add these handler functions
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -1194,24 +1211,21 @@ const Dashboard: React.FC = () => {
                             Title Font
                           </label>
                           <select
-                            value={activePage?.titleFont || "Inter"}
-                            onChange={(e) =>
-                              updatePage(activePage.id, {
-                                titleFont: e.target.value,
-                              })
-                            }
-                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
-                          >
-                            <option value="Inter">Inter</option>
-                            <option value="Roboto">Roboto</option>
-                            <option value="Poppins">Poppins</option>
-                            <option value="Montserrat">Montserrat</option>
-                            <option value="Open Sans">Open Sans</option>
-                            <option value="Lato">Lato</option>
-                            <option value="Playfair Display">
-                              Playfair Display
-                            </option>
-                          </select>
+  value={activePage?.titleFont || "Inter"}
+  onChange={(e) =>
+    updatePage(activePage.id, {
+      titleFont: e.target.value,
+    })
+  }
+  className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+>
+  {fonts.map((font) => (
+    <option key={font} value={font}>
+      {font}
+    </option>
+  ))}
+</select>
+
                         </div>
 
                         {/* Description Font */}
@@ -1220,24 +1234,21 @@ const Dashboard: React.FC = () => {
                             Description Font
                           </label>
                           <select
-                            value={activePage?.descriptionFont || "Inter"}
-                            onChange={(e) =>
-                              updatePage(activePage.id, {
-                                descriptionFont: e.target.value,
-                              })
-                            }
-                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
-                          >
-                            <option value="Inter">Inter</option>
-                            <option value="Roboto">Roboto</option>
-                            <option value="Poppins">Poppins</option>
-                            <option value="Montserrat">Montserrat</option>
-                            <option value="Open Sans">Open Sans</option>
-                            <option value="Lato">Lato</option>
-                            <option value="Playfair Display">
-                              Playfair Display
-                            </option>
-                          </select>
+  value={activePage?.descriptionFont || "Inter"}
+  onChange={(e) =>
+    updatePage(activePage.id, {
+      descriptionFont: e.target.value,
+    })
+  }
+  className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+>
+  {fonts.map((font) => (
+    <option key={font} value={font}>
+      {font}
+    </option>
+  ))}
+</select>
+
                         </div>
 
                         {/* Button Text Font */}
@@ -1246,24 +1257,21 @@ const Dashboard: React.FC = () => {
                             Button Text Font
                           </label>
                           <select
-                            value={activePage?.buttonTextFont || "Inter"}
-                            onChange={(e) =>
-                              updatePage(activePage.id, {
-                                buttonTextFont: e.target.value,
-                              })
-                            }
-                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
-                          >
-                            <option value="Inter">Inter</option>
-                            <option value="Roboto">Roboto</option>
-                            <option value="Poppins">Poppins</option>
-                            <option value="Montserrat">Montserrat</option>
-                            <option value="Open Sans">Open Sans</option>
-                            <option value="Lato">Lato</option>
-                            <option value="Playfair Display">
-                              Playfair Display
-                            </option>
-                          </select>
+  value={activePage?.buttonTextFont || "Inter"}
+  onChange={(e) =>
+    updatePage(activePage.id, {
+      buttonTextFont: e.target.value,
+    })
+  }
+  className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+>
+  {fonts.map((font) => (
+    <option key={font} value={font}>
+      {font}
+    </option>
+  ))}
+</select>
+
                         </div>
                       </div>
                     </div>
