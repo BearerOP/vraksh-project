@@ -32,7 +32,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-blue-500 text-white",
     titleClass: "text-gray-900 font-semibold",
     subtitleClass: "text-gray-600",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-01.png?alt=media&token=6f3347fb-9c16-4521-b761-8c8ceff84e5b",
+    backgroundImage: "/template-bg/bg-01.png",
   },
   {
     id: "minimal",

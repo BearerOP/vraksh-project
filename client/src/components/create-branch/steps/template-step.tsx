@@ -88,6 +88,8 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                             `}
                       >
                         <CardContent className={`p-0`}>
+                          {/* <img src="/template-bg/bg-01.png" alt="Template Background" /> */}
+                          {template.backgroundImage}
                           <div
                             className={`${template.className}  p-6 flex flex-col items-center text-center h-screen`}
                             style={{
