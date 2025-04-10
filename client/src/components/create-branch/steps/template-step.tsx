@@ -83,7 +83,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                             ${
                               field.value === template.id
                                 ? "shadow-[0px_10px_20px_10px_#868686] scale-105 border-blue-200"
-                                : "hover:shadow-[0px_10px_15px_10px_rgba(0,0,0,0.2)]"
+                                : "hover:shadow-[0px_10px_15px_10px_rgba(0,0,0,0.2)] hover:scale-[1.02]"
                             }
                             `}
                       >
