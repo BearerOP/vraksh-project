@@ -4,6 +4,7 @@ import { useLinks, Link } from '@/context/LinkContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
+import { templateConfigs } from '@/components/TemplateSelector';
 
 const Preview: React.FC = () => {
   const { pageId } = useParams<{ pageId: string }>();
@@ -17,11 +18,9 @@ const Preview: React.FC = () => {
   useEffect(() => {
     if (!page && pages.length > 0) {
       navigate('/dashboard');
-    }
-    console.log(page, "page");
-    console.log(pages, "pages");
-    
+    }    
   }, [page, pages, navigate]);
+  console.log(page.socialIcons)
   
   // If the page is still loading or not found, show a loading state
   if (!page) {
@@ -39,85 +38,24 @@ const Preview: React.FC = () => {
     }
     return url;
   };
-  
-  // Get background based on template
-  const getBackground = (template: string) => {
-    switch (template) {
-      case 'gradient':
-        return 'bg-gradient-to-br from-blue-400 to-purple-500';
-      case 'dark':
-        return 'bg-gray-900';
-      case 'minimal':
-      case 'rounded':
-      case 'default':
-      default:
-        return 'bg-white';
-    }
-  };
 
-  // Get link styles based on template
-  const getLinkStyles = (template: string) => {
-    const baseStyles = "block w-full p-4 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between";
-    
-    switch (template) {
-      case 'minimal':
-        return cn(
-          baseStyles,
-          'bg-transparent border border-gray-300 hover:border-gray-400',
-          'rounded-md'
-        );
-      case 'gradient':
-        return cn(
-          baseStyles,
-          'bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white',
-          'rounded-lg'
-        );
-      case 'dark':
-        return cn(
-          baseStyles,
-          'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700',
-          'rounded-lg'
-        );
-      case 'rounded':
-        return cn(
-          baseStyles,
-          'bg-gray-100 hover:bg-gray-200',
-          'rounded-full'
-        );
-      case 'default':
-      default:
-        return cn(
-          baseStyles,
-          'bg-gray-100 hover:bg-gray-200',
-          'rounded-xl'
-        );
-    }
-  };
+  const templateConfig = templateConfigs.find(
+    (template) => template.id === page.templateId
+  );
 
-  // Profile image styles based on template
-  const getProfileStyles = (template: string) => {
-    const baseStyles = "mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold";
-    
-    switch (template) {
-      case 'minimal':
-        return cn(baseStyles, 'w-20 h-20 rounded-md bg-gradient-to-br from-gray-700 to-gray-900');
-      case 'gradient':
-        return cn(baseStyles, 'w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border border-white/30');
-      case 'dark':
-        return cn(baseStyles, 'w-24 h-24 rounded-full bg-gray-800 border border-gray-700');
-      case 'rounded':
-        return cn(baseStyles, 'w-28 h-28 rounded-full bg-gradient-to-br from-blue-400 to-blue-600');
-      case 'default':
-      default:
-        return cn(baseStyles, 'w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600');
-    }
-  };
+
   
   return (
     <div 
       className={cn(
         "min-h-screen flex flex-col items-center",
-        getBackground(page?.templateId)
+        templateConfig.className,
+        page.backgroundImageUrl ? "bg-cover bg-center" : "bg-white",
+        page.backgroundImageUrl && {
+          backgroundImage: `url(${templateConfig.backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        },
       )}
     >
       <Button
@@ -138,7 +76,8 @@ const Preview: React.FC = () => {
         <div className="mb-8 text-center">
           <div 
             className={cn(
-              getProfileStyles(page.templateId),
+              "mx-auto mb-4 flex items-center justify-center text-2xl font-bold size-16 rounded-full",
+              templateConfig.profileClass,
               "animate-fade-in"
             )}
             style={{ 
@@ -159,7 +98,7 @@ const Preview: React.FC = () => {
           )} 
             style={{ animationDelay: '0.1s' }}
           >
-            @username
+           {page.description}
           </p>
         </div>
         
@@ -172,7 +111,9 @@ const Preview: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                getLinkStyles(page.templateId),
+                `w-full p-3 transition-all duration-300 transform hover:scale-[1.02]
+                active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center`,
+                templateConfig.linkClass,
                 "animate-slide-up"
               )}
               style={{ 
@@ -216,7 +157,8 @@ const Preview: React.FC = () => {
           "mt-12 pt-6 border-t w-full text-center text-xs animate-fade-in",
           page.templateId === 'gradient' ? "border-white/10 text-white/60" : "opacity-60"
         )} style={{ animationDelay: '0.5s' }}>
-          <p>Made with LinkTree Clone</p>
+          <p>Made with Vraksh</p>
+          <p>© {new Date().getFullYear()} Vraksh. All rights reserved.</p>
         </div>
       </div>
     </div>

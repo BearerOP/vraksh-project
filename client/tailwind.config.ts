@@ -69,7 +69,31 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			backgroundImage: {
+				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+				"gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+			  },
 			keyframes: {
+				fadeIn: {
+					from: { opacity: "0" },
+					to: { opacity: "1" },
+				  },
+				  slideUp: {
+					from: { opacity: "0", transform: "translateY(20px)" },
+					to: { opacity: "1", transform: "translateY(0)" },
+				  },
+				  slideInFromRight: {
+					from: { opacity: "0", transform: "translateX(30px)" },
+					to: { opacity: "1", transform: "translateX(0)" },
+				  },
+				  scaleIn: {
+					from: { opacity: "0", transform: "scale(0.8)" },
+					to: { opacity: "1", transform: "scale(1)" },
+				  },
+				  pulse: {
+					"0%, 100%": { transform: "scale(1)" },
+					"50%": { transform: "scale(1.05)" },
+				  },
 				'accordion-down': {
 					from: { height: '0' },
 					to: { height: 'var(--radix-accordion-content-height)' }
@@ -116,7 +140,12 @@ export default {
 				'slide-down': 'slide-down 0.4s ease-out',
 				'scale-in': 'scale-in 0.3s ease-out',
 				'scale-out': 'scale-out 0.3s ease-out',
-				'spin-slow': 'spin-slow 8s linear infinite'
+				'spin-slow': 'spin-slow 8s linear infinite',
+				fadeIn: "fadeIn 0.8s ease-in-out forwards",
+        slideUp: "slideUp 0.6s ease-out forwards",
+        slideInFromRight: "slideInFromRight 0.5s ease-out forwards",
+        scaleIn: "scaleIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+        pulseSlow: "pulse 2s infinite",
 			}
 		}
 	},
