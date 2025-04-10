@@ -1,114 +1,102 @@
-// components/ImageCropper.tsx
-import React, { useState, useRef, useEffect } from "react";
-import ReactCrop, {
-  Crop,
-  PixelCrop,
-  centerCrop,
-  makeAspectCrop,
-} from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 interface ImageCropperProps {
   image: string | null;
-  aspect: number; // use 1 for 1:1
+  aspect: number;
   onCropComplete: (blob: Blob) => void;
 }
 
-const ImageCropper: React.FC<ImageCropperProps> = ({
-  image,
-  aspect,
-  onCropComplete,
-}) => {
+function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight
+    ),
+    mediaWidth,
+    mediaHeight
+  );
+}
+
+const ImageCropper: React.FC<ImageCropperProps> = ({ image, aspect, onCropComplete }) => {
   const [crop, setCrop] = useState<Crop>();
-  const imageRef = useRef<HTMLImageElement>(null);
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-
-    const initialCrop = centerCrop(
-      makeAspectCrop(
-        {
-          unit: "%",
-          width: 90,
-        },
-        aspect,
-        width,
-        height
-      ),
-      width,
-      height
-    );
-
-    setCrop(initialCrop);
-  };
-
-  const generateCroppedImage = async () => {
-    if (!crop || !imageRef.current) return;
-
-    const canvas = document.createElement("canvas");
-    const scaleX = imageRef.current.naturalWidth / imageRef.current.width;
-    const scaleY = imageRef.current.naturalHeight / imageRef.current.height;
-
-    const pixelRatio = window.devicePixelRatio;
-    const ctx = canvas.getContext("2d");
-
-    const cropWidth = crop.width * scaleX;
-    const cropHeight = crop.height * scaleY;
-
-    canvas.width = cropWidth * pixelRatio;
-    canvas.height = cropHeight * pixelRatio;
-
-    if (ctx) {
-      ctx.scale(pixelRatio, pixelRatio);
-      ctx.imageSmoothingQuality = "high";
-
-      ctx.drawImage(
-        imageRef.current,
-        crop.x * scaleX,
-        crop.y * scaleY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        cropWidth,
-        cropHeight
-      );
-    }
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        onCropComplete(blob);
-      }
-    }, "image/jpeg", 0.95);
-  };
+  const onImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const { width, height } = e.currentTarget;
+      setCrop(centerAspectCrop(width, height, aspect));
+    },
+    [aspect]
+  );
 
   useEffect(() => {
-    if (crop?.width && crop?.height) {
-      generateCroppedImage();
+    if (completedCrop?.width && completedCrop?.height && imgRef.current) {
+      // This is to demonstrate how to export a crop as a blob
+      const offscreen = document.createElement('canvas');
+      const ctx = offscreen.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error('No 2d context');
+      }
+
+      const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
+      const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
+      
+      // Set canvas dimensions to the cropped image dimensions
+      offscreen.width = completedCrop.width * scaleX;
+      offscreen.height = completedCrop.height * scaleY;
+
+      ctx.drawImage(
+        imgRef.current,
+        completedCrop.x * scaleX,
+        completedCrop.y * scaleY,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY,
+        0,
+        0,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY
+      );
+
+      // Convert canvas to blob
+      offscreen.toBlob(
+        (blob) => {
+          if (blob) {
+            onCropComplete(blob);
+          }
+        },
+        'image/jpeg',
+        0.95 // Quality
+      );
     }
-  }, [crop]);
+  }, [completedCrop, onCropComplete]);
 
   if (!image) return null;
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <ReactCrop
-        crop={crop}
-        onChange={(newCrop) => setCrop(newCrop)}
-        aspect={aspect}
-        minWidth={100}
-        minHeight={100}
-        keepSelection={true}
-      >
-        <img
-          ref={imageRef}
-          src={image}
-          alt="Crop source"
-          onLoad={onImageLoad}
-          className="max-w-full"
-        />
-      </ReactCrop>
-    </div>
+    <ReactCrop
+      crop={crop}
+      onChange={(_, percentCrop) => setCrop(percentCrop)}
+      onComplete={(c) => setCompletedCrop(c)}
+      aspect={aspect}
+      className="max-h-96"
+    >
+      <img
+        ref={imgRef}
+        src={image}
+        alt="Crop preview"
+        style={{ maxWidth: '100%' }}
+        onLoad={onImageLoad}
+      />
+    </ReactCrop>
   );
 };
 

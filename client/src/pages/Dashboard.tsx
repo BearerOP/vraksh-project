@@ -24,7 +24,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { getBranches, getMe } from "@/lib/apis";
 import { useAuth } from "@/hooks/use-auth";
-import { Branch, BranchItem, User } from "@/types/User";
+import { Branch, BranchItem, SocialIcon, User } from "@/types/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,6 +53,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, Trash2, ImageIcon } from "lucide-react";
 import ImageCropper from "@/components/ImageCropper";
 import ColorPicker from "@/components/ColorPicker";
+import { link } from "fs";
 
 const Dashboard: React.FC = () => {
   // Add these state variables to your component
@@ -175,10 +176,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleColorChange = (color: string) => {
+  const handleRemoveProfileImage = () => {
     if (activePage) {
-      updatePage(activePage.id, { accentColor: color });
-      toast.success("Color updated successfully");
+      updatePage(activePage.id, { imageUrl: "" });
+      toast.success("Profile image removed successfully");
     }
   };
 
@@ -291,15 +292,24 @@ const Dashboard: React.FC = () => {
               url: item.url,
               active: item.active,
             })) || [],
-          accentColor: "#0ea5e9", // default or from branch if available
-          templateId: branch.templateId, // default or from branch if available
-          imageUrl: branch.imageUrl, // default or from branch if available
+          templateId: branch.templateId || "default", // default or from branch if available
+          imageUrl: branch.imageUrl || "", // default or from branch if available
           createdAt: branch.createdAt,
           updatedAt: branch.updatedAt,
-          backgroundImageUrl: branch.backgroundImageUrl, // default or from branch if available
+          backgroundImageUrl: branch.backgroundImageUrl || "", // default or from branch if available
           userId: branch.userId,
-          description: branch.description,
-          socialLinks: branch.socialIcons,
+          description: branch.description || "",
+          socialIcons: branch.socialIcons as SocialIcon[],
+          // Add new style fields with defaults
+          titleColor: branch.titleColor,
+          titleFont: branch.titleFont,
+          descriptionColor: branch.descriptionColor,
+          descriptionFont: branch.descriptionFont,
+          linkTextColor: branch.linkTextColor,
+          linkBorderSize: branch.linkBorderSize,
+          linkBackgroundColor: branch.linkBackgroundColor,
+          buttonTextFont: branch.buttonTextFont,
+          avatarRounded: branch.avatarRounded ,
         }));
 
         setPages(mappedPages);
@@ -697,257 +707,560 @@ const Dashboard: React.FC = () => {
               </TabsContent>
 
               <TabsContent value="appearance" className="animate-fade-in">
-  <div className="grid grid-cols-1 p-6 lg:grid-cols-3 gap-6">
-    <div className="lg:col-span-2 space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-medium mb-4">Profile Settings</h2>
-        <div className="space-y-6">
-          {/* Profile Image Section */}
-          <div>
-            <label className="block text-sm font-medium mb-3">
-              Profile Image
-            </label>
-            <div className="flex items-center gap-4">
-              <Avatar className="size-16 border border-muted-foreground/20">
-                <AvatarImage src={activePage?.imageUrl} />
-                <AvatarFallback>
-                  {(activePage?.title?.[0] || "") +
-                    (activePage?.title?.[1] || "")}
-                </AvatarFallback>
-              </Avatar>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Image
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Upload Profile Image</DialogTitle>
-                    <DialogDescription>
-                      Upload and crop your profile picture
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    {profileImageFile ? (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="relative w-full aspect-square max-w-sm mx-auto border rounded-lg overflow-hidden">
-                          <ImageCropper
-                            image={profileImagePreview}
-                            aspect={1}
-                            onCropComplete={handleProfileCropComplete}
-                          />
+                <div className="grid grid-cols-1 p-6 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                      <h2 className="text-lg font-medium mb-4">
+                        Profile Settings
+                      </h2>
+                      <div className="space-y-6">
+                        {/* Profile Image Section */}
+                        <div>
+                          <label className="block text-sm font-medium mb-3">
+                            Profile Image
+                          </label>
+                          <div className="flex items-center gap-4">
+                            <Avatar className="size-16 border border-muted-foreground/20">
+                              <AvatarImage src={activePage?.imageUrl} />
+                              <AvatarFallback>
+                                {(activePage?.title?.[0] || "") +
+                                  (activePage?.title?.[1] || "")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline">
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Upload Image
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Upload Profile Image
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Upload and crop your profile picture
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  {profileImageFile ? (
+                                    <div className="flex flex-col items-center gap-4">
+                                      <div className="relative w-full aspect-square max-w-sm mx-auto border rounded-lg overflow-hidden">
+                                        <ImageCropper
+                                          image={profileImagePreview}
+                                          aspect={1}
+                                          onCropComplete={
+                                            handleProfileCropComplete
+                                          }
+                                        />
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() =>
+                                          setProfileImageFile(null)
+                                        }
+                                      >
+                                        Choose Different Image
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center gap-4">
+                                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                                        <input
+                                          type="file"
+                                          id="profileImageUpload"
+                                          className="hidden"
+                                          accept="image/*"
+                                          onChange={handleProfileImageChange}
+                                        />
+                                        <label
+                                          htmlFor="profileImageUpload"
+                                          className="cursor-pointer"
+                                        >
+                                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                          <p className="text-sm text-muted-foreground">
+                                            Drag & drop or click to upload
+                                          </p>
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            Supports JPG, PNG, WEBP
+                                          </p>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                <DialogFooter className="sm:justify-between">
+                                  <DialogClose asChild>
+                                    <Button variant="secondary">Cancel</Button>
+                                  </DialogClose>
+                                  <Button
+                                    disabled={!profileImageFile}
+                                    onClick={handleProfileImageSave}
+                                  >
+                                    Save Changes
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Recommended size: 400x400px. Max file size: 2MB
+                          </p>
+
+                          {/* Avatar Shape Toggle */}
+                          <div className="mt-4">
+                            <label className="block text-sm font-medium mb-2">
+                              Avatar Shape
+                            </label>
+                            <select
+                              value={
+                                activePage?.avatarRounded || "rounded-none"
+                              }
+                              onChange={(e) =>
+                                updatePage(activePage.id, {
+                                  avatarRounded: e.target.value,
+                                })
+                              }
+                              className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            >
+                              <option value="0">None</option>
+                              <option value="4px">Small</option>
+                              <option value="8px">Default</option>
+                              <option value="12px">Medium</option>
+                              <option value="16px">Large</option>
+                              <option value="24px">Extra Large</option>
+                              <option value="32px">
+                                2x Extra Large
+                              </option>
+                              <option value="calc(infinity * 1px)">Full</option>
+                            </select>
+                          </div>
                         </div>
-                        <Button variant="outline" onClick={() => setProfileImageFile(null)}>
-                          Choose Different Image
+
+                        {/* Background Image Section */}
+                        <div>
+                          <label className="block text-sm font-medium mb-3">
+                            Background
+                          </label>
+                          <div className="relative h-24 w-full rounded-lg overflow-hidden mb-3 bg-gray-100">
+                            {activePage?.backgroundImageUrl ? (
+                              <img
+                                src={activePage?.backgroundImageUrl}
+                                alt="Background preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full text-muted-foreground">
+                                <ImageIcon className="h-6 w-6 mr-2" />
+                                <span>No background set</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline">
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Upload Background
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-lg">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Upload Background Image
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Upload and crop your background image
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  {backgroundImageFile ? (
+                                    <div className="flex flex-col items-center gap-4">
+                                      <div className="relative w-full aspect-video max-w-lg mx-auto border rounded-lg overflow-hidden">
+                                        <ImageCropper
+                                          image={backgroundImagePreview}
+                                          aspect={16 / 9}
+                                          onCropComplete={
+                                            handleBackgroundCropComplete
+                                          }
+                                        />
+                                      </div>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() =>
+                                          setBackgroundImageFile(null)
+                                        }
+                                      >
+                                        Choose Different Image
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center gap-4">
+                                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                                        <input
+                                          type="file"
+                                          id="backgroundImageUpload"
+                                          className="hidden"
+                                          accept="image/*"
+                                          onChange={handleBackgroundImageChange}
+                                        />
+                                        <label
+                                          htmlFor="backgroundImageUpload"
+                                          className="cursor-pointer"
+                                        >
+                                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                          <p className="text-sm text-muted-foreground">
+                                            Drag & drop or click to upload
+                                          </p>
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            Supports JPG, PNG, WEBP
+                                          </p>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                <DialogFooter className="sm:justify-between">
+                                  <DialogClose asChild>
+                                    <Button variant="secondary">Cancel</Button>
+                                  </DialogClose>
+                                  <Button
+                                    disabled={!backgroundImageFile}
+                                    onClick={handleBackgroundImageSave}
+                                  >
+                                    Save Changes
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+                            {activePage?.backgroundImageUrl && (
+                              <Button
+                                variant="outline"
+                                onClick={handleRemoveBackground}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Recommended size: 1080x608px. Max file size: 5MB
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Text & Color Settings */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                      <h2 className="text-lg font-medium mb-4">
+                        Text & Colors
+                      </h2>
+
+                      {/* Bio Text */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium mb-2">
+                          Bio Text
+                        </label>
+                        <Textarea
+                          placeholder="Add a short bio"
+                          className="resize-none"
+                          value={activePage?.description || ""}
+                          onChange={(e) =>
+                            handleChangeDescription(e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* Color Settings */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        {/* Title Color */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Title Color
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-full border shadow-sm"
+                              style={{
+                                backgroundColor:
+                                  activePage?.titleColor || "#000000",
+                              }}
+                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Palette className="h-4 w-4 mr-2" />
+                                  Change Color
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64">
+                                <ColorPicker
+                                  color={activePage?.titleColor || "#000000]"}
+                                  onChange={(color) =>
+                                    updatePage(activePage.id, {
+                                      titleColor: color,
+                                    })
+                                  }
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+
+                        {/* Description Color */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Description Color
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-full border shadow-sm"
+                              style={{
+                                backgroundColor:
+                                  activePage?.descriptionColor || "#6b7280",
+                              }}
+                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Palette className="h-4 w-4 mr-2" />
+                                  Change Color
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64">
+                                <ColorPicker
+                                  color={
+                                    activePage?.descriptionColor || "#6b7280"
+                                  }
+                                  onChange={(color) =>
+                                    updatePage(activePage.id, {
+                                      descriptionColor: color,
+                                    })
+                                  }
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+
+                        {/* Link Text Color */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Link Text Color
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-full border shadow-sm"
+                              style={{
+                                backgroundColor:
+                                  activePage?.linkTextColor || "#ffffff",
+                              }}
+                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Palette className="h-4 w-4 mr-2" />
+                                  Change Color
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64">
+                                <ColorPicker
+                                  color={activePage?.linkTextColor || "#ffffff"}
+                                  onChange={(color) =>
+                                    updatePage(activePage.id, {
+                                      linkTextColor: color,
+                                    })
+                                  }
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+
+                        {/* Link Background Color */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Link Background Color
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-full border shadow-sm"
+                              style={{
+                                backgroundColor:
+                                  activePage?.linkBackgroundColor || "#0ea5e9",
+                              }}
+                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Palette className="h-4 w-4 mr-2" />
+                                  Change Color
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64">
+                                <ColorPicker
+                                  color={
+                                    activePage?.linkBackgroundColor || "#0ea5e9"
+                                  }
+                                  onChange={(color) =>
+                                    updatePage(activePage.id, {
+                                      linkBackgroundColor: color,
+                                    })
+                                  }
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Link Border Size */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium mb-2">
+                          Link Border Size
+                        </label>
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="range"
+                            min="0"
+                            max="8"
+                            step="1"
+                            value={
+                              (activePage?.linkBorderSize &&
+                                parseInt(activePage.linkBorderSize)) ||
+                              "0"
+                            }
+                            onChange={(e) =>
+                              updatePage(activePage.id, {
+                                linkBorderSize: e.target.value,
+                              })
+                            }
+                            className="w-full"
+                          />
+                          <span className="min-w-8 text-center">
+                            {(activePage?.linkBorderSize &&
+                              parseInt(activePage.linkBorderSize)) ||
+                              "0"}
+                            px
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Typography Settings */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                      <h2 className="text-lg font-medium mb-4">Typography</h2>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Title Font */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Title Font
+                          </label>
+                          <select
+                            value={activePage?.titleFont || "Inter"}
+                            onChange={(e) =>
+                              updatePage(activePage.id, {
+                                titleFont: e.target.value,
+                              })
+                            }
+                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                          >
+                            <option value="Inter">Inter</option>
+                            <option value="Roboto">Roboto</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Open Sans">Open Sans</option>
+                            <option value="Lato">Lato</option>
+                            <option value="Playfair Display">
+                              Playfair Display
+                            </option>
+                          </select>
+                        </div>
+
+                        {/* Description Font */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Description Font
+                          </label>
+                          <select
+                            value={activePage?.descriptionFont || "Inter"}
+                            onChange={(e) =>
+                              updatePage(activePage.id, {
+                                descriptionFont: e.target.value,
+                              })
+                            }
+                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                          >
+                            <option value="Inter">Inter</option>
+                            <option value="Roboto">Roboto</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Open Sans">Open Sans</option>
+                            <option value="Lato">Lato</option>
+                            <option value="Playfair Display">
+                              Playfair Display
+                            </option>
+                          </select>
+                        </div>
+
+                        {/* Button Text Font */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Button Text Font
+                          </label>
+                          <select
+                            value={activePage?.buttonTextFont || "Inter"}
+                            onChange={(e) =>
+                              updatePage(activePage.id, {
+                                buttonTextFont: e.target.value,
+                              })
+                            }
+                            className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                          >
+                            <option value="Inter">Inter</option>
+                            <option value="Roboto">Roboto</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Open Sans">Open Sans</option>
+                            <option value="Lato">Lato</option>
+                            <option value="Playfair Display">
+                              Playfair Display
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-medium">Theme & Layout</h2>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-muted-foreground"
+                        >
+                          <Paintbrush className="h-4 w-4 mr-2" />
+                          Customize
                         </Button>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
-                          <input
-                            type="file"
-                            id="profileImageUpload"
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleProfileImageChange}
-                          />
-                          <label htmlFor="profileImageUpload" className="cursor-pointer">
-                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              Drag & drop or click to upload
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Supports JPG, PNG, WEBP
-                            </p>
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <DialogFooter className="sm:justify-between">
-                    <DialogClose asChild>
-                      <Button variant="secondary">Cancel</Button>
-                    </DialogClose>
-                    <Button 
-                      disabled={!profileImageFile}
-                      onClick={handleProfileImageSave}
-                    >
-                      Save Changes
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Recommended size: 400x400px. Max file size: 2MB
-            </p>
-          </div>
-          
-          {/* Background Image Section */}
-          <div>
-            <label className="block text-sm font-medium mb-3">
-              Background
-            </label>
-            <div className="relative h-24 w-full rounded-lg overflow-hidden mb-3 bg-gray-100">
-              {activePage?.backgroundImageUrl ? (
-                <img 
-                  src={activePage?.backgroundImageUrl} 
-                  alt="Background preview" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <ImageIcon className="h-6 w-6 mr-2" />
-                  <span>No background set</span>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Background
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Upload Background Image</DialogTitle>
-                    <DialogDescription>
-                      Upload and crop your background image
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    {backgroundImageFile ? (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="relative w-full aspect-video max-w-lg mx-auto border rounded-lg overflow-hidden">
-                          <ImageCropper
-                            image={backgroundImagePreview}
-                            aspect={16/9}
-                            onCropComplete={handleBackgroundCropComplete}
-                          />
-                        </div>
-                        <Button variant="outline" onClick={() => setBackgroundImageFile(null)}>
-                          Choose Different Image
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
-                          <input
-                            type="file"
-                            id="backgroundImageUpload"
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleBackgroundImageChange}
-                          />
-                          <label htmlFor="backgroundImageUpload" className="cursor-pointer">
-                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              Drag & drop or click to upload
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Supports JPG, PNG, WEBP
-                            </p>
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <DialogFooter className="sm:justify-between">
-                    <DialogClose asChild>
-                      <Button variant="secondary">Cancel</Button>
-                    </DialogClose>
-                    <Button 
-                      disabled={!backgroundImageFile}
-                      onClick={handleBackgroundImageSave}
-                    >
-                      Save Changes
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              
-              {activePage?.backgroundImageUrl && (
-                <Button variant="outline" onClick={handleRemoveBackground}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Remove
-                </Button>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Recommended size: 1080x608px. Max file size: 5MB
-            </p>
-          </div>
-          
-          {/* Colors and Text Settings */}
-          <div>
-            <h3 className="text-sm font-medium mb-3">Text & Colors</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">
-                  Bio Text
-                </label>
-                <Textarea 
-                  placeholder="Add a short bio" 
-                  className="resize-none" 
-                  value={activePage?.description || ""}
-                  onChange={(e) => handleChangeDescription(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">
-                  Accent Color
-                </label>
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-8 h-8 rounded-full border shadow-sm" 
-                    style={{ backgroundColor: activePage?.accentColor || "#0ea5e9" }}
-                  />
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <Palette className="h-4 w-4 mr-2" />
-                        Change Color
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-64">
-                      <ColorPicker 
-                        color={activePage?.accentColor || "#0ea5e9"} 
-                        onChange={handleColorChange}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-medium">Theme & Layout</h2>
-          <Button variant="outline" size="sm" className="text-muted-foreground">
-            <Paintbrush className="h-4 w-4 mr-2" />
-            Customize
-          </Button>
-        </div>
 
-        <TemplateSelector pageId={activePage.id} />
-      </div>
-    </div>
+                      <TemplateSelector pageId={activePage.id} />
+                    </div>
+                  </div>
 
-    <div className="hidden lg:block">
-      <div className="sticky top-24">
-        <h3 className="text-lg font-medium mb-4 text-center">Preview</h3>
-        <MobilePreview page={activePage} />
-      </div>
-    </div>
-  </div>
-</TabsContent>
+                  <div className="hidden lg:block">
+                    <div className="sticky top-24">
+                      <h3 className="text-lg font-medium mb-4 text-center">
+                        Preview
+                      </h3>
+                      <MobilePreview page={activePage} />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">

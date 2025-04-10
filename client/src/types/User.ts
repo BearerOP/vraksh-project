@@ -32,17 +32,27 @@ export type BranchItem = {
   updatedAt: Date;
 };
 
-
 export type Branch = {
-    _id: string;
-    userId: string;
-    name: string;
-    description: string;
-    socialIcons: SocialIcon[];
-    items: BranchItem[];
-    createdAt: Date;
-    updatedAt: Date;
-    templateId: string;
-    imageUrl: string;
-    backgroundImageUrl: string;
-  };
+  _id: string;
+  userId: string;
+  name: string;
+  description: string;
+  socialIcons: SocialIcon[];
+  items: BranchItem[];
+  createdAt: Date;
+  updatedAt: Date;
+  imageUrl: string;
+
+  //Template Fields
+  templateId: string;
+  backgroundImageUrl: string;
+  titleColor: string;
+  descriptionColor: string;
+  linkTextColor: string;
+  linkBorderSize: string;
+  linkBackgroundColor: string;
+  titleFont: string;
+  descriptionFont: string;
+  buttonTextFont: string;
+  avatarRounded: string;
+};

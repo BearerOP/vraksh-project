@@ -1,5 +1,4 @@
-// components/ColorPicker.tsx
-import React from "react";
+import React, { useState, useEffect } from 'react';
 
 interface ColorPickerProps {
   color: string;
@@ -7,59 +6,85 @@ interface ColorPickerProps {
 }
 
 const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange }) => {
-  const colors = [
-    "#ef4444", // red
-    "#f97316", // orange
-    "#f59e0b", // amber
-    "#eab308", // yellow
-    "#84cc16", // lime
-    "#22c55e", // green
-    "#10b981", // emerald
-    "#14b8a6", // teal
-    "#06b6d4", // cyan
-    "#0ea5e9", // sky
-    "#3b82f6", // blue
-    "#6366f1", // indigo
-    "#8b5cf6", // violet
-    "#a855f7", // purple
-    "#d946ef", // fuchsia
-    "#ec4899", // pink
-    "#f43f5e", // rose
-    "#0f172a", // slate
+  const [selectedColor, setSelectedColor] = useState(color || '#0ea5e9');
+  const [customColor, setCustomColor] = useState(color || '#0ea5e9');
+
+  useEffect(() => {
+    setSelectedColor(color);
+    setCustomColor(color);
+  }, [color]);
+
+  const presetColors = [
+    '#000000', // Black
+    '#ffffff', // White
+    '#0ea5e9', // Sky Blue (Default)
+    '#ef4444', // Red
+    '#f97316', // Orange
+    '#eab308', // Yellow
+    '#22c55e', // Green
+    '#3b82f6', // Blue
+    '#8b5cf6', // Purple
+    '#ec4899', // Pink
+    '#6b7280', // Gray
+    '#1e293b', // Slate
   ];
 
+  const handleColorClick = (newColor: string) => {
+    setSelectedColor(newColor);
+    onChange(newColor);
+  };
+
+  const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setCustomColor(newColor);
+    setSelectedColor(newColor);
+    onChange(newColor);
+  };
+
   return (
-    <div className="p-2">
-      <h3 className="text-sm font-medium mb-3">Select color</h3>
-      <div className="grid grid-cols-6 gap-2">
-        {colors.map((colorOption) => (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {presetColors.map((presetColor) => (
           <button
-            key={colorOption}
-            className={`w-8 h-8 rounded-full ${
-              colorOption === color ? "ring-2 ring-offset-2 ring-black" : ""
+            key={presetColor}
+            type="button"
+            className={`w-8 h-8 rounded-full border-2 transition-all ${
+              selectedColor === presetColor ? 'border-black scale-110' : 'border-gray-200'
             }`}
-            style={{ backgroundColor: colorOption }}
-            onClick={() => onChange(colorOption)}
-            aria-label={`Select color ${colorOption}`}
+            style={{ backgroundColor: presetColor }}
+            onClick={() => handleColorClick(presetColor)}
+            aria-label={`Select color ${presetColor}`}
           />
         ))}
       </div>
       
-      <div className="mt-4">
-        <label className="block text-sm mb-1">Custom color</label>
-        <div className="flex items-center gap-2">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium">Custom Color</label>
+        <div className="flex items-center gap-3">
           <input
             type="color"
-            value={color}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-10 h-10 rounded p-1"
+            value={customColor}
+            onChange={handleCustomColorChange}
+            className="h-8 w-12 p-0 border rounded cursor-pointer"
           />
           <input
             type="text"
-            value={color}
-            onChange={(e) => onChange(e.target.value)}
-            className="px-2 py-1 border rounded flex-1"
-            placeholder="#000000"
+            value={customColor}
+            onChange={(e) => {
+              if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value)) {
+                setCustomColor(e.target.value);
+              }
+            }}
+            onBlur={() => {
+              if (/^#[0-9A-Fa-f]{6}$/.test(customColor)) {
+                onChange(customColor);
+              } else {
+                // Reset to a valid color if input is invalid
+                setCustomColor(selectedColor);
+              }
+            }}
+            className="flex-1 p-2 text-sm border rounded"
+            placeholder="#0ea5e9"
           />
         </div>
       </div>
