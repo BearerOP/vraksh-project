@@ -18,6 +18,8 @@ import {
   LayoutGridIcon,
   LucideLayoutDashboard,
   Ellipsis,
+  Menu,
+  X,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBranches, getMe } from "@/lib/apis";
@@ -26,20 +28,160 @@ import { Branch, BranchItem, User } from "@/types/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Snapchat } from "@/components/create-branch/steps/social-icons";
 import {
-  FacebookIcon,
   InstagramIcon,
   LinkedinIcon,
-  MailIcon,
   SnapchatIcon,
-  TiKTokIcon,
-  WhatsappIcon,
   XIcon,
-  YouTubeIcon,
 } from "@/components/ui/social-icons";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { Upload, Trash2, ImageIcon } from "lucide-react";
+import ImageCropper from "@/components/ImageCropper";
+import ColorPicker from "@/components/ColorPicker";
 
 const Dashboard: React.FC = () => {
+  // Add these state variables to your component
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null
+  );
+  const [croppedProfileImage, setCroppedProfileImage] = useState<Blob | null>(
+    null
+  );
+
+  const [backgroundImageFile, setBackgroundImageFile] = useState<File | null>(
+    null
+  );
+  const [backgroundImagePreview, setBackgroundImagePreview] = useState<
+    string | null
+  >(null);
+  const [croppedBackgroundImage, setCroppedBackgroundImage] =
+    useState<Blob | null>(null);
+
+  // Add these handler functions
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProfileImageFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfileImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProfileCropComplete = (blob: Blob) => {
+    setCroppedProfileImage(blob);
+  };
+
+  const handleProfileImageSave = async () => {
+    if (!croppedProfileImage) return;
+
+    try {
+      // Create a FormData instance for the API call
+      const formData = new FormData();
+      formData.append("image", croppedProfileImage);
+      formData.append("pageId", activePage.id);
+
+      // API call would go here
+      // const response = await uploadProfileImage(formData);
+
+      // For demo, we'll just update the local state
+      const imageUrl = URL.createObjectURL(croppedProfileImage);
+      updatePage(activePage.id, { imageUrl });
+
+      toast.success("Profile image updated successfully!");
+
+      // Clean up
+      setProfileImageFile(null);
+      setProfileImagePreview(null);
+      setCroppedProfileImage(null);
+    } catch (error) {
+      toast.error("Failed to update profile image");
+      console.error(error);
+    }
+  };
+
+  const handleBackgroundImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setBackgroundImageFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        setBackgroundImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleBackgroundCropComplete = (blob: Blob) => {
+    setCroppedBackgroundImage(blob);
+  };
+
+  const handleBackgroundImageSave = async () => {
+    if (!croppedBackgroundImage) return;
+
+    try {
+      // Create a FormData instance for the API call
+      const formData = new FormData();
+      formData.append("image", croppedBackgroundImage);
+      formData.append("pageId", activePage.id);
+
+      // API call would go here
+      // const response = await uploadBackgroundImage(formData);
+
+      // For demo, we'll just update the local state
+      const backgroundImageUrl = URL.createObjectURL(croppedBackgroundImage);
+      updatePage(activePage.id, { backgroundImageUrl });
+
+      toast.success("Background image updated successfully!");
+
+      // Clean up
+      setBackgroundImageFile(null);
+      setBackgroundImagePreview(null);
+      setCroppedBackgroundImage(null);
+    } catch (error) {
+      toast.error("Failed to update background image");
+      console.error(error);
+    }
+  };
+
+  const handleRemoveBackground = () => {
+    if (activePage) {
+      updatePage(activePage.id, { backgroundImageUrl: "" });
+      toast.success("Background removed successfully");
+    }
+  };
+
+  const handleColorChange = (color: string) => {
+    if (activePage) {
+      updatePage(activePage.id, { accentColor: color });
+      toast.success("Color updated successfully");
+    }
+  };
+
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
   const {
     pages,
@@ -53,6 +195,8 @@ const Dashboard: React.FC = () => {
 
   const [pageTitle, setPageTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState("links");
   const navigate = useNavigate();
 
   const handleCreatePage = () => {
@@ -87,6 +231,7 @@ const Dashboard: React.FC = () => {
       updatePage(activePage.id, { description });
     }
   };
+
   const handleCopyLink = (url: string) => {
     navigator.clipboard
       .writeText(url)
@@ -148,9 +293,10 @@ const Dashboard: React.FC = () => {
             })) || [],
           accentColor: "#0ea5e9", // default or from branch if available
           templateId: branch.templateId, // default or from branch if available
-          imageUrl: "", // default or from branch if available
+          imageUrl: branch.imageUrl, // default or from branch if available
           createdAt: branch.createdAt,
           updatedAt: branch.updatedAt,
+          backgroundImageUrl: branch.backgroundImageUrl, // default or from branch if available
           userId: branch.userId,
           description: branch.description,
           socialLinks: branch.socialIcons,
@@ -166,22 +312,46 @@ const Dashboard: React.FC = () => {
     fetchUserBranches();
   }, []);
 
+  // Handle responsive sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">
-      {/* <Navbar /> */}
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-full mx-auto flex relative">
+        {/* Mobile sidebar toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="md:hidden fixed top-4 left-4 z-30 bg-white shadow-sm rounded-full"
+        >
+          {sidebarOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
+        </Button>
 
-      <main className="flex-1 min-w-full mx-auto flex">
         {/* Sidebar */}
-        <aside className="w-56 bg-[#ededeb] py-4 sticky h-screen top-0 border-r flex flex-col">
-          <div className="relative px-4">
+        <aside
+          className={`${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 transition-transform duration-300 w-64 bg-[#ededeb] py-6 fixed md:sticky h-screen top-0 border-r flex flex-col z-20`}
+        >
+          <div className="relative px-4 mb-4">
             {/* Dropdown Button */}
             <button
-              className="w-fit flex justify-between items-center p-3 text-sm bg-white rounded-lg shadow-sm"
+              className="w-full flex justify-between items-center p-3 text-sm bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              {activePage ? activePage.title : "Select a page"}
+              <span className="truncate font-medium">
+                {activePage ? activePage.title : "Select a page"}
+              </span>
               <ChevronDown
-                className={`h-4 w-4 ml-2 transition-transform ${
+                className={`h-4 w-4 ml-2 transition-transform flex-shrink-0 ${
                   showDropdown ? "rotate-180" : ""
                 }`}
               />
@@ -190,9 +360,9 @@ const Dashboard: React.FC = () => {
             {/* Dropdown Menu */}
             {showDropdown && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 className="absolute w-full mt-2 z-10 bg-white shadow-md rounded-lg border"
               >
                 <div className="max-h-48 overflow-y-auto p-2">
@@ -200,13 +370,17 @@ const Dashboard: React.FC = () => {
                     <Button
                       key={page.id}
                       variant="ghost"
-                      className="w-full justify-start px-3 py-2 h-auto text-left rounded-md hover:bg-gray-100"
+                      className={`w-full justify-start px-3 py-2 mb-1 h-auto text-left rounded-md hover:bg-gray-100 ${
+                        activePage?.id === page.id
+                          ? "bg-gray-100 font-medium"
+                          : ""
+                      }`}
                       onClick={() => {
                         setActivePage(page);
                         setShowDropdown(false);
                       }}
                     >
-                      {page.title}
+                      <span className="truncate">{page.title}</span>
                     </Button>
                   ))}
                 </div>
@@ -218,43 +392,112 @@ const Dashboard: React.FC = () => {
                     navigate("/new-branch");
                   }}
                 >
-                  <PlusCircle className="h-4 w-4 mr-2" />
+                  <PlusCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   Create new Branch
                 </Button>
               </motion.div>
             )}
           </div>
 
-          {/* Sidebar Links */}
-          <div className="flex flex-col space-y-2 mt-4 px-4">
+          {/* Sidebar Navigation */}
+          <div className="space-y-1 px-3">
+            <h3 className="px-4 text-xs uppercase text-muted-foreground font-semibold tracking-wider mb-2">
+              Main
+            </h3>
             <Link to="/dashboard">
-              <Button variant="ghost" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-lg"
+              >
                 <LayoutGridIcon className="h-4 w-4 mr-2" />
                 My Vraksh
               </Button>
             </Link>
 
-            <h3 className="text-sm text-muted-foreground mt-4">Tools</h3>
-
+            <h3 className="px-4 text-xs uppercase text-muted-foreground font-semibold tracking-wider mt-6 mb-2">
+              Tools
+            </h3>
             <Link to="/bento">
-              <Button variant="ghost" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-lg"
+              >
                 <LucideLayoutDashboard className="h-4 w-4 mr-2" />
                 My Bento
               </Button>
             </Link>
+
+            <Link to="/analytics">
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-lg"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+            </Link>
           </div>
+
+          {/* User Profile Section */}
+          {user && (
+            <div className="mt-auto border-t pt-4 px-4">
+              <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                <Avatar className="size-8">
+                  <AvatarImage src={user.imageUrl} />
+                  <AvatarFallback>
+                    {user.username?.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {user.username}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.email}
+                  </p>
+                </div>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </aside>
 
-        {/* Main Content View */}
-        <section className="flex-1 bg-[#fbfbf9]  pt-0">
+        {/* Main Content */}
+        <section
+          className={`flex-1 bg-[#fbfbf9] transition-all duration-300 ${
+            sidebarOpen ? "md:ml-0" : ""
+          }`}
+        >
           {activePage ? (
-            <Tabs defaultValue="links" className="w-full mt-0 ">
-              <div className="flex justify-between  sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b">
-                <h2 className="text-xl font-bold text-center relative self-center">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row justify-between sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b shadow-sm">
+                <h2 className="text-xl font-bold text-center relative self-center mb-3 sm:mb-0">
                   My Vraksh
                 </h2>
 
-                <div className="flex gap-2 ">
+                <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
+                  <TabsList className="mb-3 sm:mb-0 mr-2">
+                    <TabsTrigger
+                      value="links"
+                      onClick={() => setActiveTab("links")}
+                    >
+                      Links
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="appearance"
+                      onClick={() => setActiveTab("appearance")}
+                    >
+                      Appearance
+                    </TabsTrigger>
+                  </TabsList>
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -264,7 +507,7 @@ const Dashboard: React.FC = () => {
                     className="text-foreground hover:bg-foreground/10 transition-all duration-200"
                   >
                     <Paintbrush className="h-4 w-4 mr-2" />
-                    Theme
+                    <span className="hidden sm:inline">Theme</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -273,7 +516,7 @@ const Dashboard: React.FC = () => {
                     className="text-foreground hover:bg-foreground/10 transition-all duration-200"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    Share
+                    <span className="hidden sm:inline">Share</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -284,7 +527,7 @@ const Dashboard: React.FC = () => {
                     className="text-foreground hover:bg-foreground/10 transition-all duration-200"
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    Preview
+                    <span className="hidden sm:inline">Preview</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -294,203 +537,423 @@ const Dashboard: React.FC = () => {
                     }}
                     className="text-foreground hover:bg-foreground/10 transition-all duration-200"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Settings</span>
                   </Button>
                 </div>
               </div>
-              <div className="flex-col flex xl:flex-row animate-fade-in justify-between gap-6 xl:gap-0 min-h-[800px]]">
-                <div className="space-y-4 shrink w-full xl:px-10 border-r min-h-screen">
-                  <Card className=" mt-4 mb-4 border-none shadow-lg rounded-3xl flex items-center justify-between bg-emerald-100">
-                    <CardHeader className="">
-                      <CardTitle className="text-sm font-medium">
-                        Your Vraksh is live:{" "}
-                        <Link
-                          className="underline text-muted-foreground"
-                          to={`/${activePage.title}`}
-                        >
-                          {import.meta.env.VITE_VRAKSH_DOMAIN}/
-                          {activePage.title}
-                        </Link>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex items-center justify-center pt-6">
-                      <Button
-                        onClick={() => {
-                          handleCopyLink(
-                            `${import.meta.env.VITE_VRAKSH_APP_URL}/${
-                              activePage.title
-                            }`
-                          );
-                        }}
-                        variant="outline"
-                        size="lg"
-                        className="rounded-2xl text-base hover:bg-emerald-50 transition-all duration-300"
-                      >
-                        Claim your Vraksh URL
-                      </Button>
-                    </CardContent>
-                  </Card>
-                  <div className="flex items-center justify-between p-6 px-10">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="border border-muted-foreground/20 size-14">
-                        <AvatarImage src={activePage?.imageUrl} />
-                        <AvatarFallback>
-                          {(activePage?.title?.[0] || "") +
-                            (activePage?.title?.[1] || "")}
-                        </AvatarFallback>
-                      </Avatar>
 
-                      <div className="flex flex-col gap-1 items-start">
+              {/* Content Area */}
+              <TabsContent value="links" className="animate-fade-in">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Links Management Section */}
+                  <div className="lg:col-span-2 space-y-4 px-4 md:px-8 py-6">
+                    {/* Notification Card */}
+                    <Card className="mb-6 border-none shadow-lg rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between bg-emerald-100">
+                      <CardHeader className="pb-0 sm:pb-6">
+                        <CardTitle className="text-sm font-medium">
+                          Your Vraksh is live:{" "}
+                          <Link
+                            className="underline text-muted-foreground"
+                            to={`/${activePage.title}`}
+                          >
+                            {import.meta.env.VITE_VRAKSH_DOMAIN}/
+                            {activePage.title}
+                          </Link>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0 sm:pt-6">
                         <Button
-                          variant="link"
-                          className="text-black underline p-0 h-auto"
+                          onClick={() => {
+                            handleCopyLink(
+                              `${import.meta.env.VITE_VRAKSH_APP_URL}/${
+                                activePage.title
+                              }`
+                            );
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="w-full sm:w-auto rounded-2xl text-base hover:bg-emerald-50 transition-all duration-300"
                         >
-                          @{activePage?.title || "username"}
+                          Claim your Vraksh URL
                         </Button>
+                      </CardContent>
+                    </Card>
 
-                        <Button
-                          variant="link"
-                          className="text-muted-foreground hover:underline-offset-1 p-0 h-auto"
-                        >
-                          {activePage?.description || "Add description"}
-                        </Button>
+                    {/* Profile Section */}
+                    <div className="flex items-center justify-between p-4 sm:p-6 bg-white rounded-xl shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="border border-muted-foreground/20 size-14">
+                          <AvatarImage src={activePage?.imageUrl} />
+                          <AvatarFallback>
+                            {(activePage?.title?.[0] || "") +
+                              (activePage?.title?.[1] || "")}
+                          </AvatarFallback>
+                        </Avatar>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-1 items-start">
                           <Button
                             variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="instagram"
+                            className="text-black underline p-0 h-auto"
                           >
-                            <InstagramIcon />
+                            @{activePage?.title || "username"}
                           </Button>
+
                           <Button
                             variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="snapchat"
+                            className="text-muted-foreground hover:underline-offset-1 p-0 h-auto"
                           >
-                            <SnapchatIcon />
+                            {activePage?.description || "Add description"}
                           </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="twitter"
-                          >
-                            <XIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="tiktok"
-                          >
-                            <TiKTokIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="facebook"
-                          >
-                            <FacebookIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="whatsapp"
-                          >
-                            <WhatsappIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="youtube"
-                          >
-                            <YouTubeIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="linkedin"
-                          >
-                            <LinkedinIcon />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="text-muted-foreground p-0 h-auto"
-                            aria-label="mail"
-                          >
-                            <MailIcon />
-                          </Button>
+
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            <Button
+                              variant="link"
+                              className="text-muted-foreground p-0 h-auto"
+                              aria-label="instagram"
+                            >
+                              <InstagramIcon />
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="text-muted-foreground p-0 h-auto"
+                              aria-label="snapchat"
+                            >
+                              <SnapchatIcon />
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="text-muted-foreground p-0 h-auto"
+                              aria-label="twitter"
+                            >
+                              <XIcon />
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="text-muted-foreground p-0 h-auto"
+                              aria-label="linkedin"
+                            >
+                              <LinkedinIcon />
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="text-muted-foreground p-0 h-auto"
+                              aria-label="more"
+                            >
+                              <Ellipsis className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200"
-                      onClick={() => {}}
-                    >
-                      <Ellipsis />
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3 px-6">
-                    {activePage.links.length > 0 ? (
-                      <LinksList
-                        pageId={activePage.id}
-                        links={activePage.links}
-                      />
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <p>No links added yet. Add your first link below.</p>
-                      </div>
-                    )}
-
-                    <LinkForm pageId={activePage.id} />
-                  </div>
-                </div>
-                <div className="min-w-[30rem] lg:block mx-auto p-6">
-                  <div className="sticky top-36">
-                    <MobilePreview page={activePage} />
-                  </div>
-                </div>
-              </div>
-
-              <TabsContent value="appearance" className="animate-fade-in">
-                <div className="grid grid-cols-1 p-6 lg:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-medium">Appearance</h2>
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground"
+                        size="icon"
+                        className="text-muted-foreground rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200 ml-auto sm:ml-0"
+                        onClick={() => {}}
                       >
-                        <Palette className="h-4 w-4 mr-2" />
-                        Customize
+                        <Ellipsis />
                       </Button>
                     </div>
 
-                    <TemplateSelector pageId={activePage.id} />
+                    {/* Links Section */}
+                    <div className="space-y-4 bg-white p-6 rounded-xl shadow-sm">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-medium">Your Links</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-muted-foreground"
+                        >
+                          Reorder
+                        </Button>
+                      </div>
+
+                      {activePage.links.length > 0 ? (
+                        <LinksList
+                          pageId={activePage.id}
+                          links={activePage.links}
+                        />
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>No links added yet. Add your first link below.</p>
+                        </div>
+                      )}
+
+                      <LinkForm pageId={activePage.id} />
+                    </div>
                   </div>
 
+                  {/* Mobile Preview */}
                   <div className="hidden lg:block">
-                    <div className="sticky top-28">
+                    <div className="sticky top-24">
+                      <h3 className="text-lg font-medium mb-4 text-center">
+                        Preview
+                      </h3>
                       <MobilePreview page={activePage} />
                     </div>
                   </div>
                 </div>
               </TabsContent>
-              {/* <TabsContent value="preview" className="animate-fade-in p-6">
-                <div className="flex justify-center">
-                  <MobilePreview page={activePage} />
+
+              <TabsContent value="appearance" className="animate-fade-in">
+  <div className="grid grid-cols-1 p-6 lg:grid-cols-3 gap-6">
+    <div className="lg:col-span-2 space-y-6">
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <h2 className="text-lg font-medium mb-4">Profile Settings</h2>
+        <div className="space-y-6">
+          {/* Profile Image Section */}
+          <div>
+            <label className="block text-sm font-medium mb-3">
+              Profile Image
+            </label>
+            <div className="flex items-center gap-4">
+              <Avatar className="size-16 border border-muted-foreground/20">
+                <AvatarImage src={activePage?.imageUrl} />
+                <AvatarFallback>
+                  {(activePage?.title?.[0] || "") +
+                    (activePage?.title?.[1] || "")}
+                </AvatarFallback>
+              </Avatar>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Image
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Upload Profile Image</DialogTitle>
+                    <DialogDescription>
+                      Upload and crop your profile picture
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {profileImageFile ? (
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="relative w-full aspect-square max-w-sm mx-auto border rounded-lg overflow-hidden">
+                          <ImageCropper
+                            image={profileImagePreview}
+                            aspect={1}
+                            onCropComplete={handleProfileCropComplete}
+                          />
+                        </div>
+                        <Button variant="outline" onClick={() => setProfileImageFile(null)}>
+                          Choose Different Image
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                          <input
+                            type="file"
+                            id="profileImageUpload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleProfileImageChange}
+                          />
+                          <label htmlFor="profileImageUpload" className="cursor-pointer">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Drag & drop or click to upload
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Supports JPG, PNG, WEBP
+                            </p>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <DialogFooter className="sm:justify-between">
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <Button 
+                      disabled={!profileImageFile}
+                      onClick={handleProfileImageSave}
+                    >
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Recommended size: 400x400px. Max file size: 2MB
+            </p>
+          </div>
+          
+          {/* Background Image Section */}
+          <div>
+            <label className="block text-sm font-medium mb-3">
+              Background
+            </label>
+            <div className="relative h-24 w-full rounded-lg overflow-hidden mb-3 bg-gray-100">
+              {activePage?.backgroundImageUrl ? (
+                <img 
+                  src={activePage?.backgroundImageUrl} 
+                  alt="Background preview" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <ImageIcon className="h-6 w-6 mr-2" />
+                  <span>No background set</span>
                 </div>
-              </TabsContent> */}
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Background
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Upload Background Image</DialogTitle>
+                    <DialogDescription>
+                      Upload and crop your background image
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {backgroundImageFile ? (
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="relative w-full aspect-video max-w-lg mx-auto border rounded-lg overflow-hidden">
+                          <ImageCropper
+                            image={backgroundImagePreview}
+                            aspect={16/9}
+                            onCropComplete={handleBackgroundCropComplete}
+                          />
+                        </div>
+                        <Button variant="outline" onClick={() => setBackgroundImageFile(null)}>
+                          Choose Different Image
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                          <input
+                            type="file"
+                            id="backgroundImageUpload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleBackgroundImageChange}
+                          />
+                          <label htmlFor="backgroundImageUpload" className="cursor-pointer">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Drag & drop or click to upload
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Supports JPG, PNG, WEBP
+                            </p>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <DialogFooter className="sm:justify-between">
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <Button 
+                      disabled={!backgroundImageFile}
+                      onClick={handleBackgroundImageSave}
+                    >
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              
+              {activePage?.backgroundImageUrl && (
+                <Button variant="outline" onClick={handleRemoveBackground}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Remove
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Recommended size: 1080x608px. Max file size: 5MB
+            </p>
+          </div>
+          
+          {/* Colors and Text Settings */}
+          <div>
+            <h3 className="text-sm font-medium mb-3">Text & Colors</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">
+                  Bio Text
+                </label>
+                <Textarea 
+                  placeholder="Add a short bio" 
+                  className="resize-none" 
+                  value={activePage?.description || ""}
+                  onChange={(e) => handleChangeDescription(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">
+                  Accent Color
+                </label>
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-8 h-8 rounded-full border shadow-sm" 
+                    style={{ backgroundColor: activePage?.accentColor || "#0ea5e9" }}
+                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Palette className="h-4 w-4 mr-2" />
+                        Change Color
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64">
+                      <ColorPicker 
+                        color={activePage?.accentColor || "#0ea5e9"} 
+                        onChange={handleColorChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">Theme & Layout</h2>
+          <Button variant="outline" size="sm" className="text-muted-foreground">
+            <Paintbrush className="h-4 w-4 mr-2" />
+            Customize
+          </Button>
+        </div>
+
+        <TemplateSelector pageId={activePage.id} />
+      </div>
+    </div>
+
+    <div className="hidden lg:block">
+      <div className="sticky top-24">
+        <h3 className="text-lg font-medium mb-4 text-center">Preview</h3>
+        <MobilePreview page={activePage} />
+      </div>
+    </div>
+  </div>
+</TabsContent>
             </Tabs>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center max-w-md p-6">
-                <h2 className="text-xl font-bold mb-2">No Page Selected</h2>
-                <p className="text-muted-foreground mb-4">
+            <div className="flex-1 flex items-center justify-center p-6">
+              <div className="text-center max-w-md p-6 bg-white rounded-xl shadow-sm">
+                <h2 className="text-xl font-bold mb-4">No Page Selected</h2>
+                <p className="text-muted-foreground mb-6">
                   Select an existing page or create a new one to get started
                 </p>
                 <Button
@@ -504,7 +967,19 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </section>
-      </main>
+      </div>
+
+      {/* Mobile Preview Floating Button (only on small screens) */}
+      {activePage && (
+        <div className="lg:hidden fixed bottom-6 right-6 z-30">
+          <Button
+            onClick={() => navigate(`/preview/${activePage.id}`)}
+            className="rounded-full shadow-lg h-14 w-14 bg-blue-500 hover:bg-blue-600"
+          >
+            <Eye className="h-6 w-6" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

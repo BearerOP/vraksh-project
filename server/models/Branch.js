@@ -43,6 +43,14 @@ const BranchSchema = new mongoose.Schema({
     type: String,
     default: "default",
   },
+  imageUrl:{
+    type: String,
+    default: "/placeholder-profile.jpg",
+  },
+  backgroundImageUrl:{
+    type: String,
+    optional: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

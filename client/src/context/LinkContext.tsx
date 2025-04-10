@@ -17,6 +17,7 @@ export interface Page {
   imageUrl: string;
   templateId?: string; // Optional, for future use
   description?: string; // Optional, for future use
+  backgroundImageUrl?: string; // Optional, for future use
 }
 
 interface LinkContextType {

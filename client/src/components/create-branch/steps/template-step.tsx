@@ -115,7 +115,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                               Your description{" "}
                             </p>
                             <div className="flex space-x-2 mb-4 ">
-                            <div className="transform scale-75 sm:scale-90 md:scale-100">
+                              <div className="transform scale-75 sm:scale-90 md:scale-100">
                                 <InstagramIcon />
                               </div>
                               <div className="transform scale-75 sm:scale-90 md:scale-100">

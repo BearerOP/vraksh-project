@@ -6,33 +6,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 import { templateConfigs } from "./TemplateSelector";
 
-// Sample template config
-const sampleTemplate = {
-  id: "gothic",
-  backgroundImage: "/template-bg/bg-07.png",
-  className: "bg-gradient-to-r from-pink-500 via-red-500 to-orange-500",
-  textClass: "text-white",
-  linkClass: "bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg",
-  profileClass: "bg-white/30 border border-white/40 text-white",
-  titleClass: "text-white font-semibold",
-};
 
 export interface MobilePreviewProps {
   page: Page;
-  templateConfig?: {
-    id: string;
-    className: string;
-    textClass: string;
-    profileClass: string;
-    linkClass: string;
-    backgroundImage?: string;
-    titleClass: string;
-  };
 }
 
 const MobilePreview: React.FC<MobilePreviewProps> = ({
   page,
-  // templateConfig,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
@@ -51,9 +31,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
       : `https://${url}`;
 
   // templateConfig = templateConfig || sampleTemplate; // use sample for now
-
   return (
-    <div className="relative w-full max-w-[293px] mx-auto">
+    <div className="relative w-[293px] mx-auto">
       {/* Phone Frame */}
       <div
         style={{
@@ -72,13 +51,19 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
         )}
         style={{
           height: 525,
-          backgroundImage: templateConfig.backgroundImage
-            ? `url(${templateConfig.backgroundImage})`
-            : undefined,
-          backgroundSize: templateConfig.backgroundImage ? "cover" : undefined,
-          backgroundPosition: templateConfig.backgroundImage
-            ? "center"
-            : undefined,
+          backgroundImage: page.backgroundImageUrl
+        ? `url(${page.backgroundImageUrl})`
+        : templateConfig.backgroundImage
+        ? `url(${templateConfig.backgroundImage})`
+        : undefined,
+          backgroundSize:
+        page.backgroundImageUrl || templateConfig.backgroundImage
+          ? "cover"
+          : undefined,
+          backgroundPosition:
+        page.backgroundImageUrl || templateConfig.backgroundImage
+          ? "center"
+          : undefined,
         }}
       >
         <div
@@ -87,71 +72,71 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
         >
           {/* Profile Section */}
           <div className="mb-8 text-center">
-            <div
-              className={cn(
-                "mx-auto mb-4 flex items-center justify-center text-2xl font-bold size-16 rounded-full",
-                templateConfig.profileClass
-              )}
-            >
-              {page.imageUrl ? (
-                <img
-                  src={page?.imageUrl}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                page.title.charAt(0)
-              )}
-            </div>
-            <h1 className={cn("text-sm font-bold", templateConfig.titleClass)}>
-              {page.title}
-            </h1>
-            <p className="text-xs opacity-70">
-              @{user?.username || "username"}
-            </p>
+        <div
+          className={cn(
+            "mx-auto mb-4 flex items-center justify-center text-2xl font-bold size-16 rounded-full",
+            templateConfig.profileClass
+          )}
+        >
+          {page.imageUrl ? (
+            <img
+          src={page?.imageUrl}
+          alt="Profile"
+          className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            page.title.charAt(0)
+          )}
+        </div>
+        <h1 className={cn("text-sm font-bold", templateConfig.titleClass)}>
+          {page.title}
+        </h1>
+        <p className="text-xs opacity-70">
+          @{user?.username || "username"}
+        </p>
           </div>
 
           {/* Links Section */}
           <div className="w-full space-y-3 pb-20">
-            {page.links
-              .filter((link) => link.active)
-              .map((link: LinkType, index: number) => (
-                <a
-                  key={link.id}
-                  href={normalizeUrl(link.url)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    `w-full p-3 transition-all duration-300 transform hover:scale-[1.02] 
-                    active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center`,
-                    templateConfig.linkClass
-                  )}
-                  style={{
-                    animationDelay: `${(index * 0.1).toFixed(1)}s`,
-                    boxShadow:
-                      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <span className="font-normal">{link.title}</span>
-                  {page.templateId === "rounded" ? (
-                    <ExternalLink className="h-4 w-4 opacity-60" />
-                  ) : (
-                    <ArrowUpRight className="h-4 w-4 opacity-60" />
-                  )}
-                </a>
-              ))}
+        {page.links
+          .filter((link) => link.active)
+          .map((link: LinkType, index: number) => (
+            <a
+          key={link.id}
+          href={normalizeUrl(link.url)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            `w-full p-3 transition-all duration-300 transform hover:scale-[1.02] 
+            active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center`,
+            templateConfig.linkClass
+          )}
+          style={{
+            animationDelay: `${(index * 0.1).toFixed(1)}s`,
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+          }}
+            >
+          <span className="font-normal">{link.title}</span>
+          {page.templateId === "rounded" ? (
+            <ExternalLink className="h-4 w-4 opacity-60" />
+          ) : (
+            <ArrowUpRight className="h-4 w-4 opacity-60" />
+          )}
+            </a>
+          ))}
           </div>
 
           {/* Footer */}
-          <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t-[1.25] w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-md">
+          <div className="absolute z-[999] bottom-0 pb-4 min-h-16 bg-gradient-to-t from-black via-black/60 to-transparent pt-2 border-t-[1.25] w-full text-center text-xs flex flex-col justify-center gap-1 items-center backdrop-blur-sm">
             <Link to="/" className="text-xs text-white">
-              <img src="https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Ficon.svg?alt=media&token=6ca793eb-5cb4-452f-aad8-be22a13f0d9b" loading="lazy" alt="icon" className="h-4 w-4 shadow-md" />
+              <img src="/icon.svg" loading="lazy" alt="icon" className="h-4 w-4 shadow-md" />
             </Link>
             <p className="font-bold text-white">VRAKSH</p>
           </div>
         </div>
       </div>
-    </div>
+      </div>
   );
 };
 

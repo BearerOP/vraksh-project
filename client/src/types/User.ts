@@ -44,4 +44,5 @@ export type Branch = {
     updatedAt: Date;
     templateId: string;
     imageUrl: string;
+    backgroundImageUrl: string;
   };
