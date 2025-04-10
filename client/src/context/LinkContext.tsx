@@ -114,6 +114,18 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
       links: [],
       templateId: "default",
       imageUrl: "",
+      titleColor: "#000000",
+      descriptionColor: "#000000",
+      linkTextColor: "#000000",
+      linkBorderSize: "2px",
+      linkBackgroundColor: "#ffffff",
+      titleFont: "Arial",
+      descriptionFont: "Arial",
+      buttonTextFont: "Arial",
+      avatarRounded: "50%",
+      socialIcons: [],
+      description: "",
+      backgroundImageUrl: "",
     };
 
     setPages([...pages, newPage]);
@@ -125,7 +137,6 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
     const updatedPages = pages.map((page) =>
       page.id === pageId ? { ...page, ...updates } : page
     );
-
     setPages(updatedPages);
 
     // If active page was updated, update that reference too

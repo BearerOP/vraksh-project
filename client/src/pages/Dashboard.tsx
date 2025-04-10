@@ -54,6 +54,13 @@ import { Upload, Trash2, ImageIcon } from "lucide-react";
 import ImageCropper from "@/components/ImageCropper";
 import ColorPicker from "@/components/ColorPicker";
 import { link } from "fs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Dashboard: React.FC = () => {
   // Add these state variables to your component
@@ -309,7 +316,7 @@ const Dashboard: React.FC = () => {
           linkBorderSize: branch.linkBorderSize,
           linkBackgroundColor: branch.linkBackgroundColor,
           buttonTextFont: branch.buttonTextFont,
-          avatarRounded: branch.avatarRounded ,
+          avatarRounded: branch.avatarRounded,
         }));
 
         setPages(mappedPages);
@@ -713,96 +720,114 @@ const Dashboard: React.FC = () => {
                       <h2 className="text-lg font-medium mb-4">
                         Profile Settings
                       </h2>
-                      <div className="space-y-6">
+                      <div className="flex justify-between ">
                         {/* Profile Image Section */}
                         <div>
-                          <label className="block text-sm font-medium mb-3">
+                          <label className="block text-sm font-medium mb-6">
                             Profile Image
                           </label>
-                          <div className="flex items-center gap-4">
-                            <Avatar className="size-16 border border-muted-foreground/20">
+                          <div className="flex flex-col items-center gap-4">
+                            <Avatar
+                              className="size-48 border border-muted-foreground/20"
+                              style={{
+                                borderRadius: activePage?.avatarRounded,
+                              }}
+                            >
                               <AvatarImage src={activePage?.imageUrl} />
                               <AvatarFallback>
                                 {(activePage?.title?.[0] || "") +
                                   (activePage?.title?.[1] || "")}
                               </AvatarFallback>
                             </Avatar>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline">
-                                  <Upload className="h-4 w-4 mr-2" />
-                                  Upload Image
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Upload Profile Image
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    Upload and crop your profile picture
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                  {profileImageFile ? (
-                                    <div className="flex flex-col items-center gap-4">
-                                      <div className="relative w-full aspect-square max-w-sm mx-auto border rounded-lg overflow-hidden">
-                                        <ImageCropper
-                                          image={profileImagePreview}
-                                          aspect={1}
-                                          onCropComplete={
-                                            handleProfileCropComplete
-                                          }
-                                        />
-                                      </div>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() =>
-                                          setProfileImageFile(null)
-                                        }
-                                      >
-                                        Choose Different Image
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    <div className="flex flex-col items-center gap-4">
-                                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
-                                        <input
-                                          type="file"
-                                          id="profileImageUpload"
-                                          className="hidden"
-                                          accept="image/*"
-                                          onChange={handleProfileImageChange}
-                                        />
-                                        <label
-                                          htmlFor="profileImageUpload"
-                                          className="cursor-pointer"
-                                        >
-                                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                                          <p className="text-sm text-muted-foreground">
-                                            Drag & drop or click to upload
-                                          </p>
-                                          <p className="text-xs text-muted-foreground mt-1">
-                                            Supports JPG, PNG, WEBP
-                                          </p>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                                <DialogFooter className="sm:justify-between">
-                                  <DialogClose asChild>
-                                    <Button variant="secondary">Cancel</Button>
-                                  </DialogClose>
-                                  <Button
-                                    disabled={!profileImageFile}
-                                    onClick={handleProfileImageSave}
-                                  >
-                                    Save Changes
+                            <div className="flex gap-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="outline">
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Upload Image
                                   </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Upload Profile Image
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Upload and crop your profile picture
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    {profileImageFile ? (
+                                      <div className="flex flex-col items-center gap-4">
+                                        <div className="relative flex justify-center w-full aspect-square max-w-sm mx-auto border rounded-lg overflow-hidden">
+                                          <ImageCropper
+                                            image={profileImagePreview}
+                                            aspect={1}
+                                            onCropComplete={
+                                              handleProfileCropComplete
+                                            }
+                                          />
+                                        </div>
+                                        <Button
+                                          variant="outline"
+                                          onClick={() =>
+                                            setProfileImageFile(null)
+                                          }
+                                        >
+                                          Choose Different Image
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <div className="flex flex-col items-center gap-4">
+                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                                          <input
+                                            type="file"
+                                            id="profileImageUpload"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleProfileImageChange}
+                                          />
+                                          <label
+                                            htmlFor="profileImageUpload"
+                                            className="cursor-pointer"
+                                          >
+                                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                            <p className="text-sm text-muted-foreground">
+                                              Drag & drop or click to upload
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              Supports JPG, PNG, WEBP
+                                            </p>
+                                          </label>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <DialogFooter className="sm:justify-between">
+                                    <DialogClose asChild>
+                                      <Button variant="secondary">
+                                        Cancel
+                                      </Button>
+                                    </DialogClose>
+                                    <Button
+                                      disabled={!profileImageFile}
+                                      onClick={handleProfileImageSave}
+                                    >
+                                      Save Changes
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                              {activePage?.imageUrl && (
+                                <Button
+                                  variant="outline"
+                                  onClick={handleRemoveProfileImage}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Remove
+                                </Button>
+                              )}
+                            </div>
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">
                             Recommended size: 400x400px. Max file size: 2MB
@@ -813,49 +838,58 @@ const Dashboard: React.FC = () => {
                             <label className="block text-sm font-medium mb-2">
                               Avatar Shape
                             </label>
-                            <select
-                              value={
-                                activePage?.avatarRounded || "rounded-none"
-                              }
-                              onChange={(e) =>
+
+                            <Select
+                              value={activePage?.avatarRounded} // "8px" is Default
+                              onValueChange={(value) =>
                                 updatePage(activePage.id, {
-                                  avatarRounded: e.target.value,
+                                  avatarRounded: value,
                                 })
                               }
-                              className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                              defaultValue="9999px"
                             >
-                              <option value="0">None</option>
-                              <option value="4px">Small</option>
-                              <option value="8px">Default</option>
-                              <option value="12px">Medium</option>
-                              <option value="16px">Large</option>
-                              <option value="24px">Extra Large</option>
-                              <option value="32px">
-                                2x Extra Large
-                              </option>
-                              <option value="calc(infinity * 1px)">Full</option>
-                            </select>
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Select the avatar shape" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="0">Square</SelectItem>
+                                <SelectItem value="4px">
+                                  Small Curved
+                                </SelectItem>
+                                <SelectItem value="8px">Default</SelectItem>
+                                <SelectItem value="12px">Curved</SelectItem>
+                                <SelectItem value="16px">
+                                  Large Curved
+                                </SelectItem>
+                                <SelectItem value="24px">2XL Curved</SelectItem>
+                                <SelectItem value="9999px">
+                                  Circle
+                                </SelectItem>{" "}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
 
                         {/* Background Image Section */}
                         <div>
-                          <label className="block text-sm font-medium mb-3">
+                          <label className="block text-sm font-medium mb-6">
                             Background
                           </label>
-                          <div className="relative h-24 w-full rounded-lg overflow-hidden mb-3 bg-gray-100">
-                            {activePage?.backgroundImageUrl ? (
-                              <img
-                                src={activePage?.backgroundImageUrl}
-                                alt="Background preview"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center h-full text-muted-foreground">
-                                <ImageIcon className="h-6 w-6 mr-2" />
-                                <span>No background set</span>
-                              </div>
-                            )}
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="relative h-48 w-fit rounded-lg overflow-hidden mb-3 bg-gray-100">
+                              {activePage?.backgroundImageUrl ? (
+                                <img
+                                  src={activePage?.backgroundImageUrl}
+                                  alt="Background preview"
+                                  className="h-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex items-center justify-center h-full text-muted-foreground">
+                                  <ImageIcon className="h-6 w-6 mr-2" />
+                                  <span>No background set</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex gap-2">
                             <Dialog>
@@ -877,10 +911,10 @@ const Dashboard: React.FC = () => {
                                 <div className="space-y-4">
                                   {backgroundImageFile ? (
                                     <div className="flex flex-col items-center gap-4">
-                                      <div className="relative w-full aspect-video max-w-lg mx-auto border rounded-lg overflow-hidden">
+                                      <div className="relative aspect-[9/16] max-w-lg mx-auto border rounded-lg overflow-hidden">
                                         <ImageCropper
                                           image={backgroundImagePreview}
-                                          aspect={16 / 9}
+                                          aspect={9 / 16}
                                           onCropComplete={
                                             handleBackgroundCropComplete
                                           }
