@@ -45,7 +45,7 @@ export const templateConfigs: TemplateConfig[] = [
     titleClass: "text-gray-900 font-light",
     subtitleClass: "text-gray-500",
 
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-02.png?alt=media&token=1edb77a4-8000-42c3-9c07-29dd5e9cd421",
+    backgroundImage: "/template-bg/bg-26.png",
   },
   {
     id: "gradient",
@@ -56,7 +56,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-white/30 border border-white/40 text-white",
     titleClass: "text-white font-medium",
     subtitleClass: "text-white/80",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-03.png?alt=media&token=d2c977de-2910-43c9-a44d-2e6ea1858a90",
+    backgroundImage: "/template-bg/bg-03.png",
   },
   {
     id: "dark",
@@ -68,7 +68,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-gray-800 border border-gray-700 text-white",
     titleClass: "text-white font-bold",
     subtitleClass: "text-gray-400",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-04.png?alt=media&token=e822ef7c-b1ce-40bc-8baf-f41c1642ace9",
+    backgroundImage: "/template-bg/bg-04.png",
   },
   {
     id: "rounded",
@@ -79,7 +79,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-gray-300 text-gray-800",
     titleClass: "text-gray-900 font-semibold",
     subtitleClass: "text-gray-600",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-05.png?alt=media&token=72167ee9-f00e-4fca-8c7a-bc87ee267023",
+    backgroundImage: "/template-bg/bg-05.png",
   },
   {
     id: "glass",
@@ -91,7 +91,7 @@ export const templateConfigs: TemplateConfig[] = [
       "bg-white/30 backdrop-blur-md border border-white/40 text-gray-900",
     titleClass: "text-gray-900 font-medium",
     subtitleClass: "text-gray-700",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-06.png?alt=media&token=4e188e27-bff3-4ef9-8c3a-0716a4b371c6",
+    backgroundImage: "/template-bg/bg-06.png",
   },
   {
     id: "neon",
@@ -103,7 +103,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-neon-pink/20 border border-neon-pink text-neon-pink",
     titleClass: "text-neon-pink font-bold tracking-wide",
     subtitleClass: "text-neon-pink/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-07.png?alt=media&token=e1c012ab-e482-4741-ac5f-3c640de40f42",
+    backgroundImage: "/template-bg/bg-07.png",
   },
   {
     id: "futuristic",
@@ -114,7 +114,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-white/30 border border-white/40 text-white",
     titleClass: "text-white font-extrabold uppercase tracking-widest",
     subtitleClass: "text-white/80",
-    backgroundImage: "/https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-08.png?alt=media&token=e208ccba-4ad3-4099-ac2b-b4dd69e81ba5",
+    backgroundImage: "/template-bg/bg-08.png",
   },
   {
     id: "pastel",
@@ -125,7 +125,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-pink-200 text-pink-900",
     titleClass: "text-pink-900 font-medium",
     subtitleClass: "text-pink-700",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-05.png?alt=media&token=72167ee9-f00e-4fca-8c7a-bc87ee267023",
+    backgroundImage: "/template-bg/bg-05.png",
   },
 
   {
@@ -138,7 +138,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-neon-green/20 border border-neon-green text-neon-green",
     titleClass: "text-neon-green font-extrabold uppercase",
     subtitleClass: "text-neon-green/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-26.png?alt=media&token=d7fb7f20-ab67-45df-a5a7-4819e47ae7ed",
+    backgroundImage: "/template-bg/bg-26.png",
   },
   {
     id: "vintage",
@@ -222,7 +222,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-white/30 border border-white/40 text-white",
     titleClass: "text-white font-bold uppercase",
     subtitleClass: "text-white/80",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-28.png?alt=media&token=f0f7148d-9d4e-494b-8ddd-c5a2679c3864",
+    backgroundImage: "/template-bg/bg-28.png",
   },
   {
     id: "matrix",
@@ -244,7 +244,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-blue-200 text-blue-900",
     titleClass: "text-blue-900 font-medium",
     subtitleClass: "text-blue-700",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-25.png?alt=media&token=fb8baa2d-80f2-4612-a2e0-44b8d2e9f677"
+    backgroundImage: "/template-bg/bg-25.png"
   },
   {
     id: "golden",
@@ -266,7 +266,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-white/30 border border-white/40 text-white",
     titleClass: "text-white font-semibold",
     subtitleClass: "text-white/80",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-23.png?alt=media&token=aeac1a51-c920-4c5a-8438-f07c68061f18",
+    backgroundImage: "/template-bg/bg-23.png",
 
   },
   {
@@ -289,7 +289,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-red-500/20 border border-red-500 text-red-500",
     titleClass: "text-red-500 font-blackletter",
     subtitleClass: "text-red-500/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-07.png?alt=media&token=e1c012ab-e482-4741-ac5f-3c640de40f42",
+    backgroundImage: "/template-bg/bg-07.png",
   },
   {
     id: "sunset",
@@ -300,7 +300,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-white/30 border border-white/40 text-white",
     titleClass: "text-white font-semibold",
     subtitleClass: "text-white/80",
-    backgroundImage:"https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-19.png?alt=media&token=3182a36e-fcc3-40dc-84da-eafc611310af"
+    backgroundImage:"/template-bg/bg-19.png"
   },
   {
     id: "forest",
@@ -312,7 +312,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-green-300/20 border border-green-300 text-green-300",
     titleClass: "text-green-300 font-semibold uppercase",
     subtitleClass: "text-green-300/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-18.png?alt=media&token=292602a6-3796-4e9d-a2ea-499f0942ccfd",
+    backgroundImage: "/template-bg/bg-18.png",
 
   },
   {
@@ -325,7 +325,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-pink-200/20 border border-pink-200 text-pink-200",
     titleClass: "text-pink-200 font-mono uppercase",
     subtitleClass: "text-pink-200/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-15.png?alt=media&token=7d24657d-f449-4c40-9ef5-376a7f0f9376",
+    backgroundImage: "/template-bg/bg-15.png",
 
   },
   {
@@ -338,7 +338,7 @@ export const templateConfigs: TemplateConfig[] = [
     profileClass: "bg-gold-500/20 border border-gold-500 text-gold-500",
     titleClass: "text-gold-500 font-serif font-bold uppercase",
     subtitleClass: "text-gold-500/70",
-    backgroundImage: "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/template-bg%2Fbg-27.png?alt=media&token=d921b6d7-361a-4c81-a4f4-74a107644b1e",
+    backgroundImage: "/template-bg/bg-27.png",
 
   },
 ];

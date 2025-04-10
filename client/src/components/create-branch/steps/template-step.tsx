@@ -88,8 +88,6 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                             `}
                       >
                         <CardContent className={`p-0`}>
-                          {/* <img src="/template-bg/bg-01.png" alt="Template Background" /> */}
-                          {template.backgroundImage}
                           <div
                             className={`${template.className}  p-6 flex flex-col items-center text-center h-screen`}
                             style={{
@@ -100,9 +98,9 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                           >
                             <div className="relative size-16 rounded-full overflow-hidden mb-1 md:mb-2">
                               <img
-                                src={
-                                  "https://firebasestorage.googleapis.com/v0/b/theslugproject.appspot.com/o/vraksh%2Fplaceholder-profile.jpg?alt=media&token=6da1c298-4481-4596-bd7b-95c20b26fd31"
-                                }
+                                src="
+                                  /placeholder-profile.jpg
+                                "
                                 alt={template.name}
                                 className="object-cover"
                                 loading="lazy"
