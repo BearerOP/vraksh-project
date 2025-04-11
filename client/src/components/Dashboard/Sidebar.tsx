@@ -40,12 +40,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     <aside
       className={`${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } md:translate-x-0 transition-transform duration-300 w-64  backdrop-blur-lg py-6 fixed md:sticky h-screen top-0 border-r flex flex-col z-20`}
+      } md:translate-x-0 transition-transform duration-300 w-64 backdrop-blur-lg  bg-white/20 py-6 fixed md:sticky h-screen top-0 border-r flex flex-col z-20`}
     >
       <div className="relative px-4 mb-4">
         {/* Dropdown Button */}
         <button
-          className="w-fit mt-10 flex justify-between items-center p-3 text-sm bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+          className="w-fit flex justify-between items-center p-3 text-sm bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
           onClick={() => setShowDropdown(!showDropdown)}
         >
           <span className="truncate font-medium">

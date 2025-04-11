@@ -13,38 +13,48 @@ interface DashboardHeaderProps {
   className?: string;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveTab, className }) => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+  activeTab,
+  setActiveTab,
+  className,
+}) => {
   const navigate = useNavigate();
   const { activePage } = useLinks();
 
   return (
-    <div className={cn( `flex flex-col sm:flex-row justify-between sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b shadow-sm`)}>
+    <div
+      className={cn(
+        `flex flex-col  sm:flex-row justify-center md:justify-between sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b shadow-sm`
+      )}
+    >
       <h2 className="text-xl font-bold text-center relative self-center mb-3 sm:mb-0">
-        My Vraksh
+        My Vraksh Branch
       </h2>
 
-      <div className={cn(`flex gap-2 flex-wrap justify-center sm:justify-end`, className)}>
-        <TabsList className="mb-3 sm:mb-0 mr-2">
-          <TabsTrigger value="links" onClick={() => setActiveTab("links")}>
-            Links
-          </TabsTrigger>
-          <TabsTrigger
-            value="appearance"
-            onClick={() => setActiveTab("appearance")}>
-            Appearance
-          </TabsTrigger>
-        </TabsList>
-
+      <div
+        className={cn(
+          `hidden md:flex gap-2 flex-wrap justify-center sm:justify-end `,
+        )}
+      >
         <Button
           variant="outline"
           size="sm"
-          onClick={() => {
-            navigate(`/theme/${activePage.id}`);
-          }}
+          value="links"
+          onClick={() => setActiveTab("links")}
           className="text-foreground hover:bg-foreground/10 transition-all duration-200"
         >
           <Paintbrush className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Theme</span>
+          <span className="hidden lg:inline">Links</span>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          value="theme"
+          onClick={() => setActiveTab("theme")}
+          className="text-foreground hover:bg-foreground/10 transition-all duration-200"
+        >
+          <Paintbrush className="h-4 w-4 mr-2" />
+          <span className="hidden lg:inline">Theme</span>
         </Button>
         <Button
           variant="outline"
@@ -53,9 +63,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveT
           className="text-foreground hover:bg-foreground/10 transition-all duration-200"
         >
           <Share2 className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Share</span>
+          <span className="hidden lg:inline">Share</span>
         </Button>
-        <Button
+        {/* <Button
           variant="outline"
           size="sm"
           onClick={() => {
@@ -65,7 +75,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveT
         >
           <Eye className="h-4 w-4 mr-2" />
           <span className="hidden sm:inline">Preview</span>
-        </Button>
+        </Button> */}
         <Button
           variant="outline"
           size="sm"
@@ -75,7 +85,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveT
           className="text-foreground hover:bg-foreground/10 transition-all duration-200"
         >
           <Settings className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Settings</span>
+          <span className="hidden lg:inline">Settings</span>
         </Button>
       </div>
     </div>

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import DashboardSidebar from "@/components/Dashboard/Sidebar";
 import DashboardHeader from "@/components/Dashboard/Header";
 import LinksTabContent from "@/components/Dashboard/LinksTabContent";
-import AppearanceTabContent from "@/components/Dashboard/AppearanceTabContent";
+import ThemeTabContent from "@/components/Dashboard/ThemeTabContent";
 import MobilePreviewButton from "@/components/Dashboard/MobilePreviewButton";
 import { getBranches, getMe } from "@/lib/apis";
 import { Branch, BranchItem, SocialIcon, User } from "@/types/types";
@@ -223,19 +223,27 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">
       <div className="flex-1 min-w-full mx-auto flex relative pb-16 md:pb-0">
         {/* Mobile sidebar toggle */}
+        {sidebarOpen ? (
         <Button
+          ref={sidebarToggleRef}
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="md:hidden fixed top-6 left-44 z-30 bg-white shadow-sm rounded-full"
+        >
+            <X className="h-5 w-5" />
+        </Button>
+          ) : (
+            <Button
           ref={sidebarToggleRef}
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
           className="md:hidden fixed top-4 left-4 z-30 bg-white shadow-sm rounded-full"
         >
-          {sidebarOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
             <Menu className="h-5 w-5" />
-          )}
         </Button>
+          )}
 
         {/* Sidebar - with ref for detecting outside clicks */}
         <div ref={sidebarRef}>
@@ -270,11 +278,8 @@ const Dashboard: React.FC = () => {
                 <LinksTabContent />
               </TabsContent>
 
-              <TabsContent
-                value="appearance"
-                className="animate-fade-in relative"
-              >
-                <AppearanceTabContent />
+              <TabsContent value="theme" className="animate-fade-in relative">
+                <ThemeTabContent />
                 <MobilePreviewButton pageId={activePage.id} />
               </TabsContent>
 
@@ -317,9 +322,9 @@ const Dashboard: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveTab("appearance")}
+              onClick={() => setActiveTab("theme")}
               className={`flex flex-col items-center justify-center w-full h-full ${
-                activeTab === "appearance" ? "text-blue-600" : "text-gray-500"
+                activeTab === "theme" ? "text-blue-600" : "text-gray-500"
               }`}
             >
               <Palette className="h-5 w-5" />

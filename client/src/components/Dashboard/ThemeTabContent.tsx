@@ -1,4 +1,4 @@
-// 5. AppearanceTabContent Component
+// 5. ThemeTabContent Component
 import React from "react";
 import { useLinks } from "@/context/LinkContext";
 
@@ -9,7 +9,7 @@ import ColorSettingsSection from "./ColorSettingSection";
 import TypographySettings from "./TypographySettings";
 import ThemeSettings from "./ThemeSettings";
 
-const AppearanceTabContent: React.FC = () => {
+const ThemeTabContent: React.FC = () => {
   const { activePage } = useLinks();
 
   return (
@@ -41,4 +41,4 @@ const AppearanceTabContent: React.FC = () => {
   );
 };
 
-export default AppearanceTabContent;
+export default ThemeTabContent;
