@@ -11,12 +11,12 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { Instagram, Twitter, Facebook, MapPin } from "lucide-react";
-import { templateConfigs } from "@/components/TemplateSelector";
 import {
   InstagramIcon,
   SnapchatIcon,
   XIcon,
 } from "@/components/ui/social-icons";
+import { templateConfigs } from "@/types/types";
 
 interface TemplateStepProps {
   form: UseFormReturn<{

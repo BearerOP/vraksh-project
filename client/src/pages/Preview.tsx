@@ -4,7 +4,7 @@ import { useLinks, Link } from '@/context/LinkContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
-import { templateConfigs } from '@/components/TemplateSelector';
+import { templateConfigs } from '@/types/types';
 
 const Preview: React.FC = () => {
   const { pageId } = useParams<{ pageId: string }>();
@@ -43,8 +43,6 @@ const Preview: React.FC = () => {
     (template) => template.id === page.templateId
   );
 
-
-  
   return (
     <div 
       className={cn(
