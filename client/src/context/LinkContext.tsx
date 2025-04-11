@@ -1,4 +1,4 @@
-import { SocialIcon } from "@/types/types";
+import { SocialIcon } from "@/utils/types";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface Link {

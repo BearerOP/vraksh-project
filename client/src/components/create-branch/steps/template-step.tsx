@@ -16,7 +16,7 @@ import {
   SnapchatIcon,
   XIcon,
 } from "@/components/ui/social-icons";
-import { templateConfigs } from "@/types/types";
+import { templateConfigs } from "@/utils/types";
 
 interface TemplateStepProps {
   form: UseFormReturn<{

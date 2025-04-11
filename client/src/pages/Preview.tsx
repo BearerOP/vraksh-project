@@ -4,7 +4,7 @@ import { useLinks, Link } from '@/context/LinkContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
-import { templateConfigs } from '@/types/types';
+import { templateConfigs } from '@/utils/types';
 
 const Preview: React.FC = () => {
   const { pageId } = useParams<{ pageId: string }>();

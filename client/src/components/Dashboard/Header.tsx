@@ -1,7 +1,6 @@
 // 3. DashboardHeader Component
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { useLinks } from "@/context/LinkContext";
 import { Paintbrush, Share2, Eye, Settings } from "lucide-react";

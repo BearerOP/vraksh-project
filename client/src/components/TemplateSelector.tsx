@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { templateConfigs } from "@/types/types";
+import { templateConfigs } from "@/utils/types";
 
 interface TemplateSelectorProps {
   pageId: string;

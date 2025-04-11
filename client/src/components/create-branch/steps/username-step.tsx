@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useDebounce } from "@/hooks/use-debounce"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { checkUsername } from "@/lib/apis"
+import { reservedUsernames } from "@/utils/constant"
 
 interface UsernameStepProps {
   form: UseFormReturn<{
@@ -40,18 +41,20 @@ export default function UsernameStep({ form }: UsernameStepProps) {
 
   useEffect(() => {
     const checkUsernameAvailability = async () => {
+
+      if(reservedUsernames.includes(debouncedUsername)) {
+        setIsAvailable(false)
+        return
+      }
+
       if (!debouncedUsername || debouncedUsername.length < 3) {
         setIsAvailable(null)
         return
       }
-
       setIsChecking(true)
       try {
-        // Mock API call - replace with your actual API endpoint
         const res = await checkUsername(debouncedUsername)
         console.log("Username checked successfully:", res);
-        
-        // For demo purposes, let's say usernames containing "taken" are unavailable
         const available = (res.data as { exists: boolean }).exists === false
         setIsAvailable(available)
       } catch (error) {

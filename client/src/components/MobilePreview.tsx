@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
-import { templateConfigs } from "@/types/types";
+import { templateConfigs } from "@/utils/types";
 export interface MobilePreviewProps {
   page: Page;
 }

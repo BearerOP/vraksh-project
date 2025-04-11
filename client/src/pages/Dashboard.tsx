@@ -20,7 +20,7 @@ import LinksTabContent from "@/components/Dashboard/LinksTabContent";
 import ThemeTabContent from "@/components/Dashboard/ThemeTabContent";
 import MobilePreviewButton from "@/components/Dashboard/MobilePreviewButton";
 import { getBranches, getMe } from "@/lib/apis";
-import { Branch, BranchItem, SocialIcon, User } from "@/types/types";
+import { Branch, BranchItem, SocialIcon, User } from "@/utils/types";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Drawer,
