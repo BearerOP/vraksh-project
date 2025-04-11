@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useLinks } from "@/context/LinkContext";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +39,8 @@ const Dashboard: React.FC = () => {
   const [pageTitle, setPageTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const sidebarToggleRef = useRef<HTMLButtonElement>(null);
 
   const navigate = useNavigate();
 
@@ -68,6 +70,26 @@ const Dashboard: React.FC = () => {
     }
     fetchUserData();
   }, []);
+
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node) &&
+        sidebarToggleRef.current &&
+        !sidebarToggleRef.current.contains(event.target as Node)
+      ) {
+        setSidebarOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sidebarOpen]);
 
   useEffect(() => {
     async function fetchUserBranches() {
@@ -202,6 +224,7 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 min-w-full mx-auto flex relative pb-16 md:pb-0">
         {/* Mobile sidebar toggle */}
         <Button
+          ref={sidebarToggleRef}
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
@@ -214,14 +237,16 @@ const Dashboard: React.FC = () => {
           )}
         </Button>
 
-        {/* Sidebar */}
-        <DashboardSidebar
-          sidebarOpen={sidebarOpen}
-          showDropdown={showDropdown}
-          setShowDropdown={setShowDropdown}
-          setActiveTab={setActiveTab}
-          setSidebarOpen={setSidebarOpen}
-        />
+        {/* Sidebar - with ref for detecting outside clicks */}
+        <div ref={sidebarRef}>
+          <DashboardSidebar
+            sidebarOpen={sidebarOpen}
+            showDropdown={showDropdown}
+            setShowDropdown={setShowDropdown}
+            setActiveTab={setActiveTab}
+            setSidebarOpen={setSidebarOpen}
+          />
+        </div>
 
         {/* Main Content */}
         <section
@@ -307,10 +332,11 @@ const Dashboard: React.FC = () => {
             >
               <DrawerTrigger asChild>
                 <button
-                  onClick={() => setActiveTab("share")}
-                  className={`flex flex-col items-center justify-center w-full h-full ${
-                    activeTab === "share" ? "text-blue-600" : "text-gray-500"
-                  }`}
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default behavior
+                    setIsShareDrawerOpen(true); // Just open drawer without changing tab
+                  }}
+                  className="flex flex-col items-center justify-center w-full h-full text-gray-500"
                 >
                   <Share className="h-5 w-5" />
                   <span className="text-xs mt-1">Share</span>

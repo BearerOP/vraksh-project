@@ -166,7 +166,7 @@ const LinksTabContent: React.FC = () => {
       </div>
 
       {/* Mobile Preview */}
-      <div className=" lg:block order-1 lg:order-2 mr-6">
+      <div className=" lg:block order-1 lg:order-2 lg:mr-6">
         <div className="sticky top-24">
           <h3 className="text-lg font-medium mb-4 text-center">Preview</h3>
           <MobilePreview page={activePage} />
