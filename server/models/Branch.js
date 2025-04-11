@@ -43,13 +43,58 @@ const BranchSchema = new mongoose.Schema({
     type: String,
     default: "default",
   },
-  imageUrl:{
+  imageUrl: {
     type: String,
     default: "/placeholder-profile.jpg",
   },
-  backgroundImageUrl:{
+  backgroundImageUrl: {
     type: String,
     optional: true,
+  },
+  titleColor: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  descriptionColor: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  linkTextColor: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  linkBorderSize: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  linkBackgroundColor: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  titleFont: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  descriptionFont: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  buttonTextFont: {
+    type: String,
+    default: "",
+    optional: true,
+  },
+  avatarRounded: {
+    type: String,
+    optional: true,
+    default: "",
   },
   createdAt: {
     type: Date,
