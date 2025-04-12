@@ -14,27 +14,23 @@ const BranchItemSchema = new mongoose.Schema({
   },
   index: {
     type: Number,
-    required: [true, "Index not provided"],
+    // required: [true, "Index not provided"],
     default: null,
   },
   url: {
     type: String,
-    required: [true, "Please add a URL"],
+    required: [true, "Url not provided"],
     trim: true,
   },
   description: {
     type: String,
-    required: [true, "Please add a description"],
+    // required: [true, "Please add a description"],
     maxlength: [250, "Description cannot be more than 250 characters"],
     trim: true,
   },
   imageUrl: {
     type: String,
     trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
   style: {
     type: String,
@@ -44,6 +40,10 @@ const BranchItemSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

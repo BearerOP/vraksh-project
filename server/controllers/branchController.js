@@ -48,16 +48,41 @@ const getBranch = async (req, res) => {
 const createBranch = async (req, res) => {
   try {
     const userId = req.user._id;
-    console.log(req.body);
-    const branch = await Branch.create({ ...req.body, userId: userId });
+    const formData = req.body;
+    const links = formData.links;
+    let branch = {
+      userId,
+      name: formData.name,
+      description: formData.description,
+      socialIcons: formData.socialIcons,
+      templateId: formData.templateId,
+      imageUrl: formData.imageUrl,
+    };
 
-    console.dir(branch);
+    branch = await Branch.create({ ...branch });
+
+    const items = links.map((link) => {
+      return {
+        ...link,
+        branchId: branch._id,
+      };
+    });
+    branch.items = items;
+    const branchItems = await BranchItem.insertMany(items);
+    console.log(branchItems);
+    branch.items = branchItems.map((item) => item._id);
+    
+
+    await branch.save();
 
     res.status(201).json({
       success: true,
+      // data: req.body,
       data: branch,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({
       success: false,
       message: error.message,
