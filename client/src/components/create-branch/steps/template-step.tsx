@@ -17,29 +17,10 @@ import {
   XIcon,
 } from "@/components/ui/social-icons";
 import { templateConfigs } from "@/utils/types";
+import { FormValues } from "../create-branch-form";
 
 interface TemplateStepProps {
-  form: UseFormReturn<{
-    template?: string;
-    username?: string;
-    socials?: {
-      custom?: { title?: string; url?: string }[];
-      instagram?: string;
-      twitter?: string;
-      facebook?: string;
-      snapchat?: string;
-      tiktok?: string;
-      youtube?: string;
-      linkedin?: string;
-      github?: string;
-      website?: string;
-    };
-    profile?: {
-      title?: string;
-      bio?: string;
-      image?: string;
-    };
-  }>;
+  form: UseFormReturn<FormValues>;
 }
 
 const templates = templateConfigs;
@@ -54,7 +35,7 @@ export default function TemplateStep({ form }: TemplateStepProps) {
 
       <FormField
         control={form.control}
-        name="template"
+        name="templateId"
         render={({ field }) => (
           <FormItem className="space-y-3 mx-auto w-full">
             <FormControl>

@@ -1,83 +1,72 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import type { UseFormReturn } from "react-hook-form"
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useDebounce } from "@/hooks/use-debounce"
-import { CheckCircle, XCircle, Loader2 } from "lucide-react"
-import { checkUsername } from "@/lib/apis"
-import { reservedUsernames } from "@/utils/constant"
+import { useState, useEffect } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/use-debounce";
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { checkUsername } from "@/lib/apis";
+import { reservedUsernames } from "@/utils/constant";
+import { FormValues } from "../create-branch-form";
 
 interface UsernameStepProps {
-  form: UseFormReturn<{
-    template?: string;
-    username?: string;
-    socials?: {
-      custom?: { title?: string; url?: string }[];
-      instagram?: string;
-      twitter?: string;
-      facebook?: string;
-      snapchat?: string;
-      tiktok?: string;
-      youtube?: string;
-      linkedin?: string;
-      github?: string;
-      website?: string;
-    };
-    profile?: {
-      title?: string;
-      bio?: string;
-      image?: string;
-    };
-  }>
+  form: UseFormReturn<FormValues>;
 }
 
 export default function UsernameStep({ form }: UsernameStepProps) {
-  const [isChecking, setIsChecking] = useState(false)
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
-  const username = form.watch("username")
-  const debouncedUsername = useDebounce(username, 500)
+  const [isChecking, setIsChecking] = useState(false);
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const username = form.watch("title");
+  const debouncedUsername = useDebounce(username, 500);
 
   useEffect(() => {
     const checkUsernameAvailability = async () => {
-
-      if(reservedUsernames.includes(debouncedUsername)) {
-        setIsAvailable(false)
-        return
+      if (reservedUsernames.includes(debouncedUsername)) {
+        setIsAvailable(false);
+        return;
       }
 
       if (!debouncedUsername || debouncedUsername.length < 3) {
-        setIsAvailable(null)
-        return
+        setIsAvailable(null);
+        return;
       }
-      setIsChecking(true)
+      setIsChecking(true);
       try {
-        const res = await checkUsername(debouncedUsername)
+        const res = await checkUsername(debouncedUsername);
         console.log("Username checked successfully:", res);
-        const available = (res.data as { exists: boolean }).exists === false
-        setIsAvailable(available)
+        const available = (res.data as { exists: boolean }).exists === false;
+        setIsAvailable(available);
       } catch (error) {
-        console.error("Error checking username:", error)
-        setIsAvailable(null)
+        console.error("Error checking username:", error);
+        setIsAvailable(null);
       } finally {
-        setIsChecking(false)
+        setIsChecking(false);
       }
-    }
+    };
 
-    checkUsernameAvailability()
-  }, [debouncedUsername])
+    checkUsernameAvailability();
+  }, [debouncedUsername]);
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Choose your username</h2>
-        <p className="text-muted-foreground">This will be your unique branch URL.</p>
+        <p className="text-muted-foreground">
+          This will be your unique branch URL.
+        </p>
       </div>
 
       <FormField
         control={form.control}
-        name="username"
+        name="title"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Username</FormLabel>
@@ -101,15 +90,18 @@ export default function UsernameStep({ form }: UsernameStepProps) {
                 </div>
               )}
             </div>
-            <FormDescription>vraksh.com/{field.value || "yourname"}</FormDescription>
+            <FormDescription>
+              vraksh.com/{field.value || "yourname"}
+            </FormDescription>
             {!isChecking && isAvailable === false && (
-              <p className="text-sm text-red-500 mt-1">This username is already taken</p>
+              <p className="text-sm text-red-500 mt-1">
+                This username is already taken
+              </p>
             )}
             <FormMessage />
           </FormItem>
         )}
       />
     </div>
-  )
+  );
 }
-

@@ -6,46 +6,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Upload, X } from "lucide-react"
-import { BranchForm } from "@/types/BranchForm"
-
+import { FormValues } from "../create-branch-form"
 
 interface ProfileStepProps {
-  form: UseFormReturn<{
-    template?: string;
-    username?: string;
-    socials?: {
-      custom?: { title?: string; url?: string }[];
-      instagram?: string;
-      twitter?: string;
-      facebook?: string;
-      snapchat?: string;
-      tiktok?: string;
-      youtube?: string;
-      linkedin?: string;
-      github?: string;
-      website?: string;
-    };
-    profile?: {
-      title?: string;
-      bio?: string;
-      image?: string;
-    };
-  }>
+  form: UseFormReturn<FormValues>;
 }
 
 export default function ProfileStep({ form }: ProfileStepProps) {
-  
-  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(form.getValues("imageUrl") || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const username = form.watch("username")
-  const title = form.watch("profile.title")
-
-  // Automatically set profile.title to username if not manually changed
-  useEffect(() => {
-    if (!title) {
-      form.setValue("profile.title", username, { shouldValidate: true })
-    }
-  }, [username, title, form.setValue])
+  const title = form.watch("title")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -54,7 +24,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
       reader.onload = () => {
         const result = reader.result as string
         setPreviewImage(result)
-        form.setValue("profile.image", result)
+        form.setValue("imageUrl", result)
       }
       reader.readAsDataURL(file)
     }
@@ -62,7 +32,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
 
   const removeImage = () => {
     setPreviewImage(null)
-    form.setValue("profile.image", "")
+    form.setValue("imageUrl", "")
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -82,7 +52,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
             <Avatar className="w-32 h-32">
               <AvatarImage src={previewImage || ""} />
               <AvatarFallback className="bg-muted text-2xl">
-                {username?.substring(0, 2).toUpperCase() || "?"}
+                {title?.substring(0, 2).toUpperCase() || "?"}
               </AvatarFallback>
             </Avatar>
             {previewImage && (
@@ -113,7 +83,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
         <div className="md:w-2/3 space-y-4">
           <FormField
             control={form.control}
-            name="profile.title"
+            name="title"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Branch Title</FormLabel>
@@ -128,7 +98,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
 
           <FormField
             control={form.control}
-            name="profile.bio"
+            name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Bio</FormLabel>
@@ -147,5 +117,5 @@ export default function ProfileStep({ form }: ProfileStepProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

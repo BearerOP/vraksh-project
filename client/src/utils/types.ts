@@ -14,7 +14,6 @@ export type User = {
 
 export type SocialIcon = {
   name: string;
-  icon: string;
   url: string;
 };
 
