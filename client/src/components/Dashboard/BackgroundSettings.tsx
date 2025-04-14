@@ -44,20 +44,20 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
 
   const handleBackgroundImageSave = async () => {
     if (!croppedBlob || !user) return;
-  
+
     try {
       const croppedFile = new File([croppedBlob], "cropped-image.jpg", {
         type: croppedBlob.type,
       });
-  
+
       const compressedFile = await imageCompression(croppedFile, {
         maxSizeMB: 1,
         maxWidthOrHeight: 1080,
         useWebWorker: true,
       });
-  
+
       const publicId = `vraksh/${activePage?.title}-bg`;
-  
+
       const sigRes = await cloudinarySign(publicId, "bg_preset");
       const { signature, timestamp, apiKey, cloudName } = sigRes.data as {
         signature: string;
@@ -65,7 +65,7 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
         apiKey: string;
         cloudName: string;
       };
-  
+
       // 2. Prepare and send upload
       const formData = new FormData();
       formData.append("file", compressedFile);
@@ -74,7 +74,7 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
       formData.append("signature", signature);
       formData.append("upload_preset", "bg_preset");
       formData.append("public_id", publicId);
-  
+
       const uploadRes = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
         {
@@ -82,9 +82,9 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
           body: formData,
         }
       );
-  
+
       const data = await uploadRes.json();
-  
+
       if (data.secure_url) {
         updatePage(pageId, { backgroundImageUrl: data.secure_url });
         setBackgroundImageFile(null);
@@ -95,7 +95,6 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
       console.error("Background image upload error:", error);
     }
   };
-  
 
   const handleRemoveBackground = () => {
     updatePage(pageId, { backgroundImageUrl: null });

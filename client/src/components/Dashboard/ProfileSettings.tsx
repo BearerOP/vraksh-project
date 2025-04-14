@@ -49,70 +49,70 @@ const ProfileSettings: React.FC = () => {
     setCroppedProfileImage(blob);
   };
 
+  const handleProfileImageSave = async () => {
+    if (!croppedProfileImage || !activePage?.id || !activePage?.title) return;
 
-const handleProfileImageSave = async () => {
-  if (!croppedProfileImage || !activePage?.id || !activePage?.title) return;
+    try {
+      // Convert Blob to File
+      const croppedFile = new File(
+        [croppedProfileImage],
+        "cropped-profile.jpg",
+        {
+          type: croppedProfileImage.type || "image/jpeg",
+        }
+      );
 
-  try {
-    // Convert Blob to File
-    const croppedFile = new File([croppedProfileImage], "cropped-profile.jpg", {
-      type: croppedProfileImage.type || "image/jpeg",
-    });
+      // Compress the file
+      const compressedFile = await imageCompression(croppedFile, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1080,
+        useWebWorker: true,
+      });
 
-    // Compress the file
-    const compressedFile = await imageCompression(croppedFile, {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1080,
-      useWebWorker: true,
-    });
+      // Generate Cloudinary publicId
+      const publicId = `vraksh/${activePage.title}-profile`;
 
-    // Generate Cloudinary publicId
-    const publicId = `vraksh/${activePage.title}-profile`;
+      // Get signature for secure upload
+      const sigRes = await cloudinarySign(publicId, "bg_preset");
+      const { signature, timestamp, apiKey, cloudName } = sigRes.data as {
+        signature: string;
+        timestamp: number;
+        apiKey: string;
+        cloudName: string;
+      };
 
-    // Get signature for secure upload
-    const sigRes = await cloudinarySign(publicId, "bg_preset");
-    const { signature, timestamp, apiKey, cloudName } = sigRes.data as {
-      signature: string;
-      timestamp: number;
-      apiKey: string;
-      cloudName: string;
-    };
+      const formData = new FormData();
+      formData.append("file", compressedFile);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp.toString());
+      formData.append("signature", signature);
+      formData.append("upload_preset", "bg_preset");
+      formData.append("public_id", publicId);
 
-    // Prepare formData for Cloudinary
-    const formData = new FormData();
-    formData.append("file", compressedFile);
-    formData.append("api_key", apiKey);
-    formData.append("timestamp", timestamp.toString());
-    formData.append("signature", signature);
-    formData.append("upload_preset", "bg_preset");
-    formData.append("public_id", publicId);
+      const uploadRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-    // Upload to Cloudinary
-    const uploadRes = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
+      const data = await uploadRes.json();
+
+      if (data.secure_url) {
+        updatePage(activePage.id, { imageUrl: data.secure_url });
+        toast.success("Profile image updated successfully!");
+        setProfileImageFile(null);
+        setProfileImagePreview(null);
+        setCroppedProfileImage(null);
+      } else {
+        throw new Error("No secure_url returned from Cloudinary.");
       }
-    );
-
-    const data = await uploadRes.json();
-
-    if (data.secure_url) {
-      updatePage(activePage.id, { imageUrl: data.secure_url });
-      toast.success("Profile image updated successfully!");
-      setProfileImageFile(null);
-      setProfileImagePreview(null);
-      setCroppedProfileImage(null);
-    } else {
-      throw new Error("No secure_url returned from Cloudinary.");
+    } catch (error) {
+      toast.error("Failed to upload profile image");
+      console.error("Profile image upload error:", error);
     }
-  } catch (error) {
-    toast.error("Failed to upload profile image");
-    console.error("Profile image upload error:", error);
-  }
-};
-
+  };
 
   const handleRemoveProfileImage = () => {
     if (activePage?.id) {
