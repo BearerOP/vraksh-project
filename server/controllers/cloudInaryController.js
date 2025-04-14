@@ -30,5 +30,4 @@ async function cloudinaryHandler(req, res) {
   });
 }
 
-
 module.exports = cloudinaryHandler;

@@ -24,25 +24,25 @@ const allowedOrigins = process.env.ORIGINS;
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log('Requested Origin:', origin);
+    console.log("Requested Origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       console.log(allowedOrigins);
-      
+
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // Enable CORS
 app.use(cors(corsOptions));
 
 // CORS preflight
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 // Routes
