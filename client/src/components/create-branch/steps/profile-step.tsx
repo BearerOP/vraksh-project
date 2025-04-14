@@ -15,7 +15,7 @@ interface ProfileStepProps {
 export default function ProfileStep({ form }: ProfileStepProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(form.getValues("imageUrl") || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const title = form.watch("title")
+  const name = form.watch("name")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -52,7 +52,7 @@ export default function ProfileStep({ form }: ProfileStepProps) {
             <Avatar className="w-32 h-32">
               <AvatarImage src={previewImage || ""} />
               <AvatarFallback className="bg-muted text-2xl">
-                {title?.substring(0, 2).toUpperCase() || "?"}
+                {name?.substring(0, 2).toUpperCase() || "?"}
               </AvatarFallback>
             </Avatar>
             {previewImage && (
@@ -83,10 +83,10 @@ export default function ProfileStep({ form }: ProfileStepProps) {
         <div className="md:w-2/3 space-y-4">
           <FormField
             control={form.control}
-            name="title"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Branch Title</FormLabel>
+                <FormLabel>Branch Name</FormLabel>
                 <FormControl>
                   <Input placeholder="My Awesome Branch" {...field} />
                 </FormControl>

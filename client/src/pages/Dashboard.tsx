@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useLinks } from "@/context/LinkContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   PlusCircle,
@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/drawer";
 
 const Dashboard: React.FC = () => {
-  const { activePage, addPage, setPages, setActivePage } = useLinks();
+  const { activePage, addPage, setPages, setActivePage,pages } = useLinks();
   const { user, setUser, setIsAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("links");
@@ -41,6 +41,8 @@ const Dashboard: React.FC = () => {
   const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
+  const location = useLocation();
+  const { branchId } = location.state || {}; // fallback in case it's undefined
 
   const navigate = useNavigate();
 
@@ -70,6 +72,19 @@ const Dashboard: React.FC = () => {
     }
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    if(branchId) {
+      const selectedPage = pages.find((page) => page.id === branchId);
+      if (selectedPage) {
+        setActivePage(selectedPage);
+      } else {
+        console.error("Page not found");
+        navigate("/new-branch");
+      }
+    }
+  }, [branchId, pages]);
+    
 
   // Close sidebar when clicking outside
   useEffect(() => {

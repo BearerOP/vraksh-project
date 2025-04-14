@@ -24,7 +24,7 @@ interface UsernameStepProps {
 export default function UsernameStep({ form }: UsernameStepProps) {
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const username = form.watch("title");
+  const username = form.watch("name");
   const debouncedUsername = useDebounce(username, 500);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function UsernameStep({ form }: UsernameStepProps) {
 
       <FormField
         control={form.control}
-        name="title"
+        name="name"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Username</FormLabel>

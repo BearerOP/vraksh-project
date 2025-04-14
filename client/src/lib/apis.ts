@@ -15,3 +15,20 @@ export const getBranches =  async () => {
   const response = await axiosInstance.get('/api/branches');
   return response;
 }
+
+
+export const createBranch = async (data: FormData) => {
+  console.log("Creating branch with data:", data);
+  
+  const response = await axiosInstance.post('/api/branch', data
+  );
+  return response;
+}
+
+export const cloudinarySign = async(publicId: string, uploadPreset: string) => {
+  const response = await axiosInstance.post('/api/cloudinary-signature', {
+    public_id: publicId,
+    upload_preset: uploadPreset,
+  });
+  return response;
+}

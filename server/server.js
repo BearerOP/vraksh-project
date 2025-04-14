@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const referralRoutes = require("./routes/referralRoutes");
 const branchRoutes = require("./routes/branchRoutes");
-
+const cloudinaryRoutes = require("./routes/cloudinaryRoute");
 const app = express();
 
 if (process.env.NODE_ENV !== "test") {
@@ -49,6 +49,7 @@ app.use(express.json());
 app.use("/api", authRoutes);
 app.use("/api", referralRoutes);
 app.use("/api", branchRoutes);
+app.use("/api", cloudinaryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

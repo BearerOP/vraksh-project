@@ -17,11 +17,7 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({ pageId }) => {
     <div className="bg-white p-6 rounded-xl shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-medium">Theme & Layout</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-muted-foreground"
-        >
+        <Button variant="outline" size="sm" className="text-muted-foreground">
           <Paintbrush className="h-4 w-4 mr-2" />
           Customize
         </Button>
@@ -29,20 +25,16 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({ pageId }) => {
 
       {/* Template Selector would go here - this is a placeholder */}
       <div className="bg-white p-6 rounded-xl shadow-sm">
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-medium">Theme & Layout</h2>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-muted-foreground"
-                        >
-                          <Paintbrush className="h-4 w-4 mr-2" />
-                          Customize
-                        </Button>
-                      </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">Theme & Layout</h2>
+          <Button variant="outline" size="sm" className="text-muted-foreground">
+            <Paintbrush className="h-4 w-4 mr-2" />
+            Customize
+          </Button>
+        </div>
 
-                      <TemplateSelector pageId={activePage.id} />
-                    </div>
+        <TemplateSelector pageId={activePage.id} />
+      </div>
     </div>
   );
 };

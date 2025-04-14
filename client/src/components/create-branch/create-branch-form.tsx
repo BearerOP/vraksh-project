@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -10,12 +10,13 @@ import UsernameStep from "./steps/username-step";
 import TemplateStep from "./steps/template-step";
 import SocialsStep from "./steps/socials-step";
 import ProfileStep from "./steps/profile-step";
-import { useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import { createBranch } from "@/lib/apis";
 
 // Define the form schema
 const formSchema = z.object({
-  title: z.string().min(3).max(20),
+  name: z.string().min(3).max(20),
   templateId: z.string(),
   socialIcons: z.array(
     z.object({
@@ -41,10 +42,23 @@ export default function CreateBranchForm() {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const { user } = useAuth();
+
+  useEffect(() => {
+
+    if (!user) {
+      navigate("/login");
+    } else {
+      // Fetch user data if needed
+      // You can use the user object directly if it's already available
+      console.log("User data:", user);
+    }
+  }
+  , [user]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
+      name: "",
       templateId: "",
       socialIcons: [],
       links: [],
@@ -70,10 +84,18 @@ export default function CreateBranchForm() {
 
     try {
       // Here you would submit the data to your API
-      console.log("Form submitted:", data);
 
-      // Redirect to the new branch
-      navigate(`/${data.title}`);
+      console.log("Form submitted:", data);
+      const response = await createBranch(data);
+      console.log("Response from API:", response);
+      if (response.status !== 200) {
+        throw new Error("Failed to create branch");
+      }
+      navigate(`/dashboard`, {
+        state: {
+          branchId: response.data.data._id,
+        },
+      });
     } catch (error) {
       console.error("Error creating branch:", error);
     }
