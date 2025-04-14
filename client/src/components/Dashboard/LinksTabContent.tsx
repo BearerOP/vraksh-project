@@ -55,7 +55,7 @@ const LinksTabContent: React.FC = () => {
             <Button
               onClick={() => {
                 handleCopyLink(
-                  `${import.meta.env.VITE_VRAKSH_APP_URL}/${activePage.title}`
+                  `${import.meta.env.VITE_VRAKSH_DOMAIN}/${activePage.title}`
                 );
               }}
               variant="outline"

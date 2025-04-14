@@ -30,9 +30,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { toast } from "sonner";
+import { se } from "date-fns/locale";
+import { a, nav } from "motion/react-client";
 
 const Dashboard: React.FC = () => {
-  const { activePage, addPage, setPages, setActivePage,pages } = useLinks();
+  const { activePage, addPage, setPages, setActivePage, pages } = useLinks();
   const { user, setUser, setIsAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("links");
@@ -74,7 +77,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if(branchId) {
+    if (branchId) {
       const selectedPage = pages.find((page) => page.id === branchId);
       if (selectedPage) {
         setActivePage(selectedPage);
@@ -84,7 +87,6 @@ const Dashboard: React.FC = () => {
       }
     }
   }, [branchId, pages]);
-    
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -171,18 +173,29 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const copyVrakshLink = () => {
+  const handleCopyLink = () => {
     if (activePage) {
-      const link = `${import.meta.env.VITE_VRAKSH_APP_URL}/preview/${
-        activePage.id
+      const url = `${import.meta.env.VITE_VRAKSH_DOMAIN}/preview/${
+        activePage.title
       }`;
-      navigator.clipboard.writeText(link);
-      // You could add a toast notification here
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          toast.success("Vraksh Url copied!", {
+            description: `Copied: ${url}`,
+            duration: 3000,
+          });
+        })
+        .catch(() => {
+          toast.error("Failed to copy link.");
+        });
     }
+    setIsShareDrawerOpen(false);
   };
 
   const openPreview = () => {
     if (activePage) {
+      setIsShareDrawerOpen(false);
       window.open(`/preview/${activePage.id}`, "_blank");
     }
   };
@@ -191,7 +204,7 @@ const Dashboard: React.FC = () => {
     <div className="p-4 space-y-4">
       <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
         <Copy className="h-5 w-5 text-gray-500" />
-        <button onClick={copyVrakshLink} className="flex-1 text-left">
+        <button onClick={handleCopyLink} className="flex-1 text-left">
           Copy my Vraksh link
         </button>
       </div>
@@ -239,26 +252,26 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 min-w-full mx-auto flex relative pb-16 md:pb-0">
         {/* Mobile sidebar toggle */}
         {sidebarOpen ? (
-        <Button
-          ref={sidebarToggleRef}
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="md:hidden fixed top-6 left-44 z-30 bg-white shadow-sm rounded-full"
-        >
+          <Button
+            ref={sidebarToggleRef}
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="md:hidden fixed top-6 left-44 z-30 bg-white shadow-sm rounded-full"
+          >
             <X className="h-5 w-5" />
-        </Button>
-          ) : (
-            <Button
-          ref={sidebarToggleRef}
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="md:hidden fixed top-4 left-4 z-30 bg-white shadow-sm rounded-full"
-        >
+          </Button>
+        ) : (
+          <Button
+            ref={sidebarToggleRef}
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="md:hidden fixed top-4 left-4 z-30 bg-white shadow-sm rounded-full"
+          >
             <Menu className="h-5 w-5" />
-        </Button>
-          )}
+          </Button>
+        )}
 
         {/* Sidebar - with ref for detecting outside clicks */}
         <div ref={sidebarRef}>
