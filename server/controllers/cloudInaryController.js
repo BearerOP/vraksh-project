@@ -6,7 +6,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-async function cloudinaryHandler(req, res) {
+const cloudinaryHandler = async (req, res) => {
   if (req.method !== "POST") return res.status(405).end();
 
   const { public_id, upload_preset } = req.body;
@@ -28,6 +28,6 @@ async function cloudinaryHandler(req, res) {
     apiKey: process.env.CLOUDINARY_API_KEY,
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
   });
-}
+};
 
-module.exports = cloudinaryHandler;
+module.exports = { cloudinaryHandler };

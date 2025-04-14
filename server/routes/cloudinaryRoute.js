@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const cloudinaryHandler = require("../controllers/cloudinaryController");
+const {cloudinaryHandler} = require("../controllers/cloudinaryController");
 
 const { protect } = require("../middleware/auth");
 
