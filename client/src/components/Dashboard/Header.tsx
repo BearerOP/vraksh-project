@@ -10,15 +10,18 @@ interface DashboardHeaderProps {
   activeTab: string;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   className?: string;
+  setIsShareDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   activeTab,
   setActiveTab,
   className,
+  setIsShareDrawerOpen
 }) => {
   const navigate = useNavigate();
   const { activePage } = useLinks();
+
 
   return (
     <div
@@ -58,7 +61,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => {}}
+          onClick={() => {
+            setIsShareDrawerOpen(true);
+          }}
           className="text-foreground hover:bg-foreground/10 transition-all duration-200"
         >
           <Share2 className="h-4 w-4 mr-2" />

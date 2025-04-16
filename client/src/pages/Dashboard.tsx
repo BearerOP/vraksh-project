@@ -31,8 +31,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { toast } from "sonner";
-import { se } from "date-fns/locale";
-import { a, nav } from "motion/react-client";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { AnimatePresence,motion } from "motion/react";
 
 const Dashboard: React.FC = () => {
   const { activePage, addPage, setPages, setActivePage, pages } = useLinks();
@@ -45,6 +45,7 @@ const Dashboard: React.FC = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
     async function fetchUserData() {
@@ -287,6 +288,7 @@ const Dashboard: React.FC = () => {
                 className="hidden sm:flex"
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                setIsShareDrawerOpen={setIsShareDrawerOpen}
               />
 
               <TabsContent value="links" className="animate-fade-in">
@@ -298,9 +300,64 @@ const Dashboard: React.FC = () => {
                 <MobilePreviewButton pageId={activePage.id} />
               </TabsContent>
 
-              <TabsContent value="share" className="animate-fade-in">
-                <ShareDrawerContent />
-              </TabsContent>
+              {/* For desktop, we'll show the share content as a sidebar */}
+              {isDesktop && (
+  <>
+    {/* Backdrop */}
+    <AnimatePresence>
+      {isShareDrawerOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsShareDrawerOpen(false)}
+          className="fixed inset-0 bg-black bg-opacity-30 z-30"
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Sidebar */}
+    <AnimatePresence>
+      {isShareDrawerOpen && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
+          className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-40 border-l border-gray-200 overflow-y-auto"
+        >
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-6">
+              <motion.h2 
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-xl font-bold"
+              >
+                Share Your Vraksh
+              </motion.h2>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsShareDrawerOpen(false)}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <X className="h-5 w-5" />
+              </motion.button>
+            </div>
+            <motion.div
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <ShareDrawerContent />
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
+)}
             </Tabs>
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">
@@ -347,16 +404,18 @@ const Dashboard: React.FC = () => {
             </button>
 
             <Drawer
-              open={isShareDrawerOpen}
+              open={isShareDrawerOpen && !isDesktop}
               onOpenChange={setIsShareDrawerOpen}
             >
               <DrawerTrigger asChild>
                 <button
                   onClick={(e) => {
-                    e.preventDefault(); // Prevent default behavior
-                    setIsShareDrawerOpen(true); // Just open drawer without changing tab
+                    e.preventDefault();
+                    setIsShareDrawerOpen(true);
                   }}
-                  className="flex flex-col items-center justify-center w-full h-full text-gray-500"
+                  className={`flex flex-col items-center justify-center w-full h-full ${
+                    activeTab === "share" ? "text-blue-600" : "text-gray-500"
+                  }`}
                 >
                   <Share className="h-5 w-5" />
                   <span className="text-xs mt-1">Share</span>
@@ -378,5 +437,4 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
-
 export default Dashboard;
