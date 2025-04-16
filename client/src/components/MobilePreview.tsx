@@ -5,6 +5,7 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 import { templateConfigs } from "@/utils/types";
+import { iconMap } from "./ui/social-icons";
 export interface MobilePreviewProps {
   page: Page;
 }
@@ -88,20 +89,48 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
               )}
             </div>
             <h1
-              className={cn("text-sm font-bold animate-slide-up", templateConfig.titleClass)}
+              className={cn(
+                "text-sm font-bold animate-slide-up",
+                templateConfig.titleClass
+              )}
               style={{ color: page.titleColor, fontFamily: page.titleFont }}
             >
               {page.title}
             </h1>
-            <p className="text-xs opacity-70 animate-slide-up" style={
-              { color: page.descriptionColor, fontFamily: page.descriptionFont,
-                animationDelay: "0.1s"
-               }
-            }>
+            <p
+              className="text-xs opacity-70 animate-slide-up"
+              style={{
+                color: page.descriptionColor,
+                fontFamily: page.descriptionFont,
+                animationDelay: "0.1s",
+              }}
+            >
               {page.description.length > 50
                 ? `${page.description.slice(0, 50)}...`
                 : page.description}
             </p>
+            {page.socialIcons && page.socialIcons.length > 0 && (
+              <div
+                className="flex justify-center items-center gap-2 mt-1 animate-slide-up bg-transparent"
+                style={{ animationDelay: "0.15s" }}
+              >
+                {page.socialIcons?.map((social, index) => {
+                  return (
+                    <a
+                      key={index}
+                      href={normalizeUrl(social.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:opacity-80 transition-opacity rounded-md p-2  bg-black/10 dark:bg-white/20 backdrop-blur-md shadow-md"
+                    >
+                      {iconMap[
+                        social.name.toLowerCase() as keyof typeof iconMap
+                      ] || <ExternalLink size={18} />}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Links Section */}
@@ -130,7 +159,9 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                     border: `solid ${page.linkBorderSize}px`,
                   }}
                 >
-                  <span className="font-normal animate-fade-in">{link.title}</span>
+                  <span className="font-normal animate-fade-in">
+                    {link.title}
+                  </span>
                   {page.templateId === "rounded" ? (
                     <ExternalLink className="h-4 w-4 opacity-60" />
                   ) : (

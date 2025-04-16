@@ -10,12 +10,7 @@ import {
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Instagram, Twitter, Facebook, MapPin } from "lucide-react";
-import {
-  InstagramIcon,
-  SnapchatIcon,
-  XIcon,
-} from "@/components/ui/social-icons";
+import { Instagram, Twitter, Facebook, MapPin, TwitchIcon, Dribbble } from "lucide-react";
 import { templateConfigs } from "@/utils/types";
 import { FormValues } from "../create-branch-form";
 
@@ -97,13 +92,13 @@ export default function TemplateStep({ form }: TemplateStepProps) {
                             </p>
                             <div className="flex space-x-2 mb-4 ">
                               <div className="transform scale-75 sm:scale-90 md:scale-100">
-                                <InstagramIcon />
+                                <Instagram />
                               </div>
                               <div className="transform scale-75 sm:scale-90 md:scale-100">
-                                <XIcon />
+                                <TwitchIcon />
                               </div>
                               <div className="transform scale-75 sm:scale-90 md:scale-100">
-                                <SnapchatIcon />
+                                <Dribbble />
                               </div>
                             </div>
                             <div

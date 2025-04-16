@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Page } from "@/context/LinkContext";
 import MobilePreview from "@/components/MobilePreview";
-import { log } from "console";
 
 const MobilePreviewPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -20,21 +19,18 @@ const MobilePreviewPage = () => {
       try {
         const response = await getBranch(username);
         if (response.status === 200) {
-          console.log("Page data:", response.data.data);
-          
           const data = response.data.data as any;
 
           const branch = {
             id: data._id,
             title: data.name,
-            links: data.items?.map((item: BranchItem) => (
-              console.log("Item data:", item),
-              {
-              id: item._id,
-              title: item.title,
-              url: item.url,
-              active: item.active,
-            })) || [],
+            links:
+              data.items?.map((item: BranchItem) => ({
+                id: item._id,
+                title: item.title,
+                url: item.url,
+                active: item.active,
+              })) || [],
             templateId: data.templateId,
             imageUrl: data.imageUrl,
             createdAt: data.createdAt,
@@ -85,28 +81,32 @@ const MobilePreviewPage = () => {
           <p className="mb-4 text-sm text-muted-foreground">
             The link you are trying to preview does not exist.
           </p>
-          <Button onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>
+          <Button onClick={() => navigate("/dashboard")}>
+            Go to Dashboard
+          </Button>
         </div>
       </div>
     );
   }
 
   console.log("Page data:", page);
-  
+
   const templateConfig = templateConfigs.find(
     (template) => template.id === page.templateId
   );
-  
+
   return (
-    <div 
+    <div
       className={cn(
         "min-h-screen flex flex-col items-center justify-center p-6",
         templateConfig?.className
       )}
       style={{
-        backgroundImage: page.backgroundImageUrl ? templateConfig.backgroundImage : `url(${page.backgroundImageUrl})`,
+        backgroundImage: page.backgroundImageUrl
+          ? templateConfig.backgroundImage
+          : `url(${page.backgroundImageUrl})`,
         backgroundSize: page.backgroundImageUrl ? undefined : "cover",
-        backgroundPosition: page.backgroundImageUrl ? undefined : "center"
+        backgroundPosition: page.backgroundImageUrl ? undefined : "center",
       }}
     >
       <Button
@@ -139,16 +139,16 @@ const MobilePreviewPage = () => {
           >
             Back to Dashboard
           </Button> */}
-          <Button
+          {/* <Button
             variant="outline"
             onClick={() => navigate("/preview/" + page.id)}
             className="bg-white/10 hover:bg-white/20 text-white border-white/20"
           >
             Preview on Web
-          </Button>
+          </Button> */}
         </div>
       </div>
-      
+
       <div className="mt-12 text-center text-xs text-white/60">
         <p>Made with Vraksh</p>
         <p>© {new Date().getFullYear()} Vraksh. All rights reserved.</p>

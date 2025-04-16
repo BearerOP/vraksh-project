@@ -9,13 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LinksList from "@/components/LinksList";
 import LinkForm from "@/components/LinkForm";
 import MobilePreview from "@/components/MobilePreview";
-import { Ellipsis } from "lucide-react";
-import { 
-  InstagramIcon, 
-  LinkedinIcon,
-  SnapchatIcon,
-  XIcon 
-} from "@/components/ui/social-icons";
+import { Ellipsis, InstagramIcon, Linkedin, Mail, Twitter } from "lucide-react";
 
 const LinksTabContent: React.FC = () => {
   const { activePage } = useLinks();
@@ -55,7 +49,11 @@ const LinksTabContent: React.FC = () => {
             <Button
               onClick={() => {
                 handleCopyLink(
-                  `${import.meta.env.VITE_VRAKSH_DOMAIN}/${activePage.title}`
+                  `${
+                    import.meta.env.VITE_VRAKSH_DOMAIN == "localhost"
+                      ? import.meta.env.VITE_VRAKSH_APP_URL
+                      : import.meta.env.VITE_VRAKSH_DOMAIN
+                  }/${activePage.title}`
                 );
               }}
               variant="outline"
@@ -79,7 +77,10 @@ const LinksTabContent: React.FC = () => {
             </Avatar>
 
             <div className="flex flex-col gap-1 items-start">
-              <Button variant="link" className="text-black underline p-0 h-auto">
+              <Button
+                variant="link"
+                className="text-black underline p-0 h-auto"
+              >
                 @{activePage?.title || "username"}
               </Button>
 
@@ -103,21 +104,21 @@ const LinksTabContent: React.FC = () => {
                   className="text-muted-foreground p-0 h-auto"
                   aria-label="snapchat"
                 >
-                  <SnapchatIcon />
+                  <Mail />
                 </Button>
                 <Button
                   variant="link"
                   className="text-muted-foreground p-0 h-auto"
                   aria-label="twitter"
                 >
-                  <XIcon />
+                  <Twitter />
                 </Button>
                 <Button
                   variant="link"
                   className="text-muted-foreground p-0 h-auto"
                   aria-label="linkedin"
                 >
-                  <LinkedinIcon />
+                  <Linkedin />
                 </Button>
                 <Button
                   variant="link"

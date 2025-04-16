@@ -15,6 +15,7 @@ export type User = {
 export type SocialIcon = {
   name: string;
   url: string;
+  icon: string;
 };
 
 export type BranchItem = {
