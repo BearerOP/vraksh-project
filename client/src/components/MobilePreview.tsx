@@ -78,7 +78,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                 <img
                   src={page?.imageUrl}
                   alt="Profile"
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full rounded-full object-cover animate-scale-in"
                   style={{
                     borderRadius: page?.avatarRounded,
                   }}
@@ -88,13 +88,15 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
               )}
             </div>
             <h1
-              className={cn("text-sm font-bold", templateConfig.titleClass)}
+              className={cn("text-sm font-bold animate-slide-up", templateConfig.titleClass)}
               style={{ color: page.titleColor, fontFamily: page.titleFont }}
             >
               {page.title}
             </h1>
-            <p className="text-xs opacity-70" style={
-              { color: page.descriptionColor, fontFamily: page.descriptionFont }
+            <p className="text-xs opacity-70 animate-slide-up" style={
+              { color: page.descriptionColor, fontFamily: page.descriptionFont,
+                animationDelay: "0.1s"
+               }
             }>
               {page.description.length > 50
                 ? `${page.description.slice(0, 50)}...`
@@ -115,7 +117,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                   className={cn(
                     `w-full p-3 transition-all duration-300 transform hover:scale-[1.02] 
             active:scale-[0.98] flex items-center justify-between shadow-md text-xs text-center`,
-                    templateConfig.linkClass
+                    templateConfig.linkClass,
+                    "animate-slide-up"
                   )}
                   style={{
                     animationDelay: `${(index * 0.1).toFixed(1)}s`,
@@ -127,7 +130,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page }) => {
                     border: `solid ${page.linkBorderSize}px`,
                   }}
                 >
-                  <span className="font-normal">{link.title}</span>
+                  <span className="font-normal animate-fade-in">{link.title}</span>
                   {page.templateId === "rounded" ? (
                     <ExternalLink className="h-4 w-4 opacity-60" />
                   ) : (

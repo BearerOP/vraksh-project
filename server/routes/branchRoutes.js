@@ -12,6 +12,7 @@ const {
   createItem,
   updateItem,
   deleteItem,
+  getBranchByUsername
 } = require("../controllers/branchController");
 
 const { protect } = require("../middleware/auth");
@@ -19,6 +20,8 @@ const { protect } = require("../middleware/auth");
 router.get("/branches", protect, getBranches);
 
 router.get("/branch/:branchId", protect, getBranch);
+
+router.get("/branch/username/:username", protect, getBranchByUsername);
 
 router.post("/branch", protect, createBranch);
 
@@ -34,6 +37,6 @@ router.post("/branch/:branchId/item", protect, createItem);
 
 router.put("/branch/:branchId/:itemId", protect, updateItem);
 
-router.delete("/branch/:branchId/:itemId", protect, deleteItem);
+router.delete("/branch/:branchId/:itemId", protect, deleteItem)
 
 module.exports = router;

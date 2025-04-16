@@ -8,6 +8,7 @@ import Preview from "./pages/Preview";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import CreateBranch from "./pages/CreateBranch";
+import BranchPreview from "./pages/Branch";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,8 @@ const App = () => (
           <LinkProvider>
             <Routes>
               {/* <Route path="/" element={<Index />} /> */}
-              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/" element={<Navigate to="/dashboard" />} />"
+              <Route path="/:username" element={<BranchPreview/>} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/preview/:pageId" element={<Preview />} />
               <Route path="/new-branch" element={<CreateBranch />} />

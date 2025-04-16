@@ -25,6 +25,11 @@ export const createBranch = async (data: FormData) => {
   return response;
 }
 
+export const getBranch = async (username: string) => {
+  const response = await axiosInstance.get(`/api/branch/username/${username}`);
+  return response;
+}
+
 export const cloudinarySign = async(publicId: string, uploadPreset: string) => {
   const response = await axiosInstance.post('/api/cloudinary-signature', {
     public_id: publicId,

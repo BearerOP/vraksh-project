@@ -1,5 +1,4 @@
 const Branch = require("../models/Branch");
-const User = require("../models/User");
 const BranchItem = require("../models/BranchItem");
 
 const getBranches = async (req, res) => {
@@ -16,7 +15,7 @@ const getBranches = async (req, res) => {
       "createdAt",
       "style",
       "active",
-      "templateId"
+      "templateId",
     ]);
     res.status(200).json({
       success: true,
@@ -38,6 +37,43 @@ const getBranch = async (req, res) => {
       data: branch,
     });
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getBranchByUsername = async (req, res) => {
+  try {
+    const branch = await Branch.findOne({ name: req.params.username }).populate(
+      "items",
+      [
+        "_id",
+        "branchId",
+        "title",
+        "index",
+        "url",
+        "description",
+        "imageUrl",
+        "createdAt",
+        "style",
+        "active",
+        "templateId",
+      ]
+    );
+    if (!branch) {
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: branch,
+    });
+  } catch (error) {
+    console.error("Error fetching branch by username:", error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -71,7 +107,6 @@ const createBranch = async (req, res) => {
     const branchItems = await BranchItem.insertMany(items);
     console.log(branchItems);
     branch.items = branchItems.map((item) => item._id);
-    
 
     await branch.save();
 
@@ -82,7 +117,7 @@ const createBranch = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -262,4 +297,5 @@ module.exports = {
   createItem,
   updateItem,
   deleteItem,
+  getBranchByUsername,
 };
