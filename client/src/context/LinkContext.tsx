@@ -6,6 +6,7 @@ export interface Link {
   title: string;
   url: string;
   active: boolean;
+  index?: number;
 }
 
 export type TemplateType =

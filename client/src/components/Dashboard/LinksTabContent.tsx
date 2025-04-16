@@ -154,7 +154,7 @@ const LinksTabContent: React.FC = () => {
             </Button>
           </div>
 
-          {activePage.links.length > 0 ? (
+          {activePage?.links?.length > 0 ? (
             <LinksList pageId={activePage.id} links={activePage.links} />
           ) : (
             <div className="text-center py-8 text-muted-foreground">

@@ -44,9 +44,6 @@ const Dashboard: React.FC = () => {
   const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
-  const location = useLocation();
-  const { branchId } = location.state || {}; // fallback in case it's undefined
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,18 +72,6 @@ const Dashboard: React.FC = () => {
     }
     fetchUserData();
   }, []);
-
-  useEffect(() => {
-    if (branchId) {
-      const selectedPage = pages.find((page) => page.id === branchId);
-      if (selectedPage) {
-        setActivePage(selectedPage);
-      } else {
-        console.error("Page not found");
-        navigate("/new-branch");
-      }
-    }
-  }, [branchId, pages]);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -152,7 +137,9 @@ const Dashboard: React.FC = () => {
 
         setPages(mappedPages);
         if (mappedPages.length > 0) {
-          setActivePage(mappedPages[0]);
+          if(!activePage) {
+            setActivePage(mappedPages[0]);
+          }
         }
       }
     }
