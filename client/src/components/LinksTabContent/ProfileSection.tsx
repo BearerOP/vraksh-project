@@ -45,25 +45,39 @@ export const ProfileSection = () => {
 
     setLoading(true);
     try {
-      const response = await updateBranchProfile(
-        activePage.id,
-        title,
-        description,
-        activePage.socialIcons
-      );
-      if (response.status !== 200) {
-        throw new Error("Failed to update branch profile");
+      const updates: {
+        title?: string;
+        description?: string;
+        socialIcons?: typeof activePage.socialIcons;
+      } = {};
+      
+      // Only add fields that have changed
+      if (title !== activePage.title) {
+        updates.title = title;
       }
+      
+      if (description !== activePage.description) {
+        updates.description = description;
+      }
+      
+      // Only make the API call if there are changes
+      if (Object.keys(updates).length > 0) {
+        const response = await updateBranchProfile(activePage.id, updates);
+        
+        if (response.status !== 200) {
+          throw new Error("Failed to update branch profile");
+        }
 
-      updatePage(activePage.id, {
-        title,
-        description
-      });
+        updatePage(activePage.id, updates);
 
-      toast.success("Branch details updated successfully");
+        toast.success("Branch details updated successfully");
+      } else {
+        toast.info("No changes to save");
+      }
+      
       setIsEditDialogOpen(false);
     } catch (error) {
-      toast.error(error.response.data.message || "Failed to update branch details");
+      toast.error(error.response?.data?.message || "Failed to update branch details");
       console.error(error);
     } finally {
       setLoading(false);
@@ -93,22 +107,44 @@ export const ProfileSection = () => {
         });
       }
 
-      const response = await updateBranchProfile(
-        activePage.id,
-        activePage.title,
-        activePage.description,
-        updatedSocialIcons
-      );
-
-      if (response.status !== 200) {
-        throw new Error("Failed to update social icons");
+      // Check if social icons have actually changed
+      let socialIconsChanged = false;
+      
+      if (!activePage.socialIcons || activePage.socialIcons.length !== updatedSocialIcons.length) {
+        socialIconsChanged = true;
+      } else {
+        // Compare each icon to see if there are changes
+        for (let i = 0; i < updatedSocialIcons.length; i++) {
+          const original = activePage.socialIcons[i];
+          const updated = updatedSocialIcons[i];
+          
+          if (original.name !== updated.name || 
+              original.url !== updated.url || 
+              original.icon !== updated.icon) {
+            socialIconsChanged = true;
+            break;
+          }
+        }
       }
+      
+      if (socialIconsChanged) {
+        const response = await updateBranchProfile(activePage.id, {
+          socialIcons: updatedSocialIcons
+        });
 
-      updatePage(activePage.id, {
-        socialIcons: updatedSocialIcons
-      });
+        if (response.status !== 200) {
+          throw new Error("Failed to update social icons");
+        }
 
-      toast.success("Social icons updated successfully");
+        updatePage(activePage.id, {
+          socialIcons: updatedSocialIcons
+        });
+
+        toast.success("Social icons updated successfully");
+      } else {
+        toast.info("No changes to save");
+      }
+      
       setIsSocialDialogOpen(false);
     } catch (error) {
       toast.error("Failed to update social icons");
@@ -126,12 +162,9 @@ export const ProfileSection = () => {
       const updatedSocialIcons = [...(activePage.socialIcons || [])];
       updatedSocialIcons.splice(selectedSocialIcon.index, 1);
 
-      const response = await updateBranchProfile(
-        activePage.id,
-        activePage.title,
-        activePage.description,
-        updatedSocialIcons
-      );
+      const response = await updateBranchProfile(activePage.id, {
+        socialIcons: updatedSocialIcons
+      });
 
       if (response.status !== 200) {
         throw new Error("Failed to remove social icon");

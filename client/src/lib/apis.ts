@@ -40,12 +40,10 @@ export const cloudinarySign = async (publicId: string, uploadPreset: string) => 
   return response;
 }
 
-export const updateBranchProfile = async (branchId: string, title: string, description: string, socialIcons: SocialIcon[]) => {
-  const response = await axiosInstance.put(`/api/branch/${branchId}`, {
-    name: title,
-    description,
-    socialIcons
-  });
+export const updateBranchProfile = async (branchId: string, updates:{
+  title?: string, description?: string, socialIcons?: SocialIcon[]
+}) => {
+  const response = await axiosInstance.put(`/api/branch/${branchId}`, updates);
   return response;
 }
 
