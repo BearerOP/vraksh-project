@@ -22,7 +22,7 @@ router.get("/branches", protect, getBranches);
 
 router.get("/branch/:branchId", protect, getBranch);
 
-router.get("/branch/username/:username", protect, getBranchByUsername);
+router.get("/branch/username/:username", getBranchByUsername);
 
 router.post("/branch", protect, createBranch);
 
