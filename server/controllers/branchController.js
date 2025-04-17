@@ -127,8 +127,14 @@ const createBranch = async (req, res) => {
 
 const updateBranch = async (req, res) => {
   try {
-console.log("update branch", req.body, req.params.branchId);
-
+    const existingBranchName = await Branch.findOne({ name: req.body.name });
+    if (existingBranchName) {
+      return res.status(404).json({
+        success: false,
+        message: "This username is already taken!",
+      });
+    }
+    
     const branch = await Branch.findByIdAndUpdate(
       req.params.branchId,
       req.body,
@@ -137,6 +143,13 @@ console.log("update branch", req.body, req.params.branchId);
         runValidators: true,
       }
     );
+
+    if (!branch) {
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
     res.status(200).json({
       success: true,
       data: branch,
