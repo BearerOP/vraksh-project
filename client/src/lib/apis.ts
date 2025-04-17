@@ -1,5 +1,6 @@
 import { SocialIcon } from "@/utils/types";
 import axiosInstance from "./axiosInstance";
+import { Link } from "@/context/LinkContext";
 
 export const getMe = async () => {
   const response = await axiosInstance.get("/api/me");
@@ -39,7 +40,7 @@ export const cloudinarySign = async (publicId: string, uploadPreset: string) => 
   return response;
 }
 
-export const updateBranchProfile = async (branchId: string, title: string, description: string, socialIcons:SocialIcon[]) => {
+export const updateBranchProfile = async (branchId: string, title: string, description: string, socialIcons: SocialIcon[]) => {
   const response = await axiosInstance.put(`/api/branch/${branchId}`, {
     name: title,
     description,
@@ -47,3 +48,32 @@ export const updateBranchProfile = async (branchId: string, title: string, descr
   });
   return response;
 }
+
+export const addItemToBranch = async (branchId: string, title: string, url: string) => {
+  const response = await axiosInstance.post(`/api/branch/${branchId}/item`, {
+    title,
+    url,
+    active: true,
+    style: "classic",
+    description: "" // Optional but good to provide
+  });
+  return response;
+}
+
+export const updateLink = async (item: Link) => {
+  const response = await axiosInstance.put(`/api/branch/item/${item.id}`, item);
+  return response;
+}
+
+export const deleteLink = async (branchId: string, itemId: string) => {
+  const response = await axiosInstance.delete(`/api/branch/${branchId}/${itemId}`);
+  return response;
+}
+
+export const reorderLinks = async (branchId: string, itemIds: string[]) => {
+  const response = await axiosInstance.put(`/api/branch/reorder/${branchId}`, {
+    itemIds
+  });
+  return response;
+}
+

@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
 import { useLinks } from '@/context/LinkContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
+import { addItemToBranch } from '@/lib/apis';
+import { toast } from 'sonner';
 
 interface LinkFormProps {
   pageId: string;
@@ -14,16 +15,34 @@ const LinkForm: React.FC<LinkFormProps> = ({ pageId }) => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { addLink } = useLinks();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (title.trim() && url.trim()) {
-      addLink(pageId, title, url);
-      setTitle('');
-      setUrl('');
-      setExpanded(false);
+      try {
+        setLoading(true);
+        const response = await addItemToBranch(pageId, title, url);
+        
+        if (response.status !== 201) {
+          throw new Error('Failed to add link');
+        }
+        
+        // Still use addLink to update local state
+        addLink(pageId, title, url);
+        
+        toast.success('Link added successfully');
+        setTitle('');
+        setUrl('');
+        setExpanded(false);
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to add link');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -81,8 +100,9 @@ const LinkForm: React.FC<LinkFormProps> = ({ pageId }) => {
           <Button
             type="submit"
             className="transition-all duration-200 bg-blue-500 hover:bg-blue-600"
+            disabled={loading}
           >
-            Add Link
+            {loading ? 'Adding...' : 'Add Link'}
           </Button>
         </div>
       </form>

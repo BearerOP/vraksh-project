@@ -134,7 +134,7 @@ const updateBranch = async (req, res) => {
         message: "This username is already taken!",
       });
     }
-    
+
     const branch = await Branch.findByIdAndUpdate(
       req.params.branchId,
       req.body,
@@ -217,7 +217,9 @@ const getItem = async (req, res) => {
 
 const createItem = async (req, res) => {
   try {
+    console.log("Creating item...", req.body, req.params);
     const branch = await Branch.findById(req.params.branchId);
+    
     if (!branch) {
       return res.status(404).json({
         success: false,
@@ -251,7 +253,6 @@ const createItem = async (req, res) => {
 
 const updateItem = async (req, res) => {
   try {
-    const branch = await Branch.findById(req.params.branchId);
     const item = await BranchItem.findByIdAndUpdate(
       req.params.itemId,
       req.body,
@@ -259,7 +260,6 @@ const updateItem = async (req, res) => {
         new: true,
       }
     );
-    await branch.save();
     res.status(200).json({
       success: true,
       data: item,
@@ -301,6 +301,45 @@ const deleteItem = async (req, res) => {
   }
 };
 
+const reorderItems = async (req, res) => {
+  try {
+    const { branchId } = req.params;
+    const { itemIds } = req.body;
+
+    const branch = await Branch.findById(branchId);
+    if (!branch) {
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
+    
+    // Update the order of items in the branch
+    branch.items = itemIds;
+    await branch.save();
+    
+    // Update the index of each item in the BranchItem collection
+    await Promise.all(
+      itemIds.map((itemId, index) => {
+        return BranchItem.findByIdAndUpdate(itemId, {
+          index: index,
+        });
+      })
+    );
+    
+    res.status(200).json({
+      success: true,
+      data: branch.items,
+    });
+  }
+  catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   getBranches,
   getBranch,
@@ -313,4 +352,5 @@ module.exports = {
   updateItem,
   deleteItem,
   getBranchByUsername,
+  reorderItems
 };

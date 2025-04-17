@@ -7,6 +7,9 @@ export interface Link {
   url: string;
   active: boolean;
   index?: number;
+  style?: string; // Optional, for future use
+  icon?: string; // Optional, for future use
+  
 }
 
 export type TemplateType =

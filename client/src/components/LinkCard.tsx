@@ -14,6 +14,8 @@ import {
   GripVertical,
 } from "lucide-react";
 import { Switch } from "./ui/switch";
+import { updateLink as updateLinkApi, deleteLink as deleteLinkApi } from "@/lib/apis";
+import { toast } from "sonner";
 
 interface LinkCardProps {
   link: LinkType;
@@ -30,12 +32,34 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(link.title || "");
   const [url, setUrl] = useState(link.url || "");
+  const [isLoading, setIsLoading] = useState(false);
   const { updateLink, deleteLink } = useLinks();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (title.trim() && url.trim()) {
-      updateLink(pageId, link.id, { title, url });
-      setIsEditing(false);
+      try {
+        setIsLoading(true);
+        const updatedLink = { 
+          ...link,
+          title, 
+          url 
+        };
+        
+        const response = await updateLinkApi(updatedLink);
+        if (response.status !== 200) {
+          throw new Error("Failed to update link");
+        }
+        
+        // Update local state
+        updateLink(pageId, link.id, { title, url });
+        setIsEditing(false);
+        toast.success("Link updated successfully");
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to update link");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -45,14 +69,47 @@ const LinkCard: React.FC<LinkCardProps> = ({
     setIsEditing(false);
   };
 
-  const handleToggleActive = () => {
-    console.log(link,"link----------");
-    
-    updateLink(pageId, link.id, { active: !link.active });
+  const handleToggleActive = async () => {
+    try {
+      setIsLoading(true);
+      const updatedLink = { 
+        ...link,
+        active: !link.active 
+      };
+      
+      const response = await updateLinkApi(updatedLink);
+      if (response.status !== 200) {
+        throw new Error("Failed to update link status");
+      }
+      
+      // Update local state
+      updateLink(pageId, link.id, { active: !link.active });
+      toast.success(`Link ${!link.active ? 'activated' : 'deactivated'} successfully`);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update link status");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = () => {
-    deleteLink(pageId, link.id);
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      const response = await deleteLinkApi(pageId, link.id);
+      if (response.status !== 200) {
+        throw new Error("Failed to delete link");
+      }
+      
+      // Update local state
+      deleteLink(pageId, link.id);
+      toast.success("Link deleted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete link");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Ensure URL has protocol and handle undefined/null values
@@ -87,6 +144,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Link title"
               className="transition-all duration-200"
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -99,6 +157,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
               className="transition-all duration-200"
+              disabled={isLoading}
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -107,6 +166,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
               variant="outline"
               onClick={handleCancel}
               className="transition-all duration-200"
+              disabled={isLoading}
             >
               <X className="h-4 w-4 mr-1" /> Cancel
             </Button>
@@ -114,8 +174,9 @@ const LinkCard: React.FC<LinkCardProps> = ({
               size="sm"
               onClick={handleSave}
               className="transition-all duration-200 bg-blue-500 hover:bg-blue-600"
+              disabled={isLoading}
             >
-              <Check className="h-4 w-4 mr-1" /> Save
+              <Check className="h-4 w-4 mr-1" /> {isLoading ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>
@@ -148,6 +209,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
               variant="ghost"
               onClick={() => setIsEditing(true)}
               className="h-8 w-8"
+              disabled={isLoading}
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -156,12 +218,14 @@ const LinkCard: React.FC<LinkCardProps> = ({
               checked={!!link.active}
               onCheckedChange={handleToggleActive}
               className="scale-75 shadow-md"
+              disabled={isLoading}
             />
             <Button
               size="icon"
               variant="ghost"
               onClick={handleDelete}
               className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+              disabled={isLoading}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
