@@ -127,6 +127,8 @@ const createBranch = async (req, res) => {
 
 const updateBranch = async (req, res) => {
   try {
+console.log("update branch", req.body, req.params.branchId);
+
     const branch = await Branch.findByIdAndUpdate(
       req.params.branchId,
       req.body,
