@@ -127,10 +127,6 @@ const createBranch = async (req, res) => {
 
 const updateBranch = async (req, res) => {
   try {
-
-    if (req?.body?.name) {
-      console.log(req.user);
-    }
     const existingBranchName = await Branch.findOne({ name: req.body.name });
     if (existingBranchName) {
       return res.status(404).json({
