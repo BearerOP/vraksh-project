@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useLinks } from "@/context/LinkContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Menu,
   PlusCircle,
@@ -9,9 +9,6 @@ import {
   Link,
   Palette,
   Share,
-  Copy,
-  Eye,
-  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardSidebar from "@/components/Dashboard/Sidebar";
@@ -32,7 +29,8 @@ import {
 } from "@/components/ui/drawer";
 import { toast } from "sonner";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { AnimatePresence,motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import ShareDrawerContent from "@/components/ShareContentDrawer";
 
 const Dashboard: React.FC = () => {
   const { activePage, addPage, setPages, setActivePage, pages } = useLinks();
@@ -138,7 +136,7 @@ const Dashboard: React.FC = () => {
 
         setPages(mappedPages);
         if (mappedPages.length > 0) {
-          if(!activePage) {
+          if (!activePage) {
             setActivePage(mappedPages[0]);
           }
         }
@@ -160,80 +158,6 @@ const Dashboard: React.FC = () => {
       addPage("New Page");
     }
   };
-
-  const handleCopyLink = () => {
-    if (activePage) {
-      const url = `${import.meta.env.VITE_VRAKSH_DOMAIN}/preview/${
-        activePage.title
-      }`;
-      navigator.clipboard
-        .writeText(url)
-        .then(() => {
-          toast.success("Vraksh Url copied!", {
-            description: `Copied: ${url}`,
-            duration: 3000,
-          });
-        })
-        .catch(() => {
-          toast.error("Failed to copy link.");
-        });
-    }
-    setIsShareDrawerOpen(false);
-  };
-
-  const openPreview = () => {
-    if (activePage) {
-      setIsShareDrawerOpen(false);
-      window.open(`/preview/${activePage.id}`, "_blank");
-    }
-  };
-
-  const ShareDrawerContent = () => (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-        <Copy className="h-5 w-5 text-gray-500" />
-        <button onClick={handleCopyLink} className="flex-1 text-left">
-          Copy my Vraksh link
-        </button>
-      </div>
-
-      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-        <Eye className="h-5 w-5 text-gray-500" />
-        <button onClick={openPreview} className="flex-1 text-left">
-          Preview my Vraksh
-        </button>
-      </div>
-
-      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-        <Link className="h-5 w-5 text-gray-500" />
-        <span className="flex-1 text-left">Add to your socials</span>
-      </div>
-
-      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-        <QrCode className="h-5 w-5 text-gray-500" />
-        <span className="flex-1 text-left">My Vraksh QR</span>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="text-sm font-medium mb-3">Share Vraksh to</h3>
-        <div className="grid grid-cols-4 gap-4">
-          {/* Social media sharing icons */}
-          <div className="aspect-square bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-xs">FB</span>
-          </div>
-          <div className="aspect-square bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-xs">TW</span>
-          </div>
-          <div className="aspect-square bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-xs">IG</span>
-          </div>
-          <div className="aspect-square bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-xs">WA</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">
@@ -274,9 +198,8 @@ const Dashboard: React.FC = () => {
 
         {/* Main Content */}
         <section
-          className={`flex-1 bg-[#fbfbf9] transition-all duration-300 ${
-            sidebarOpen ? "md:ml-0" : ""
-          }`}
+          className={`flex-1 bg-[#fbfbf9] transition-all duration-300 ${sidebarOpen ? "md:ml-0" : ""
+            }`}
         >
           {activePage ? (
             <Tabs
@@ -302,62 +225,63 @@ const Dashboard: React.FC = () => {
 
               {/* For desktop, we'll show the share content as a sidebar */}
               {isDesktop && (
-  <>
-    {/* Backdrop */}
-    <AnimatePresence>
-      {isShareDrawerOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setIsShareDrawerOpen(false)}
-          className="fixed inset-0 bg-black bg-opacity-30 z-30"
-        />
-      )}
-    </AnimatePresence>
+                <>
+                  {/* Backdrop */}
+                  <AnimatePresence>
+                    {isShareDrawerOpen && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsShareDrawerOpen(false)}
+                        className="fixed inset-0 bg-black bg-opacity-30 z-30"
+                      />
+                    )}
+                  </AnimatePresence>
 
-    {/* Sidebar */}
-    <AnimatePresence>
-      {isShareDrawerOpen && (
-        <motion.div
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
-          className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-40 border-l border-gray-200 overflow-y-auto"
-        >
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-6">
-              <motion.h2 
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl font-bold"
-              >
-                Share Your Vraksh
-              </motion.h2>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsShareDrawerOpen(false)}
-                className="p-2 rounded-full hover:bg-gray-100"
-              >
-                <X className="h-5 w-5" />
-              </motion.button>
-            </div>
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <ShareDrawerContent />
-            </motion.div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </>
-)}
+                  {/* Sidebar */}
+                  <AnimatePresence>
+                    {isShareDrawerOpen && (
+                      <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
+                        className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-40 border-l border-gray-200 overflow-y-auto"
+                      >
+                        <div className="p-4">
+                          <div className="flex justify-between items-center mb-6">
+                            <motion.h2
+                              initial={{ x: 20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: 0.2 }}
+                              className="text-xl font-bold"
+                            >
+                              Share Your Vraksh
+                            </motion.h2>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => setIsShareDrawerOpen(false)}
+                              className="p-2 rounded-full hover:bg-gray-100"
+                            >
+                              <X className="h-5 w-5" />
+                            </motion.button>
+                          </div>
+                          <motion.div
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+
+                            <ShareDrawerContent activePage={activePage} setIsShareDrawerOpen={setIsShareDrawerOpen} />
+                          </motion.div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              )}
             </Tabs>
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">
@@ -385,9 +309,8 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-around items-center h-16">
             <button
               onClick={() => setActiveTab("links")}
-              className={`flex flex-col items-center justify-center w-full h-full ${
-                activeTab === "links" ? "text-blue-600" : "text-gray-500"
-              }`}
+              className={`flex flex-col items-center justify-center w-full h-full ${activeTab === "links" ? "text-blue-600" : "text-gray-500"
+                }`}
             >
               <Link className="h-5 w-5" />
               <span className="text-xs mt-1">My Vraksh</span>
@@ -395,9 +318,8 @@ const Dashboard: React.FC = () => {
 
             <button
               onClick={() => setActiveTab("theme")}
-              className={`flex flex-col items-center justify-center w-full h-full ${
-                activeTab === "theme" ? "text-blue-600" : "text-gray-500"
-              }`}
+              className={`flex flex-col items-center justify-center w-full h-full ${activeTab === "theme" ? "text-blue-600" : "text-gray-500"
+                }`}
             >
               <Palette className="h-5 w-5" />
               <span className="text-xs mt-1">Theme</span>
@@ -413,9 +335,8 @@ const Dashboard: React.FC = () => {
                     e.preventDefault();
                     setIsShareDrawerOpen(true);
                   }}
-                  className={`flex flex-col items-center justify-center w-full h-full ${
-                    activeTab === "share" ? "text-blue-600" : "text-gray-500"
-                  }`}
+                  className={`flex flex-col items-center justify-center w-full h-full ${activeTab === "share" ? "text-blue-600" : "text-gray-500"
+                    }`}
                 >
                   <Share className="h-5 w-5" />
                   <span className="text-xs mt-1">Share</span>
@@ -428,7 +349,7 @@ const Dashboard: React.FC = () => {
                     Share your Vraksh link with others or add it to your socials
                   </DrawerDescription>
                 </DrawerHeader>
-                <ShareDrawerContent />
+                <ShareDrawerContent activePage={activePage} setIsShareDrawerOpen={setIsShareDrawerOpen} />
               </DrawerContent>
             </Drawer>
           </div>

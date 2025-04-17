@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LinksList from "@/components/LinksList";
 import LinkForm from "@/components/LinkForm";
 import MobilePreview from "@/components/MobilePreview";
-import { Ellipsis, InstagramIcon, Linkedin, Mail, Twitter } from "lucide-react";
+import { Ellipsis, ExternalLink, InstagramIcon, Linkedin, Mail, Twitter } from "lucide-react";
+import { iconMap } from "../ui/social-icons";
 
 const LinksTabContent: React.FC = () => {
   const { activePage } = useLinks();
@@ -27,6 +28,11 @@ const LinksTabContent: React.FC = () => {
         toast.error("Failed to copy link.");
       });
   };
+
+  const normalizeUrl = (url: string) =>
+    url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : `https://${url}`;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
@@ -91,43 +97,28 @@ const LinksTabContent: React.FC = () => {
                 {activePage?.description || "Add description"}
               </Button>
 
-              <div className="flex flex-wrap gap-2 mt-1">
-                <Button
-                  variant="link"
-                  className="text-muted-foreground p-0 h-auto"
-                  aria-label="instagram"
-                >
-                  <InstagramIcon />
-                </Button>
-                <Button
-                  variant="link"
-                  className="text-muted-foreground p-0 h-auto"
-                  aria-label="snapchat"
-                >
-                  <Mail />
-                </Button>
-                <Button
-                  variant="link"
-                  className="text-muted-foreground p-0 h-auto"
-                  aria-label="twitter"
-                >
-                  <Twitter />
-                </Button>
-                <Button
-                  variant="link"
-                  className="text-muted-foreground p-0 h-auto"
-                  aria-label="linkedin"
-                >
-                  <Linkedin />
-                </Button>
-                <Button
-                  variant="link"
-                  className="text-muted-foreground p-0 h-auto"
-                  aria-label="more"
-                >
-                  <Ellipsis className="h-4 w-4" />
-                </Button>
+              {activePage.socialIcons && activePage.socialIcons.length > 0 && (
+              <div
+                className="flex justify-center items-center gap-2 mt-1 bg-transparent"
+                style={{ animationDelay: "0.15s" }}
+              >
+                {activePage.socialIcons?.map((social, index) => {
+                  return (
+                    <a
+                      key={index}
+                      href={normalizeUrl(social.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:opacity-80 transition-opacity rounded-md p-2  bg-black/5 dark:bg-white/10 backdrop-blur-md shadow-md"
+                    >
+                      {iconMap[
+                        social.name.toLowerCase() as keyof typeof iconMap
+                      ] || <ExternalLink size={18} />}
+                    </a>
+                  );
+                })}
               </div>
+            )}
             </div>
           </div>
 

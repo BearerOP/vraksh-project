@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { BranchItem, SocialIcon, templateConfigs } from "@/utils/types";
 import { getBranch } from "@/lib/apis";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeftIcon } from "lucide-react";
 import { Page } from "@/context/LinkContext";
 import MobilePreview from "@/components/MobilePreview";
 
@@ -95,27 +95,38 @@ const MobilePreviewPage = () => {
     (template) => template.id === page.templateId
   );
 
+  console.log(templateConfig?.className)
   return (
     <div
       className={cn(
-        "min-h-screen flex flex-col items-center justify-center p-6",
-        templateConfig?.className
+        "min-h-screen flex flex-col items-center justify-center p-6 ",
+        page.backgroundImageUrl ? "bg-cover bg-center" : "bg-neutral-700",
+        templateConfig?.className,
+        page.backgroundImageUrl && {
+          backgroundImage: `url(${templateConfig.backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }
       )}
-      style={{
-        backgroundImage: page.backgroundImageUrl
-          ? templateConfig.backgroundImage
-          : `url(${page.backgroundImageUrl})`,
-        backgroundSize: page.backgroundImageUrl ? undefined : "cover",
-        backgroundPosition: page.backgroundImageUrl ? undefined : "center",
-      }}
+    // style={{
+    //   backgroundImage: page.backgroundImageUrl
+    //     ? templateConfig.backgroundImage
+    //     : `url(${page.backgroundImageUrl})`,
+    //   backgroundSize: page.backgroundImageUrl ? undefined : "cover",
+    //   backgroundPosition: page.backgroundImageUrl ? undefined : "center",
+    // }}
     >
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => navigate("/dashboard")}
-        className="absolute top-4 left-4 text-white hover:bg-white/10"
+        className={cn(
+          "absolute top-4 left-4 shadow-lg",
+          templateConfig?.linkClass
+        )}
+
       >
-        <ArrowLeft className="h-4 w-4 mr-2" />
+        <ChevronLeftIcon className="h-4 w-4 mr" />
         Back to Dashboard
       </Button>
 

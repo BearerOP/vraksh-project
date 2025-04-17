@@ -47,8 +47,8 @@ const Preview: React.FC = () => {
     <div
       className={cn(
         "min-h-screen flex flex-col items-center",
-        templateConfig.className,
         page.backgroundImageUrl ? "bg-cover bg-center" : "bg-white",
+        templateConfig.className,
         page.backgroundImageUrl && {
           backgroundImage: `url(${templateConfig.backgroundImage})`,
           backgroundSize: "cover",

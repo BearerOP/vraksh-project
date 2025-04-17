@@ -21,7 +21,7 @@ const App = () => (
             <Routes>
               {/* <Route path="/" element={<Index />} /> */}
               <Route path="/" element={<Navigate to="/dashboard" />} />"
-              <Route path="/:username" element={<BranchPreview/>} />
+              <Route path="/:username" element={<BranchPreview />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/preview/:pageId" element={<Preview />} />
               <Route path="/new-branch" element={<CreateBranch />} />
