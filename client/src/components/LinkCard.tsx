@@ -39,17 +39,17 @@ const LinkCard: React.FC<LinkCardProps> = ({
     if (title.trim() && url.trim()) {
       try {
         setIsLoading(true);
-        const updatedLink = { 
+        const updatedLink = {
           ...link,
-          title, 
-          url 
+          title,
+          url
         };
-        
+
         const response = await updateLinkApi(updatedLink);
         if (response.status !== 200) {
           throw new Error("Failed to update link");
         }
-        
+
         // Update local state
         updateLink(pageId, link.id, { title, url });
         setIsEditing(false);
@@ -72,16 +72,16 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const handleToggleActive = async () => {
     try {
       setIsLoading(true);
-      const updatedLink = { 
+      const updatedLink = {
         ...link,
-        active: !link.active 
+        active: !link.active
       };
-      
+
       const response = await updateLinkApi(updatedLink);
       if (response.status !== 200) {
         throw new Error("Failed to update link status");
       }
-      
+
       // Update local state
       updateLink(pageId, link.id, { active: !link.active });
       toast.success(`Link ${!link.active ? 'activated' : 'deactivated'} successfully`);
@@ -100,7 +100,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
       if (response.status !== 200) {
         throw new Error("Failed to delete link");
       }
-      
+
       // Update local state
       deleteLink(pageId, link.id);
       toast.success("Link deleted successfully");
