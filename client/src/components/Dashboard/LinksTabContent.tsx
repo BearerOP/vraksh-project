@@ -1,23 +1,12 @@
-// 4. LinksTabContent Component
-import React, { useState } from "react";
+import React from "react";
 import { useLinks } from "@/context/LinkContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LinksList from "@/components/LinksList";
 import LinkForm from "@/components/LinkForm";
 import MobilePreview from "@/components/MobilePreview";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-
 import { ProfileSection } from "@/components/LinksTabContent/ProfileSection";
 
 const LinksTabContent: React.FC = () => {

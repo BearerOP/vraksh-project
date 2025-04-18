@@ -3,6 +3,7 @@ import React from "react";
 import { useLinks } from "@/context/LinkContext";
 
 import MobilePreview from "@/components/MobilePreview";
+import MobilePreviewSkeleton from "@/components/MobilePreviewSkeleton";
 import ProfileSettings from "./ProfileSettings";
 import BackgroundSettings from "./BackgroundSettings";
 import ColorSettingsSection from "./ColorSettingSection";
@@ -10,7 +11,7 @@ import TypographySettings from "./TypographySettings";
 import ThemeSettings from "./ThemeSettings";
 
 const ThemeTabContent: React.FC = () => {
-  const { activePage } = useLinks();
+  const { activePage, isUpdating } = useLinks();
 
   return (
     <div className="grid grid-cols-1 p-6 lg:grid-cols-3 gap-6">
@@ -34,7 +35,11 @@ const ThemeTabContent: React.FC = () => {
       <div className="hidden lg:block">
         <div className="sticky top-24">
           <h3 className="text-lg font-medium mb-4 text-center">Preview</h3>
-          <MobilePreview page={activePage} />
+          {isUpdating ? (
+            <MobilePreviewSkeleton />
+          ) : (
+            <MobilePreview page={activePage} />
+          )}
         </div>
       </div>
     </div>

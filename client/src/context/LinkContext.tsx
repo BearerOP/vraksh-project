@@ -1,5 +1,7 @@
 import { SocialIcon } from "@/utils/types";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import { updateBranch } from "@/lib/apis";
+import { toast } from "sonner";
 
 export interface Link {
   id: string;
@@ -62,6 +64,13 @@ export interface Page {
   backgroundImageUrl?: string; // Optional, for future use
 }
 
+// Type for API responses
+interface ApiResponse {
+  success: boolean;
+  data?: unknown;
+  message?: string;
+}
+
 interface LinkContextType {
   pages: Page[];
   activePage: Page | null;
@@ -78,6 +87,7 @@ interface LinkContextType {
   ) => void;
   deleteLink: (pageId: string, linkId: string) => void;
   reorderLinks: (pageId: string, startIndex: number, endIndex: number) => void;
+  isUpdating: boolean;
 }
 
 const LinkContext = createContext<LinkContextType | undefined>(undefined);
@@ -85,30 +95,18 @@ const LinkContext = createContext<LinkContextType | undefined>(undefined);
 export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // Initialize state from localStorage or use default data
-  const [pages, setPages] = useState<Page[]>(() => {
-    if (typeof window !== "undefined") {
-      const savedPages = localStorage.getItem("pages");
-      return savedPages ? JSON.parse(savedPages) : [];
-    }
-    return [];
-  });
-
+  // Initialize state without localStorage
+  const [pages, setPages] = useState<Page[]>([]);
   const [activePage, setActivePage] = useState<Page | null>(null);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  // Set the first page as active by default
-  useEffect(() => {
-    if (pages.length > 0 && !activePage) {
-      setActivePage(pages[0]);
-    }
-  }, [pages, activePage]);
+  // Refs for debouncing
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdatesRef = useRef<{[key: string]: Partial<Omit<Page, "id">>}>({});
 
-  // Save to localStorage whenever pages change
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("pages", JSON.stringify(pages));
-    }
-  }, [pages]);
+  // No longer set the first page as active by default - handled by Dashboard
+
+  // No longer saving to localStorage
 
   // Add a new page
   const addPage = (title: string) => {
@@ -138,6 +136,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Update an existing page
   const updatePage = (pageId: string, updates: Partial<Omit<Page, "id">>) => {
+    // Immediately update UI for better user experience
     const updatedPages = pages.map((page) =>
       page.id === pageId ? { ...page, ...updates } : page
     );
@@ -149,6 +148,59 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
         updatedPages.find((p) => p.id === pageId) || null;
       setActivePage(updatedActivePage);
     }
+    
+    // Store the latest updates for this page
+    pendingUpdatesRef.current[pageId] = {
+      ...(pendingUpdatesRef.current[pageId] || {}),
+      ...updates
+    };
+    
+    // Clear any existing timeout
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    
+    // Set updating state to true
+    setIsUpdating(true);
+    
+    // Debounce API call - wait 500ms after last change
+    updateTimeoutRef.current = setTimeout(() => {
+      // Get the latest updates for this page
+      const latestUpdates = pendingUpdatesRef.current[pageId];
+      
+      if (!latestUpdates) {
+        setIsUpdating(false);
+        return;
+      }
+      
+      // Clear pending updates for this page
+      delete pendingUpdatesRef.current[pageId];
+      
+      // Make API call with latest updates
+      try {
+        updateBranch(pageId, latestUpdates)
+          .then(response => {
+            const data = response.data as ApiResponse;
+            if (!data.success) {
+              throw new Error(data.message || "Failed to update settings");
+            }
+          })
+          .catch(error => {
+            console.error("API error:", error);
+            toast.error("Failed to save changes to the server");
+          })
+          .finally(() => {
+            // Only set updating to false if no more pending updates
+            if (Object.keys(pendingUpdatesRef.current).length === 0) {
+              setIsUpdating(false);
+            }
+          });
+      } catch (error) {
+        console.error("Error updating page:", error);
+        toast.error("Failed to save changes");
+        setIsUpdating(false);
+      }
+    }, 500); // 500ms debounce time
   };
 
   // Delete a page
@@ -285,6 +337,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
     updateLink,
     deleteLink,
     reorderLinks,
+    isUpdating,
   };
 
   return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;

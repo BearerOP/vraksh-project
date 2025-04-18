@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useLinks } from "@/context/LinkContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Menu,
   PlusCircle,
@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { AnimatePresence, motion } from "motion/react";
 import ShareDrawerContent from "@/components/ShareContentDrawer";
+import DashboardSkeleton from "@/components/DashboardSkeleton";
 
 const Dashboard: React.FC = () => {
   const { activePage, addPage, setPages, setActivePage, pages } = useLinks();
@@ -40,9 +41,11 @@ const Dashboard: React.FC = () => {
   const [pageTitle, setPageTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
@@ -92,59 +95,93 @@ const Dashboard: React.FC = () => {
     };
   }, [sidebarOpen]);
 
+  // Handle activePage changes - update URL when active page changes
+  useEffect(() => {
+    if (activePage) {
+      const currentPageId = searchParams.get('page');
+      // Only update URL if the page ID has changed
+      if (currentPageId !== activePage.id) {
+        setSearchParams({ page: activePage.id });
+      }
+    }
+  }, [activePage, setSearchParams, searchParams]);
+
   useEffect(() => {
     async function fetchUserBranches() {
-      const response = await getBranches();
-      if (response.status === 200) {
-        const data = response.data as { branches: Branch[] };
-        const branches = data?.branches;
-        if (branches?.length < 1) {
-          navigate("/new-branch");
-        }
-        console.log("branches", branches);
+      setIsLoading(true);
+      try {
+        const response = await getBranches();
+        if (response.status === 200) {
+          const data = response.data as { branches: Branch[] };
+          const branches = data?.branches;
+          if (branches?.length < 1) {
+            navigate("/new-branch");
+            return;
+          }
 
-        console.log(branches[0].socialIcons);
+          const mappedPages = branches.map((branch: Branch) => ({
+            id: branch._id,
+            title: branch.name,
+            links:
+              branch.items?.map((item: BranchItem) => ({
+                id: item._id,
+                title: item.title,
+                url: item.url,
+                active: item.active,
+              })) || [],
+            templateId: branch.templateId,
+            imageUrl: branch.imageUrl,
+            createdAt: branch.createdAt,
+            updatedAt: branch.updatedAt,
+            backgroundImageUrl: branch.backgroundImageUrl,
+            userId: branch.userId,
+            description: branch.description,
+            socialIcons: branch.socialIcons as SocialIcon[],
+            titleColor: branch.titleColor,
+            titleFont: branch.titleFont,
+            descriptionColor: branch.descriptionColor,
+            descriptionFont: branch.descriptionFont,
+            linkTextColor: branch.linkTextColor,
+            linkBorderSize: branch.linkBorderSize,
+            linkBackgroundColor: branch.linkBackgroundColor,
+            buttonTextFont: branch.buttonTextFont,
+            avatarRounded: branch.avatarRounded,
+          }));
 
-        const mappedPages = branches.map((branch: Branch) => ({
-          id: branch._id,
-          title: branch.name,
-          links:
-            branch.items?.map((item: BranchItem) => ({
-              id: item._id,
-              title: item.title,
-              url: item.url,
-              active: item.active,
-            })) || [],
-          templateId: branch.templateId,
-          imageUrl: branch.imageUrl,
-          createdAt: branch.createdAt,
-          updatedAt: branch.updatedAt,
-          backgroundImageUrl: branch.backgroundImageUrl,
-          userId: branch.userId,
-          description: branch.description,
-          socialIcons: branch.socialIcons as SocialIcon[],
-          titleColor: branch.titleColor,
-          titleFont: branch.titleFont,
-          descriptionColor: branch.descriptionColor,
-          descriptionFont: branch.descriptionFont,
-          linkTextColor: branch.linkTextColor,
-          linkBorderSize: branch.linkBorderSize,
-          linkBackgroundColor: branch.linkBackgroundColor,
-          buttonTextFont: branch.buttonTextFont,
-          avatarRounded: branch.avatarRounded,
-        }));
-
-        setPages(mappedPages);
-        if (mappedPages.length > 0) {
-          if (!activePage) {
-            setActivePage(mappedPages[0]);
+          setPages(mappedPages);
+          
+          // Check if we have a page ID in the URL
+          const pageIdFromUrl = searchParams.get('page');
+          
+          if (mappedPages.length > 0) {
+            if (pageIdFromUrl) {
+              // Try to find the page with the ID from the URL
+              const pageFromUrl = mappedPages.find(page => page.id === pageIdFromUrl);
+              if (pageFromUrl) {
+                setActivePage(pageFromUrl);
+              } else {
+                // If page not found, default to first page
+                setActivePage(mappedPages[0]);
+                // Update URL with the first page ID
+                setSearchParams({ page: mappedPages[0].id });
+              }
+            } else {
+              // No page ID in URL, set first page as active
+              setActivePage(mappedPages[0]);
+              // Update URL with the first page ID
+              setSearchParams({ page: mappedPages[0].id });
+            }
           }
         }
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
     fetchUserBranches();
-  }, []);
+  }, []); // Remove searchParams dependency to avoid infinite loops
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -158,6 +195,10 @@ const Dashboard: React.FC = () => {
       addPage("New Page");
     }
   };
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9]">

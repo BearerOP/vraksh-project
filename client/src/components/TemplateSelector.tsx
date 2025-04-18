@@ -9,13 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { templateConfigs } from "@/utils/types";
+import { Loader2 } from "lucide-react";
 
 interface TemplateSelectorProps {
   pageId: string;
 }
 
 const TemplateSelector: React.FC<TemplateSelectorProps> = ({ pageId }) => {
-  const { updatePage, pages } = useLinks();
+  const { updatePage, pages, isUpdating } = useLinks();
   const page = pages.find((p) => p.id === pageId);
 
   if (!page) return null;
@@ -26,10 +27,21 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ pageId }) => {
 
   return (
     <Card className="p-4">
-      <h3 className="text-sm font-medium mb-3">Template Style</h3>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-sm font-medium">Template Style</h3>
+        {isUpdating && (
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>Saving...</span>
+          </div>
+        )}
+      </div>
 
       {/* Dropdown Selection */}
-      <Select value={page.templateId} onValueChange={handleTemplateChange}>
+      <Select 
+        value={page.templateId} 
+        onValueChange={handleTemplateChange}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select template" />
         </SelectTrigger>

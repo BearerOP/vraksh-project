@@ -11,7 +11,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Upload, ImageIcon, Trash2 } from "lucide-react";
+import { Upload, ImageIcon, Trash2, Loader2 } from "lucide-react";
 import ImageCropper from "../ImageCropper";
 import imageCompression from "browser-image-compression";
 import { useAuth } from "@/hooks/use-auth";
@@ -22,7 +22,7 @@ interface BackgroundSettingsProps {
 }
 
 const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
-  const { activePage, updatePage } = useLinks();
+  const { activePage, updatePage, isUpdating } = useLinks();
   const [backgroundImageFile, setBackgroundImageFile] = useState<File | null>(
     null
   );
@@ -125,7 +125,7 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
       <div className="flex gap-2">
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" disabled={isUpdating}>
               <Upload className="h-4 w-4 mr-2" />
               Upload Background
             </Button>
@@ -151,14 +151,22 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
                     <Button
                       variant="outline"
                       onClick={() => setBackgroundImageFile(null)}
+                      disabled={isUpdating}
                     >
                       Choose Different Image
                     </Button>
                     <Button
                       onClick={handleBackgroundImageSave}
-                      disabled={!croppedBlob}
+                      disabled={!croppedBlob || isUpdating}
                     >
-                      Save Background
+                      {isUpdating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Background"
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -187,8 +195,16 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
         </Dialog>
 
         {activePage.backgroundImageUrl && (
-          <Button variant="destructive" onClick={handleRemoveBackground}>
-            <Trash2 className="h-4 w-4 mr-2" />
+          <Button 
+            variant="destructive" 
+            onClick={handleRemoveBackground}
+            disabled={isUpdating}
+          >
+            {isUpdating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4 mr-2" />
+            )}
             Remove
           </Button>
         )}

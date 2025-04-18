@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { updateBranchProfile } from "@/lib/apis";
+import { updateBranch } from "@/lib/apis";
+import { SocialIcon } from "@/utils/types";
 
 
 export const ProfileSection = () => {
@@ -47,23 +48,36 @@ export const ProfileSection = () => {
     try {
       const updates: {
         title?: string;
-        description?: string;
-        socialIcons?: typeof activePage.socialIcons;
+        name?: string,
+        description?: string,
+        socialIcons?: SocialIcon[],
+        templateId?: string,
+        imageUrl?: string,
+        backgroundImageUrl?: string,
+        titleColor?: string,
+        descriptionColor?: string,
+        linkTextColor?: string,
+        linkBorderSize?: string,
+        linkBackgroundColor?: string,
+        titleFont?: string,
+        descriptionFont?: string,
+        buttonTextFont?: string,
+        avatarRounded?: string,
       } = {};
-      
+
       // Only add fields that have changed
       if (title !== activePage.title) {
         updates.title = title;
       }
-      
+
       if (description !== activePage.description) {
         updates.description = description;
       }
-      
+
       // Only make the API call if there are changes
       if (Object.keys(updates).length > 0) {
-        const response = await updateBranchProfile(activePage.id, updates);
-        
+        const response = await updateBranch(activePage.id, updates);
+
         if (response.status !== 200) {
           throw new Error("Failed to update branch profile");
         }
@@ -74,7 +88,7 @@ export const ProfileSection = () => {
       } else {
         toast.info("No changes to save");
       }
-      
+
       setIsEditDialogOpen(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update branch details");
@@ -109,7 +123,7 @@ export const ProfileSection = () => {
 
       // Check if social icons have actually changed
       let socialIconsChanged = false;
-      
+
       if (!activePage.socialIcons || activePage.socialIcons.length !== updatedSocialIcons.length) {
         socialIconsChanged = true;
       } else {
@@ -117,18 +131,18 @@ export const ProfileSection = () => {
         for (let i = 0; i < updatedSocialIcons.length; i++) {
           const original = activePage.socialIcons[i];
           const updated = updatedSocialIcons[i];
-          
-          if (original.name !== updated.name || 
-              original.url !== updated.url || 
-              original.icon !== updated.icon) {
+
+          if (original.name !== updated.name ||
+            original.url !== updated.url ||
+            original.icon !== updated.icon) {
             socialIconsChanged = true;
             break;
           }
         }
       }
-      
+
       if (socialIconsChanged) {
-        const response = await updateBranchProfile(activePage.id, {
+        const response = await updateBranch(activePage.id, {
           socialIcons: updatedSocialIcons
         });
 
@@ -144,7 +158,7 @@ export const ProfileSection = () => {
       } else {
         toast.info("No changes to save");
       }
-      
+
       setIsSocialDialogOpen(false);
     } catch (error) {
       toast.error("Failed to update social icons");
@@ -162,7 +176,7 @@ export const ProfileSection = () => {
       const updatedSocialIcons = [...(activePage.socialIcons || [])];
       updatedSocialIcons.splice(selectedSocialIcon.index, 1);
 
-      const response = await updateBranchProfile(activePage.id, {
+      const response = await updateBranch(activePage.id, {
         socialIcons: updatedSocialIcons
       });
 

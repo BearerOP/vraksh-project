@@ -1,7 +1,7 @@
 import React from "react";
 import { useLinks } from "@/context/LinkContext";
 import { Button } from "@/components/ui/button";
-import { Paintbrush } from "lucide-react";
+import { Paintbrush, Loader2 } from "lucide-react";
 import TemplateSelector from "../TemplateSelector";
 
 interface ThemeSettingsProps {
@@ -9,7 +9,7 @@ interface ThemeSettingsProps {
 }
 
 const ThemeSettings: React.FC<ThemeSettingsProps> = ({ pageId }) => {
-  const { activePage, updatePage } = useLinks();
+  const { activePage, updatePage, isUpdating } = useLinks();
 
   if (!activePage) return null;
 
@@ -17,8 +17,12 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({ pageId }) => {
     <div className="bg-white p-6 rounded-xl shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-medium">Theme & Layout</h2>
-        <Button variant="outline" size="sm" className="text-muted-foreground">
-          <Paintbrush className="h-4 w-4 mr-2" />
+        <Button variant="outline" size="sm" className="text-muted-foreground" disabled={isUpdating}>
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Paintbrush className="h-4 w-4 mr-2" />
+          )}
           Customize
         </Button>
       </div>
@@ -27,8 +31,17 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({ pageId }) => {
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-medium">Theme & Layout</h2>
-          <Button variant="outline" size="sm" className="text-muted-foreground">
-            <Paintbrush className="h-4 w-4 mr-2" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-muted-foreground"
+            disabled={isUpdating}
+          >
+            {isUpdating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Paintbrush className="h-4 w-4 mr-2" />
+            )}
             Customize
           </Button>
         </div>

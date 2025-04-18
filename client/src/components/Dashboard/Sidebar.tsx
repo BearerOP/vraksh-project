@@ -1,11 +1,11 @@
 // 2. DashboardSidebar Component
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
-import { useLinks } from "@/context/LinkContext";
+import { useLinks, Page } from "@/context/LinkContext";
 import {
   PlusCircle,
   Settings,
@@ -14,7 +14,6 @@ import {
   Eye,
   ChevronDown
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { se } from "date-fns/locale";
 
 interface DashboardSidebarProps {
@@ -29,12 +28,19 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   sidebarOpen, 
   setSidebarOpen,
   showDropdown, 
-  setShowDropdown ,
+  setShowDropdown,
   setActiveTab
 }) => {
   const { user } = useAuth();
   const { pages, activePage, setActivePage } = useLinks();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handlePageChange = (page: Page) => {
+    setActivePage(page);
+    setSearchParams({ page: page.id });
+    setShowDropdown(false);
+  };
 
   return (
     <aside
@@ -74,10 +80,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                   className={`w-full justify-start px-3 py-2 mb-1 h-auto text-left rounded-md hover:bg-gray-100 ${
                     activePage?.id === page.id ? "bg-gray-100 font-medium" : ""
                   }`}
-                  onClick={() => {
-                    setActivePage(page);
-                    setShowDropdown(false);
-                  }}
+                  onClick={() => handlePageChange(page)}
                 >
                   <span className="truncate">{page.title}</span>
                 </Button>

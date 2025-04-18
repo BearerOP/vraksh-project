@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLinks } from "@/context/LinkContext";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Palette } from "lucide-react";
+import { Palette, Loader2, Check } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import ColorPicker from "../ColorPicker";
 
@@ -11,9 +11,18 @@ interface ColorSettingsSectionProps {
 }
 
 const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) => {
-  const { activePage, updatePage } = useLinks();
+  const { activePage, updatePage, isUpdating } = useLinks();
+  const [localDescription, setLocalDescription] = useState<string>("");
+  
+  // Initialize local state from activePage
+  useEffect(() => {
+    if (activePage?.description !== undefined) {
+      setLocalDescription(activePage.description || "");
+    }
+  }, [activePage?.description]);
 
   const handleChangeDescription = (value: string) => {
+    setLocalDescription(value);
     updatePage(pageId, { description: value });
   };
 
@@ -27,13 +36,21 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
 
       {/* Bio Text */}
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">
-          Bio Text
-        </label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm font-medium">
+            Bio Text
+          </label>
+          {isUpdating && (
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Saving...</span>
+            </div>
+          )}
+        </div>
         <Textarea
           placeholder="Add a short bio"
           className="resize-none"
-          value={activePage.description || ""}
+          value={localDescription}
           onChange={(e) => handleChangeDescription(e.target.value)}
         />
       </div>
@@ -42,9 +59,17 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {/* Title Color */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Title Color
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">
+              Title Color
+            </label>
+            {isUpdating && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full border shadow-sm"
@@ -71,9 +96,17 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
 
         {/* Description Color */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Description Color
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">
+              Description Color
+            </label>
+            {isUpdating && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full border shadow-sm"
@@ -100,9 +133,17 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
 
         {/* Link Text Color */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Link Text Color
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">
+              Link Text Color
+            </label>
+            {isUpdating && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full border shadow-sm"
@@ -129,9 +170,17 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
 
         {/* Link Background Color */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Link Background Color
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">
+              Link Background Color
+            </label>
+            {isUpdating && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full border shadow-sm"
@@ -159,9 +208,17 @@ const ColorSettingsSection: React.FC<ColorSettingsSectionProps> = ({ pageId }) =
 
       {/* Link Border Size */}
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">
-          Link Border Size
-        </label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm font-medium">
+            Link Border Size
+          </label>
+          {isUpdating && (
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Saving...</span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-4">
           <input
             type="range"

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLinks } from "@/context/LinkContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, Trash2 } from "lucide-react";
+import { Upload, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -26,7 +26,7 @@ import { cloudinarySign } from "@/lib/apis";
 import imageCompression from "browser-image-compression";
 
 const ProfileSettings: React.FC = () => {
-  const { activePage, updatePage } = useLinks();
+  const { activePage, updatePage, isUpdating } = useLinks();
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null
@@ -137,7 +137,7 @@ const ProfileSettings: React.FC = () => {
         <div className="flex gap-2">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" disabled={isUpdating}>
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Image
               </Button>
@@ -197,18 +197,31 @@ const ProfileSettings: React.FC = () => {
                   <Button variant="secondary">Cancel</Button>
                 </DialogClose>
                 <Button
-                  disabled={!profileImageFile}
+                  disabled={!profileImageFile || isUpdating}
                   onClick={handleProfileImageSave}
                 >
-                  Save Changes
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : "Save Changes"}
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
           {activePage?.imageUrl && (
-            <Button variant="outline" onClick={handleRemoveProfileImage}>
-              <Trash2 className="h-4 w-4 mr-2" />
+            <Button 
+              variant="outline" 
+              onClick={handleRemoveProfileImage}
+              disabled={isUpdating}
+            >
+              {isUpdating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
               Remove
             </Button>
           )}
@@ -229,6 +242,7 @@ const ProfileSettings: React.FC = () => {
             })
           }
           defaultValue="9999px"
+          disabled={isUpdating}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select the avatar shape" />
