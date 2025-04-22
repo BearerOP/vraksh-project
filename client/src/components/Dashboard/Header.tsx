@@ -87,7 +87,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <Eye className="h-4 w-4 mr-2" />
           <span className="hidden sm:inline">Preview</span>
         </Button> */}
-        <Button
+        {/* <Button
           variant="outline"
           size="sm"
           onClick={() => {
@@ -97,7 +97,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         >
           <Settings className="h-4 w-4 mr-2" />
           <span className="hidden lg:inline">Settings</span>
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

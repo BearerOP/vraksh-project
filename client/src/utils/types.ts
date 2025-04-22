@@ -87,7 +87,7 @@ export const templateConfigs: TemplateConfig[] = [
     className: "bg-gradient-to-b from-gray-800 via-white to-gray-800 border-gray-200",
     textClass: "text-gray-700",
     linkClass:
-      "bg-transparent border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm",
+      "backdrop-blur-sm border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm",
     profileClass: "bg-gray-200 text-gray-800",
     titleClass: "text-gray-900 font-light",
     subtitleClass: "text-gray-500",
