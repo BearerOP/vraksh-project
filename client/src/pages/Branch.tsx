@@ -17,9 +17,37 @@ const MobilePreviewPage = () => {
   useEffect(() => {
     const fetchPage = async () => {
       try {
-        const response = await getBranch(username);
+        interface BranchResponse {
+          status: number;
+          data: {
+            data: {
+              _id: string;
+              name: string;
+              items?: BranchItem[];
+              templateId: string;
+              imageUrl: string;
+              createdAt: string;
+              updatedAt: string;
+              backgroundImageUrl?: string;
+              userId: string;
+              description: string;
+              socialIcons: SocialIcon[];
+              titleColor: string;
+              titleFont: string;
+              descriptionColor: string;
+              descriptionFont: string;
+              linkTextColor: string;
+              linkBorderSize: string;
+              linkBackgroundColor: string;
+              buttonTextFont: string;
+              avatarRounded: string;
+            };
+          };
+        }
+
+        const response = await getBranch(username) as BranchResponse;
         if (response.status === 200) {
-          const data = response.data.data as any;
+          const data = response.data.data;
 
           const branch = {
             id: data._id,

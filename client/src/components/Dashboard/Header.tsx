@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useLinks } from "@/context/LinkContext";
-import { Paintbrush, Share2, Eye, Settings } from "lucide-react";
+import { Paintbrush, Settings, Share2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
@@ -26,7 +26,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   return (
     <div
       className={cn(
-        `flex flex-col  sm:flex-row justify-center md:justify-between sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b shadow-sm`
+        `flex flex-col sm:flex-row justify-center md:justify-between sticky top-0 z-10 p-4 bg-[#fbfbf9] border-b shadow-sm`,
+        className
       )}
     >
       <h2 className="text-xl font-bold text-center relative self-center mb-3 sm:mb-0">
@@ -35,7 +36,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       <div
         className={cn(
-          `hidden md:flex gap-2 flex-wrap justify-center sm:justify-end `,
+          `hidden md:flex gap-2 flex-wrap justify-center sm:justify-end`,
         )}
       >
         <Button
@@ -43,17 +44,23 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           size="sm"
           value="links"
           onClick={() => setActiveTab("links")}
-          className="text-foreground hover:bg-foreground/10 transition-all duration-200"
+          className={cn(
+            "text-foreground hover:bg-foreground/10 transition-all duration-200",
+            activeTab === "links" ? "bg-secondary text-secondary-foreground" : ""
+          )}
         >
-          <Paintbrush className="h-4 w-4 mr-2" />
-          <span className="hidden lg:inline">Links</span>
+          <User className="h-4 w-4 mr-2" />
+          <span className="hidden lg:inline">My Vraksh</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
           value="theme"
           onClick={() => setActiveTab("theme")}
-          className="text-foreground hover:bg-foreground/10 transition-all duration-200"
+          className={cn(
+            "text-foreground hover:bg-foreground/10 transition-all duration-200",
+            activeTab === "theme" ? "bg-secondary text-secondary-foreground" : ""
+          )}
         >
           <Paintbrush className="h-4 w-4 mr-2" />
           <span className="hidden lg:inline">Theme</span>

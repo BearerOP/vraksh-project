@@ -106,12 +106,12 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
     <div>
       <label className="block text-sm font-medium mb-6">Background</label>
       <div className="flex flex-col items-center gap-4">
-        <div className="relative h-48 w-fit rounded-lg overflow-hidden mb-3 bg-gray-100">
+        <div className="relative h-48 w-fit rounded-lg overflow-hidden mb-3 bg-gray-100 border-2 p-1">
           {activePage.backgroundImageUrl ? (
             <img
               src={activePage.backgroundImageUrl}
               alt="Background preview"
-              className="h-full object-cover"
+              className="h-full object-cover  rounded-sm"
             />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -201,11 +201,11 @@ const BackgroundSettings: React.FC<BackgroundSettingsProps> = ({ pageId }) => {
             disabled={isUpdating}
           >
             {isUpdating ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Trash2 className="h-4 w-4 mr-2" />
+              <Trash2 className="h-4 w-4" />
             )}
-            Remove
+
           </Button>
         )}
       </div>

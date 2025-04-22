@@ -213,16 +213,15 @@ const ProfileSettings: React.FC = () => {
 
           {activePage?.imageUrl && (
             <Button 
-              variant="outline" 
+              variant="destructive" 
               onClick={handleRemoveProfileImage}
               disabled={isUpdating}
             >
               {isUpdating ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-4 w-4" />
               )}
-              Remove
             </Button>
           )}
         </div>

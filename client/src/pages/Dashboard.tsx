@@ -27,7 +27,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { toast } from "sonner";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { AnimatePresence, motion } from "motion/react";
 import ShareDrawerContent from "@/components/ShareContentDrawer";
@@ -181,8 +180,7 @@ const Dashboard: React.FC = () => {
     }
 
     fetchUserBranches();
-  }, []); // Remove searchParams dependency to avoid infinite loops
-
+  }, []);
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -365,7 +363,6 @@ const Dashboard: React.FC = () => {
               <Palette className="h-5 w-5" />
               <span className="text-xs mt-1">Theme</span>
             </button>
-
             <Drawer
               open={isShareDrawerOpen && !isDesktop}
               onOpenChange={setIsShareDrawerOpen}

@@ -1,11 +1,14 @@
-import React from "react";
 import { Copy, Eye, Link, QrCode } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const ShareDrawerContent = ({
     activePage
     , setIsShareDrawerOpen
 }) => {
+
+    const navigate = useNavigate();
+
     const handleCopyLink = () => {
         if (activePage) {
             const url = `${import.meta.env.VITE_VRAKSH_APP_URL}/${activePage.title}`;
@@ -27,7 +30,7 @@ const ShareDrawerContent = ({
     const openPreview = () => {
         if (activePage) {
             setIsShareDrawerOpen(false);
-            window.open(`/preview/${activePage.id}`, "_blank");
+            navigate(`/${activePage.title}`);
         }
     };
 

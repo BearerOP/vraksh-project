@@ -9,20 +9,25 @@ import { iconMap } from "@/components/ui/social-icons";
 
 const Preview: React.FC = () => {
   const { pageId } = useParams<{ pageId: string }>();
-  const { pages } = useLinks();
   const navigate = useNavigate();
 
-  // Find the page based on the ID from the URL
-  const page = pages.find((p) => p.id === pageId);
+
+  const { pages } = useLinks();
+  console.log("pageID", pageId);
+  console.log("pages", pages);
+  
 
   // Redirect to dashboard if page not found
+  const page = pages.find((p) => p.id === pageId);
   useEffect(() => {
+console.log("pages", pages);
+
+
     if (!page && pages.length > 0) {
       navigate("/dashboard");
     }
   }, [page, pages, navigate]);
 
-  // If the page is still loading or not found, show a loading state
   if (!page) {
     return (
       <div className="min-h-screen flex items-center justify-center">
