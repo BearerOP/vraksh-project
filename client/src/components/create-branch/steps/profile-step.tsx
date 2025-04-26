@@ -47,6 +47,12 @@ export default function ProfileStep({ form }: ProfileStepProps) {
       reader.readAsDataURL(file);
     }
   };
+  useEffect(() => {
+    if (!form.getValues("description")) {
+      form.setValue("description", "this is my bio branch");
+    }
+  }, [form]);
+  
 
   const removeImage = () => {
     setPreviewImage(null);
