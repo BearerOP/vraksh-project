@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Token = require("../models/Token");
 const Branch = require("../models/Branch");
 const RefreshToken = require("../models/RefreshToken");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const {
   generateToken,
@@ -469,7 +469,7 @@ const googleCallback = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    console.log(req.headers.cookie,'cookie in headers');
+    console.log(req.headers.cookie, "cookie in headers");
 
     if (!req.headers.cookie) {
       return res.status(401).send("Unauthorized"); // No cookies, no token
@@ -498,6 +498,7 @@ const refreshToken = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 15 * 60 * 1000, // 15 mins
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     });
 
     res.json({ message: "Access token refreshed", success: true });
@@ -506,7 +507,6 @@ const refreshToken = async (req, res) => {
     res.status(403).send("Forbidden");
   }
 };
-
 
 const sendTokens = async (res, userId) => {
   const accessToken = generateAccessToken(userId);
@@ -524,6 +524,7 @@ const sendTokens = async (res, userId) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 15 * 60 * 1000, // 15 minutes for access token
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
 };
 
