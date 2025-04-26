@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         setIsAuthenticated(false);
         setUser(null);
-        // window.location.href = import.meta.env.VITE_VRAKSH_URL + "/auth/login";
+        window.location.href = import.meta.env.VITE_VRAKSH_URL + "/auth/login";
       }
     }
     fetchUserData();
