@@ -468,29 +468,36 @@ const googleCallback = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  
   try {
     console.log(req.headers.cookie);
-    
-    const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
-    if (!token) return res.status(401).send("Unauthorized"); // No access token
+
+    if (!req.headers.cookie) {
+      return res.status(401).send("Unauthorized"); // No cookies, no token
+    }
+
+    const tokenCookie = req.headers.cookie
+      .split("; ")
+      .find((c) => c.startsWith("access_token="));
+
+    if (!tokenCookie) {
+      return res.status(401).send("Unauthorized"); // No access token in cookie
+    }
+
+    const token = tokenCookie.split("=")[1];
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     const userId = decoded.userId;
 
-    // Look for the stored refresh token in the database
     const storedToken = await RefreshToken.findOne({ userId });
-
     if (!storedToken) {
-      return res.status(401).send("Unauthorized");
+      return res.status(401).send("Unauthorized"); // Refresh token not found
     }
 
-    // Generate a new access token
     const newAccessToken = generateAccessToken(userId);
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 15 * 60 * 1000, // 15 minutes for access token
+      maxAge: 15 * 60 * 1000, // 15 mins
     });
 
     res.json({ message: "Access token refreshed", success: true });
@@ -499,6 +506,7 @@ const refreshToken = async (req, res) => {
     res.status(403).send("Forbidden");
   }
 };
+
 
 const sendTokens = async (res, userId) => {
   const accessToken = generateAccessToken(userId);
