@@ -16,7 +16,7 @@ import DashboardHeader from "@/components/Dashboard/Header";
 import LinksTabContent from "@/components/Dashboard/LinksTabContent";
 import ThemeTabContent from "@/components/Dashboard/ThemeTabContent";
 import MobilePreviewButton from "@/components/Dashboard/MobilePreviewButton";
-import { getBranches, getMe } from "@/lib/apis";
+import { getBranches, getMe, refreshToken } from "@/lib/apis";
 import { Branch, BranchItem, SocialIcon, User } from "@/utils/types";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -46,6 +46,26 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+
+  useEffect(() => {
+    const refreshAccessToken = async () => {
+      try {
+        const response = await refreshToken();
+        if (response.status !== 200) {
+          setIsAuthenticated(false);
+          return;
+        }
+        
+        setIsAuthenticated(true);
+      } catch (error) {
+        setIsAuthenticated(false);
+      }
+    };
+  
+    refreshAccessToken();
+  }, []);
+  
 
   useEffect(() => {
     async function fetchUserData() {

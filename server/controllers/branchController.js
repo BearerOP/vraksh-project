@@ -105,7 +105,7 @@ const createBranch = async (req, res) => {
     });
     branch.items = items;
     const branchItems = await BranchItem.insertMany(items);
-    console.log(branchItems);
+    // console.log(branchItems);
     branch.items = branchItems.map((item) => item._id);
 
     await branch.save();
@@ -217,7 +217,7 @@ const getItem = async (req, res) => {
 
 const createItem = async (req, res) => {
   try {
-    console.log("Creating item...", req.body, req.params);
+    // console.log("Creating item...", req.body, req.params);
     const branch = await Branch.findById(req.params.branchId);
     
     if (!branch) {

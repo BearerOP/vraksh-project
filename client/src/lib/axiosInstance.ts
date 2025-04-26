@@ -3,7 +3,8 @@ const SERVER_URL = import.meta.env.VITE_VRAKSH_SERVER_URL;
 
 const axiosInstance = axios.create({
   baseURL: SERVER_URL,
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true, // Include credentials (cookies) in requests
 }); // Create the axios instance
 
 // Add a request interceptor
@@ -20,7 +21,7 @@ axiosInstance.interceptors.request.use(
       // Add an authentication token to the headers
       const token = document.cookie
         .split('; ')
-        .find(row => row.startsWith('token='))
+        .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

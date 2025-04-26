@@ -1,10 +1,17 @@
 const User = require("../models/User");
 const Token = require("../models/Token");
 const Branch = require("../models/Branch");
+const RefreshToken = require("../models/RefreshToken");
+const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
-const { generateToken } = require("../config/jwt");
+const {
+  generateToken,
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../config/jwt");
 const { sendEmail } = require("../utils/emailService");
-const passport = require("passport");
+const { GOOGLE, GITHUB } = require("../config/oauth");
+const axios = require("axios");
 
 const checkUsername = async (req, res) => {
   try {
@@ -31,6 +38,7 @@ const checkUsername = async (req, res) => {
     });
   }
 };
+
 // const register = async (req, res) => {
 //   const { username, email, password, referralCode } = req.body;
 //   try {
@@ -121,10 +129,10 @@ const login = async (req, res, email) => {
       return {
         success: false,
         message: "Invalid credentials",
-      }
+      };
     }
 
-    const token = generateToken(user._id);
+    const token = generateAccessToken(user._id);
 
     return {
       success: true,
@@ -134,13 +142,13 @@ const login = async (req, res, email) => {
         username: user.username,
         email: user.email,
       },
-    }
+    };
   } catch (error) {
     console.error(error);
-    return{
+    return {
       success: false,
       message: "Server error",
-    }
+    };
   }
 };
 
@@ -256,9 +264,11 @@ const resetPassword = async (req, res) => {
 
 const getMe = async (req, res) => {
   try {
+    // console.log(req.user);
+
     const user = await User.findById(req.user.id);
     // console.log(user);
-    
+
     res.status(200).json({
       success: true,
       user,
@@ -371,11 +381,10 @@ const verifyMagicLink = async (req, res) => {
       authKeyExpire: { $gt: Date.now() },
     });
 
-    
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
-    
+
     await login(req, res, user.email);
 
     // Clear magic token (one-time use)
@@ -384,7 +393,7 @@ const verifyMagicLink = async (req, res) => {
     await user.save();
 
     // Generate JWT
-    const jwtToken = generateToken(user._id);
+    const jwtToken = generateAccessToken(user._id);
 
     // res.cookie("token", jwtToken, {
     //   httpOnly: true,
@@ -399,39 +408,144 @@ const verifyMagicLink = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    
+
     res.status(500).json({ message: "Internal server error", success: false });
   }
 };
 
-const githubAuth = passport.authenticate("github", { scope: ["user:email"] });
-
-const githubAuthCallback = (req, res) => {
-  const jwtToken = generateToken(req.user._id);
-
-  res.cookie("token", jwtToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-  });
-
-  res.redirect(process.env.FRONTEND_URL);
+const googleAuth = (req, res) => {
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE.client_id}&redirect_uri=${GOOGLE.redirect_uri}&response_type=code&scope=email%20profile`;
+  res.redirect(url);
 };
 
-const googleAuth = passport.authenticate("google", {
-  scope: ["profile", "email"],
-});
+const googleCallback = async (req, res) => {
+  const { code } = req.query;
 
-const googleAuthCallback = (req, res) => {
-  const jwtToken = generateToken(req.user._id);
+  try {
+    const { data: tokenData } = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      {
+        client_id: GOOGLE.client_id,
+        client_secret: GOOGLE.client_secret,
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: GOOGLE.redirect_uri,
+      }
+    );
 
-  res.cookie("token", jwtToken, {
+    const { access_token } = tokenData;
+
+    const { data: userInfo } = await axios.get(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: { Authorization: `Bearer ${access_token}` },
+      }
+    );
+    let user = await User.findOne({
+      email: userInfo.email,
+    });
+    if (!user) {
+      user = await User.create({
+        authProvider: "google",
+        providerId: userInfo.id,
+        username: userInfo.name,
+        email: userInfo.email,
+        imageUrl: userInfo.picture,
+      });
+    } else {
+      user.username = userInfo.name;
+      user.imageUrl = userInfo.picture;
+      await user.save();
+    }
+
+    // Send tokens to client
+    await sendTokens(res, user._id);
+    res.redirect(`${process.env.VRAKSH_APP_URL}/dashboard`);
+  } catch (error) {
+    console.error("Google OAuth Callback Error:", error);
+    res.status(500).json({ message: "Google OAuth failed" });
+  }
+};
+
+const refreshToken = async (req, res) => {
+  
+  try {
+    console.log(req.headers.cookie);
+    
+    const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+    if (!token) return res.status(401).send("Unauthorized"); // No access token
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const userId = decoded.userId;
+
+    // Look for the stored refresh token in the database
+    const storedToken = await RefreshToken.findOne({ userId });
+
+    if (!storedToken) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    // Generate a new access token
+    const newAccessToken = generateAccessToken(userId);
+
+    res.cookie("access_token", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000, // 15 minutes for access token
+    });
+
+    res.json({ message: "Access token refreshed", success: true });
+  } catch (err) {
+    console.error("Error refreshing token:", err);
+    res.status(403).send("Forbidden");
+  }
+};
+
+const sendTokens = async (res, userId) => {
+  const accessToken = generateAccessToken(userId);
+  const refreshToken = generateRefreshToken(userId);
+
+  // Store refresh token in the database (hashed)
+  const storedRefreshToken = new RefreshToken({
+    userId,
+    token: refreshToken,
+  });
+  await storedRefreshToken.save();
+
+  // Set the access token as a cookie
+  res.cookie("access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
+    maxAge: 15 * 60 * 1000, // 15 minutes for access token
   });
+};
 
-  res.redirect(process.env.FRONTEND_URL); // Redirect to frontend
+const protectedRoute = async (req, res) => {
+  const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+  if (!token) return res.sendStatus(401); // Unauthorized if no token
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    const user = await User.findById(decoded.userId);
+    if (!user) return res.sendStatus(404); // Not found if user doesn't exist
+
+    res.json({
+      message: "This is a protected route, user data: " + decoded.userId,
+    });
+  } catch (err) {
+    res.sendStatus(403); // Forbidden if token is invalid or expired
+  }
+};
+
+const logout = async (req, res) => {
+  const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+  if (token) {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const userId = decoded.userId;
+    await RefreshToken.deleteOne({ userId }); // Delete refresh token from DB
+  }
+  res.clearCookie("access_token");
+  res.json({ message: "Logged out successfully", success: true });
 };
 
 module.exports = {
@@ -443,8 +557,10 @@ module.exports = {
   getMe,
   sendMagicLink,
   verifyMagicLink,
+  googleCallback,
   googleAuth,
-  githubAuth,
-  githubAuthCallback,
-  googleAuthCallback,
+  refreshToken,
+  sendTokens,
+  protectedRoute,
+  logout,
 };

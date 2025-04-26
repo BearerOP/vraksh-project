@@ -89,3 +89,14 @@ export const reorderLinks = async (branchId: string, itemIds: string[]) => {
   return response;
 }
 
+
+
+export const refreshToken = async () => {
+  const response = await axiosInstance.get('/api/auth/refresh');
+  return response;
+}
+
+export const logout = async () => {
+  const response = await axiosInstance.post('/api/auth/logout');
+  return response;
+}

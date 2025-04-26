@@ -12,9 +12,19 @@ import {
   LayoutGridIcon,
   LucideLayoutDashboard,
   Eye,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import { se } from "date-fns/locale";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { logout } from "@/lib/apis";
+import { toast } from "sonner";
 
 interface DashboardSidebarProps {
   sidebarOpen: boolean;
@@ -24,12 +34,12 @@ interface DashboardSidebarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ 
-  sidebarOpen, 
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+  sidebarOpen,
   setSidebarOpen,
-  showDropdown, 
+  showDropdown,
   setShowDropdown,
-  setActiveTab
+  setActiveTab,
 }) => {
   const { user } = useAuth();
   const { pages, activePage, setActivePage } = useLinks();
@@ -42,6 +52,23 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     setShowDropdown(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await logout();
+      if (response.status === 200) {
+        // Handle successful logout (e.g., redirect to login page)
+        console.log(response.data);
+        toast.success("Logged out successfully");
+        setActivePage(null);
+        setSidebarOpen(false);
+        setSearchParams({});
+        window.location.href = `${import.meta.env.VITE_VRAKSH_URL}/auth/login`;
+      }
+    } catch (error) {
+      console.error("Logout failed", error);
+      toast.error("Logout failed, please try again.");
+    }
+  };
   return (
     <aside
       className={`${
@@ -106,14 +133,18 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <h3 className="px-4 text-xs uppercase text-muted-foreground font-semibold tracking-wider mb-2">
           Main
         </h3>
-          <Button onClick={()=>{
-            setActiveTab("links")
-            setSidebarOpen(false)
-            navigate("/dashboard")
-          }} variant="ghost" className="w-full justify-start rounded-lg">
-            <LayoutGridIcon className="h-4 w-4 mr-2" />
-            My Vraksh
-          </Button>
+        <Button
+          onClick={() => {
+            setActiveTab("links");
+            setSidebarOpen(false);
+            navigate("/dashboard");
+          }}
+          variant="ghost"
+          className="w-full justify-start rounded-lg"
+        >
+          <LayoutGridIcon className="h-4 w-4 mr-2" />
+          My Vraksh
+        </Button>
 
         <h3 className="px-4 text-xs uppercase text-muted-foreground font-semibold tracking-wider mt-6 mb-2">
           Tools
@@ -136,23 +167,47 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* User Profile Section */}
       {user && (
         <div className="mt-auto border-t pt-4 px-4">
-          <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
-            <Avatar className="size-8">
-              <AvatarImage src={user.imageUrl} />
-              <AvatarFallback>
-                {user.username?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user.username}</p>
-              <p className="text-xs text-muted-foreground truncate">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                <Avatar className="size-8">
+                  <AvatarImage src={user.imageUrl} />
+                  <AvatarFallback>
+                    {user.username?.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {user.username}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.email}
+                  </p>
+                </div>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel className="text-sm">
+                {user.username}
+              </DropdownMenuLabel>
+              <p className="text-xs text-gray-500 truncate px-2">
                 {user.email}
               </p>
-            </div>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-red-600 focus:bg-red-100 cursor-pointer"
+              >
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
     </aside>
