@@ -469,7 +469,7 @@ const googleCallback = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    console.log(req.headers.cookie);
+    console.log(req.headers.cookie,'cookie in headers');
 
     if (!req.headers.cookie) {
       return res.status(401).send("Unauthorized"); // No cookies, no token
