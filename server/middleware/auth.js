@@ -21,6 +21,8 @@ const protect = async (req, res, next) => {
   try {
     const decoded = jwt.verify(access_token, process.env.JWT_ACCESS_SECRET);
     req.user = await User.findById(decoded.userId);
+    req.access_token = access_token;
+    console.log('Access Token under authMiddleware:', req.access_token);
     if (!req.user) {
       return res.status(401).json({
         success: false, 

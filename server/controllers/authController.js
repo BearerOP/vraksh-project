@@ -498,10 +498,10 @@ const refreshToken = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 15 * 60 * 1000, // 15 mins
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      sameSite: "None"
     });
 
-    res.json({ message: "Access token refreshed", success: true });
+    res.json({ message: "Access token refreshed", success: true, access_token: newAccessToken });
   } catch (err) {
     console.error("Error refreshing token:", err);
     res.status(403).send("Forbidden");
@@ -548,10 +548,12 @@ const protectedRoute = async (req, res) => {
 
 const logout = async (req, res) => {
   try{
-
-    const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+    console.log("Headers under logout",req.headers);
+    const token = req.access_token
+    if (!token) return res.sendStatus(401); // Unauthorized if no token
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      
       const userId = decoded.userId;
       await RefreshToken.deleteOne({ userId }); // Delete refresh token from DB
     }

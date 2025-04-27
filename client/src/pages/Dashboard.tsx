@@ -52,6 +52,12 @@ const Dashboard: React.FC = () => {
     const refreshAccessToken = async () => {
       try {
         const response = await refreshToken();
+
+        const token = response.data?.access_token;
+        if (token) {
+          localStorage.setItem('access_token', token);
+          document.cookie = `access_token=${token}; path=/; secure; samesite=strict`;
+        }
         if (response.status !== 200) {
           setIsAuthenticated(false);
           return;
