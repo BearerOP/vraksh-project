@@ -49,15 +49,28 @@ const Dashboard: React.FC = () => {
 
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('access_token');
+    
+    if (token) {
+      localStorage.setItem('access_token', token);
+      document.cookie = `access_token=${token}; path=/; secure; samesite=default`;
+      // Clean the URL by removing the access_token from query params
+      navigate('/dashboard', { replace: true });
+
+    }
+  }, [location, navigate]);
+
+  useEffect(() => {
     const refreshAccessToken = async () => {
       try {
         const response = await refreshToken();
 
-        const token = response.data?.access_token;
-        if (token) {
-          localStorage.setItem('access_token', token);
-          document.cookie = `access_token=${token}; path=/; secure; samesite=strict`;
-        }
+        // const token = response.data?.access_token;
+        // if (token) {
+        //   localStorage.setItem('access_token', token);
+        //   document.cookie = `access_token=${token}; path=/; secure; samesite=relaxed`;
+        // }
         if (response.status !== 200) {
           setIsAuthenticated(false);
           return;

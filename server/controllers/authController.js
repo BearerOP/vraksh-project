@@ -459,8 +459,8 @@ const googleCallback = async (req, res) => {
     }
 
     // Send tokens to client
-    await sendTokens(res, user._id);
-    res.redirect(`${process.env.VRAKSH_APP_URL}/dashboard`);
+    const accessToken = await sendTokens(res, user._id);
+    res.redirect(`${process.env.VRAKSH_APP_URL}/dashboard?access_token=${accessToken}`);
   } catch (error) {
     console.error("Google OAuth Callback Error:", error);
     res.status(500).json({ message: "Google OAuth failed" });
@@ -526,6 +526,7 @@ const sendTokens = async (res, userId) => {
     maxAge: 15 * 60 * 1000, // 15 minutes for access token
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
+  return accessToken;
 };
 
 const protectedRoute = async (req, res) => {
