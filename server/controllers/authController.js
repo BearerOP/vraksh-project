@@ -529,10 +529,10 @@ const sendTokens = async (res, userId) => {
 };
 
 const protectedRoute = async (req, res) => {
-  const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
-  if (!token) return res.sendStatus(401); // Unauthorized if no token
-
+  
   try {
+    const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+    if (!token) return res.sendStatus(401); // Unauthorized if no token
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
     const user = await User.findById(decoded.userId);
@@ -547,14 +547,21 @@ const protectedRoute = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
-  if (token) {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    const userId = decoded.userId;
-    await RefreshToken.deleteOne({ userId }); // Delete refresh token from DB
+  try{
+
+    const token = req.headers.cookie.split("access_token=")[1].split(";")[0];
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      const userId = decoded.userId;
+      await RefreshToken.deleteOne({ userId }); // Delete refresh token from DB
+    }
+    res.clearCookie("access_token");
+    res.json({ message: "Logged out successfully", success: true });
   }
-  res.clearCookie("access_token");
-  res.json({ message: "Logged out successfully", success: true });
+  catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
 };
 
 module.exports = {

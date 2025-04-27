@@ -166,7 +166,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
       {/* User Profile Section */}
       {user && (
-        <div className="mt-auto border-t pt-4 px-4">
+        <div className="mt-auto border-t pt-4 px-4 mb-12 md:mb-0 ">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
