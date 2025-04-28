@@ -79,7 +79,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ pageId }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/scrape?url=${encodeURIComponent(urlString)}`
+        `${process.env.VITE_VRAKSH_SERVER_URL}/api/scrape?url=${encodeURIComponent(urlString)}`
       );
       const metadata = await response.json();
 
