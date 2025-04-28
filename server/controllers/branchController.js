@@ -12,6 +12,8 @@ const getBranches = async (req, res) => {
       "url",
       "description",
       "imageUrl",
+      "iconUrl",
+      "publisher",
       "createdAt",
       "style",
       "active",

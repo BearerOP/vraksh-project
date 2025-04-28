@@ -32,6 +32,10 @@ const BranchItemSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  iconUrl: {
+    type: String,
+    trim: true,
+  },
   style: {
     type: String,
     default: "classic",

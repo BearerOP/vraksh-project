@@ -4,7 +4,9 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link as LinkType } from "@/context/LinkContext";
+import { Switch } from "@/components/ui/switch";
+import { updateLink as updateLinkApi, deleteLink as deleteLinkApi } from "@/lib/apis";
+import { toast } from "sonner";
 import {
   Edit,
   Trash2,
@@ -13,15 +15,12 @@ import {
   ExternalLink,
   GripVertical,
 } from "lucide-react";
-import { Switch } from "./ui/switch";
-import { updateLink as updateLinkApi, deleteLink as deleteLinkApi } from "@/lib/apis";
-import { toast } from "sonner";
+import { Link as LinkType } from "@/context/LinkContext";
 
 interface LinkCardProps {
   link: LinkType;
   pageId: string;
   isDragging?: boolean;
-  active?: boolean;
 }
 
 const LinkCard: React.FC<LinkCardProps> = ({
@@ -32,7 +31,9 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(link.title || "");
   const [url, setUrl] = useState(link.url || "");
+  const [style, setstyle] = useState(link.style); // 'classic' | 'featured'
   const [isLoading, setIsLoading] = useState(false);
+
   const { updateLink, deleteLink } = useLinks();
 
   const handleSave = async () => {
@@ -42,7 +43,8 @@ const LinkCard: React.FC<LinkCardProps> = ({
         const updatedLink = {
           ...link,
           title,
-          url
+          url,
+          style,
         };
 
         const response = await updateLinkApi(updatedLink);
@@ -50,13 +52,12 @@ const LinkCard: React.FC<LinkCardProps> = ({
           throw new Error("Failed to update link");
         }
 
-        // Update local state
-        updateLink(pageId, link.id, { title, url });
+        updateLink(pageId, link.id, { title, url, style });
         setIsEditing(false);
-        toast.success("Link updated successfully");
+        toast.success("Link updated successfully 🚀");
       } catch (error) {
         console.error(error);
-        toast.error("Failed to update link");
+        toast.error("Failed to update link 😞");
       } finally {
         setIsLoading(false);
       }
@@ -66,6 +67,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const handleCancel = () => {
     setTitle(link.title || "");
     setUrl(link.url || "");
+    setstyle(link.style || "classic");
     setIsEditing(false);
   };
 
@@ -74,20 +76,19 @@ const LinkCard: React.FC<LinkCardProps> = ({
       setIsLoading(true);
       const updatedLink = {
         ...link,
-        active: !link.active
+        active: !link.active,
       };
 
       const response = await updateLinkApi(updatedLink);
       if (response.status !== 200) {
-        throw new Error("Failed to update link status");
+        throw new Error("Failed to toggle link status");
       }
 
-      // Update local state
       updateLink(pageId, link.id, { active: !link.active });
-      toast.success(`Link ${!link.active ? 'activated' : 'deactivated'} successfully`);
+      toast.success(`Link ${!link.active ? 'activated' : 'deactivated'} 🎯`);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update link status");
+      toast.error("Failed to toggle link status 😢");
     } finally {
       setIsLoading(false);
     }
@@ -96,26 +97,24 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const handleDelete = async () => {
     try {
       setIsLoading(true);
+
       const response = await deleteLinkApi(pageId, link.id);
       if (response.status !== 200) {
         throw new Error("Failed to delete link");
       }
 
-      // Update local state
       deleteLink(pageId, link.id);
-      toast.success("Link deleted successfully");
+      toast.success("Link deleted successfully 🗑️");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete link");
+      toast.error("Failed to delete link 😬");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Ensure URL has protocol and handle undefined/null values
   const normalizeUrl = (url: string | undefined | null): string => {
-    if (!url) return "#"; // Return a fallback for empty URLs
-
+    if (!url) return "#";
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       return `https://${url}`;
     }
@@ -143,7 +142,6 @@ const LinkCard: React.FC<LinkCardProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Link title"
-              className="transition-all duration-200"
               disabled={isLoading}
             />
           </div>
@@ -156,16 +154,42 @@ const LinkCard: React.FC<LinkCardProps> = ({
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="transition-all duration-200"
               disabled={isLoading}
             />
           </div>
+
+          {/* Style Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Style</label>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant={style === "classic" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setstyle("classic")}
+                disabled={isLoading}
+              >
+                Classic
+              </Button>
+              <Button
+                type="button"
+                variant={style === "featured" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setstyle("featured")}
+                disabled={isLoading}
+              >
+                Featured
+              </Button>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2 pt-2">
             <Button
               size="sm"
               variant="outline"
               onClick={handleCancel}
-              className="transition-all duration-200"
               disabled={isLoading}
             >
               <X className="h-4 w-4 mr-1" /> Cancel
@@ -173,10 +197,10 @@ const LinkCard: React.FC<LinkCardProps> = ({
             <Button
               size="sm"
               onClick={handleSave}
-              className="transition-all duration-200 bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600"
               disabled={isLoading}
             >
-              <Check className="h-4 w-4 mr-1" /> {isLoading ? 'Saving...' : 'Save'}
+              <Check className="h-4 w-4 mr-1" /> {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -194,37 +218,38 @@ const LinkCard: React.FC<LinkCardProps> = ({
                 href={normalizeUrl(link.url)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-blue-500 transition-colors flex items-center gap-1"
+                className="text-sm text-muted-foreground hover:text-blue-500 flex items-center gap-1"
               >
                 <span className="truncate max-w-[180px]">
                   {link.url || "No URL"}
                 </span>
                 <ExternalLink className="h-3 w-3" />
               </a>
+              <div className="text-xs mt-1 text-muted-foreground italic">
+                Style: {link.style || "classic"}
+              </div>
             </div>
           </div>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-center items-center">
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity items-center">
             <Button
               size="icon"
               variant="ghost"
               onClick={() => setIsEditing(true)}
-              className="h-8 w-8"
               disabled={isLoading}
             >
               <Edit className="h-4 w-4" />
             </Button>
-
             <Switch
               checked={!!link.active}
               onCheckedChange={handleToggleActive}
-              className="scale-75 shadow-md"
+              className="scale-75"
               disabled={isLoading}
             />
             <Button
               size="icon"
               variant="ghost"
               onClick={handleDelete}
-              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive hover:bg-destructive/10"
               disabled={isLoading}
             >
               <Trash2 className="h-4 w-4" />

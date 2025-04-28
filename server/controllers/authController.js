@@ -497,7 +497,7 @@ const refreshToken = async (req, res) => {
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 15 * 60 * 1000, // 15 mins
+      maxAge: 120 * 60 * 1000, // 120 minutes for access token
       sameSite: "None"
     });
 
@@ -523,7 +523,7 @@ const sendTokens = async (res, userId) => {
   res.cookie("access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 15 * 60 * 1000, // 15 minutes for access token
+    maxAge: 120 * 60 * 1000, // 120 minutes for access token
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
   return accessToken;

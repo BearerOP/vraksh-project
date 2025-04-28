@@ -28,6 +28,8 @@ export type BranchItem = {
   active: boolean;
   description: string;
   imageUrl: string;
+  iconUrl: string;
+  publisher: string;
   createdAt: Date;
   updatedAt: Date;
 };

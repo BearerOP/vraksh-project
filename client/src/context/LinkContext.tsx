@@ -1,5 +1,11 @@
 import { SocialIcon } from "@/utils/types";
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { updateBranch } from "@/lib/apis";
 import { toast } from "sonner";
 
@@ -10,8 +16,10 @@ export interface Link {
   active: boolean;
   index?: number;
   style?: string; // Optional, for future use
-  icon?: string; // Optional, for future use
-  
+  iconUrl?: string; // Optional, for future use
+  imageUrl?: string;
+  description?: string; // Optional, for future use
+  publisher?: string; // Optional, for future use
 }
 
 export type TemplateType =
@@ -79,7 +87,7 @@ interface LinkContextType {
   addPage: (title: string) => void;
   updatePage: (pageId: string, updates: Partial<Omit<Page, "id">>) => void;
   deletePage: (pageId: string) => void;
-  addLink: (pageId: string, title: string, url: string) => void;
+  addLink: (pageId: string, link: Link) => void;
   updateLink: (
     pageId: string,
     linkId: string,
@@ -102,7 +110,9 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Refs for debouncing
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingUpdatesRef = useRef<{[key: string]: Partial<Omit<Page, "id">>}>({});
+  const pendingUpdatesRef = useRef<{
+    [key: string]: Partial<Omit<Page, "id">>;
+  }>({});
 
   // No longer set the first page as active by default - handled by Dashboard
 
@@ -148,44 +158,44 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
         updatedPages.find((p) => p.id === pageId) || null;
       setActivePage(updatedActivePage);
     }
-    
+
     // Store the latest updates for this page
     pendingUpdatesRef.current[pageId] = {
       ...(pendingUpdatesRef.current[pageId] || {}),
-      ...updates
+      ...updates,
     };
-    
+
     // Clear any existing timeout
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
     }
-    
+
     // Set updating state to true
     setIsUpdating(true);
-    
+
     // Debounce API call - wait 500ms after last change
     updateTimeoutRef.current = setTimeout(() => {
       // Get the latest updates for this page
       const latestUpdates = pendingUpdatesRef.current[pageId];
-      
+
       if (!latestUpdates) {
         setIsUpdating(false);
         return;
       }
-      
+
       // Clear pending updates for this page
       delete pendingUpdatesRef.current[pageId];
-      
+
       // Make API call with latest updates
       try {
         updateBranch(pageId, latestUpdates)
-          .then(response => {
+          .then((response) => {
             const data = response.data as ApiResponse;
             if (!data.success) {
               throw new Error(data.message || "Failed to update settings");
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error("API error:", error);
             toast.error("Failed to save changes to the server");
           })
@@ -215,11 +225,11 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Add a link to a page
-  const addLink = (pageId: string, title: string, url: string) => {
+  const addLink = (pageId: string, link: Link) => {
     const newLink: Link = {
-      id: Date.now().toString(),
-      title,
-      url,
+      id: link.id,
+      title: link.title,
+      url: link.url,
       active: true,
     };
 

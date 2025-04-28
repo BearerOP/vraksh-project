@@ -31,6 +31,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { AnimatePresence, motion } from "motion/react";
 import ShareDrawerContent from "@/components/ShareContentDrawer";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
+import { image, style } from "motion/react-client";
 
 const Dashboard: React.FC = () => {
   const { activePage, addPage, setPages, setActivePage, pages } = useLinks();
@@ -158,14 +159,20 @@ const Dashboard: React.FC = () => {
           }
 
           const mappedPages = branches.map((branch: Branch) => ({
+
             id: branch._id,
             title: branch.name,
             links:
-              branch.items?.map((item: BranchItem) => ({
+              branch.items?.map((item: BranchItem) => (
+                {
                 id: item._id,
                 title: item.title,
                 url: item.url,
                 active: item.active,
+                iconUrl: item.iconUrl,
+                publisher: item.publisher,
+                imageUrl: item.imageUrl,
+                style: item.style,
               })) || [],
             templateId: branch.templateId,
             imageUrl: branch.imageUrl,
@@ -185,6 +192,8 @@ const Dashboard: React.FC = () => {
             buttonTextFont: branch.buttonTextFont,
             avatarRounded: branch.avatarRounded,
           }));
+          console.log("Mapped Pages:", mappedPages);
+          
 
           setPages(mappedPages);
           

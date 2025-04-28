@@ -26,6 +26,8 @@ const LinksTabContent: React.FC = () => {
       });
   };
 
+  console.log("activePage", activePage);
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
       {/* Links Management Section */}
@@ -77,6 +79,8 @@ const LinksTabContent: React.FC = () => {
               Reorder
             </Button>
           </div>
+          
+          <LinkForm pageId={activePage.id} />
 
           {activePage?.links?.length > 0 ? (
             <LinksList pageId={activePage.id} links={activePage.links} />
@@ -86,7 +90,6 @@ const LinksTabContent: React.FC = () => {
             </div>
           )}
 
-          <LinkForm pageId={activePage.id} />
         </div>
       </div>
 
