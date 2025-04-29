@@ -234,6 +234,8 @@ const createItem = async (req, res) => {
     }
 
     const item = req.body;
+    console.log("Item to be created:", item);
+    
     const newItem = await BranchItem.create({
       ...item,
       branchId: branch._id,

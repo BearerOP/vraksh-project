@@ -64,7 +64,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page, onDeleteLink }) => 
             rel="noopener noreferrer"
             className="block"
           >
-            <div className="aspect-video relative overflow-hidden">
+            <div className=" relative overflow-hidden">
               <img 
                 src={link.imageUrl} 
                 alt={link.title} 
@@ -75,7 +75,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ page, onDeleteLink }) => 
           
           {/* Link details */}
           <div className="p-3">
-            <div className="flex items-center">
+            <div className="flex items-center max-h-6">
               {/* iconUrl on left */}
               <div className="h-8 w-8 flex-shrink-0 bg-black/5 rounded-md flex items-center justify-center mr-3">
                 {link.iconUrl ? (
