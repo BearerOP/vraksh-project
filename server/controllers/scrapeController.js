@@ -17,11 +17,12 @@ const scrapePage = async (req, res) => {
 
   let browser;
   try {
-    const executablePath = await playwright.executablePath;
+    // Use playwright-aws-lambda to launch Chromium
+    const executablePath = await playwright.executablePath();
     browser = await playwright.launchChromium({
-      args: playwright.args,
-      executablePath,
-      headless: playwright.headless,
+      args: playwright.args,  // Use default arguments for headless mode
+      executablePath,         // Use the executablePath from playwright-aws-lambda
+      headless: playwright.headless,  // Ensures it runs headlessly
     });
 
     const context = await browser.newContext({
@@ -32,9 +33,6 @@ const scrapePage = async (req, res) => {
 
     const page = await context.newPage();
     await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 });
-
-    // ... rest of your scraping logic remains unchanged ...
-
 
     const isX = url.includes('x.com') || url.includes('twitter.com');
 
