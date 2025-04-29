@@ -12,7 +12,7 @@
     "test": "NODE_ENV=test jest",
     "test:watch": "NODE_ENV=test jest --watch",
     "test:coverage": "NODE_ENV=test jest --coverage",
-    "postinstall": "npx playwright install --with-deps"
+    "postinstall": "npx playwright install"
   },
   "jest": {
     "testEnvironment": "node",
