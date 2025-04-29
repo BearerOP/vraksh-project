@@ -1,4 +1,4 @@
-const { chromium } = require('playwright');
+const playwright = require('playwright-aws-lambda');
 const metascraper = require('metascraper')([
   require('metascraper-author')(),
   require('metascraper-date')(),
@@ -17,9 +17,11 @@ const scrapePage = async (req, res) => {
 
   let browser;
   try {
-    browser = await chromium.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    const executablePath = await playwright.executablePath;
+    browser = await playwright.launchChromium({
+      args: playwright.args,
+      executablePath,
+      headless: playwright.headless,
     });
 
     const context = await browser.newContext({
@@ -30,6 +32,9 @@ const scrapePage = async (req, res) => {
 
     const page = await context.newPage();
     await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 });
+
+    // ... rest of your scraping logic remains unchanged ...
+
 
     const isX = url.includes('x.com') || url.includes('twitter.com');
 
