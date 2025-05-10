@@ -24,6 +24,8 @@ const BranchSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please add a branch name"],
+    unique: true,
+    index: true,
   },
   description: {
     type: String,

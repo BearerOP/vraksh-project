@@ -48,7 +48,6 @@ const Dashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('access_token');
@@ -58,7 +57,6 @@ const Dashboard: React.FC = () => {
       document.cookie = `access_token=${token}; path=/; secure; samesite=default`;
       // Clean the URL by removing the access_token from query params
       navigate('/dashboard', { replace: true });
-
     }
   }, [location, navigate]);
 
@@ -66,26 +64,35 @@ const Dashboard: React.FC = () => {
     const refreshAccessToken = async () => {
       try {
         const response = await refreshToken();
-
-        // const token = response.data?.access_token;
-        // if (token) {
-        //   localStorage.setItem('access_token', token);
-        //   document.cookie = `access_token=${token}; path=/; secure; samesite=relaxed`;
-        // }
-        if (response.status !== 200) {
+        interface RefreshTokenResponse {
+          data?: {
+            access_token: string;
+          };
+          status: number;
+        }
+        const typedResponse = response as RefreshTokenResponse;
+        const token = typedResponse.data?.access_token;
+        if (token) {
+          localStorage.setItem('access_token', token);
+          document.cookie = `access_token=${token}; path=/; secure; samesite=strict`;
+        }
+        if (typedResponse.status !== 200) {
           setIsAuthenticated(false);
           return;
         }
-
         setIsAuthenticated(true);
       } catch (error) {
+        console.error('Error refreshing token:', error);
         setIsAuthenticated(false);
       }
     };
-  
-    refreshAccessToken();
+
+    // Set up periodic token refresh
+    const refreshInterval = setInterval(refreshAccessToken, 15 * 60 * 1000); // Refresh every 14 minutes
+    refreshAccessToken(); // Initial refresh
+
+    return () => clearInterval(refreshInterval);
   }, []);
-  
 
   useEffect(() => {
     async function fetchUserData() {

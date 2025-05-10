@@ -116,3 +116,8 @@ export const logout = async () => {
   const response = await axiosInstance.post("/api/auth/logout");
   return response;
 };
+
+export const deleteBranch = async (branchId: string) => {
+  const response = await axiosInstance.delete(`/api/branch/${branchId}`);
+  return response;
+};

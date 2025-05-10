@@ -3,8 +3,16 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useLinks } from "@/context/LinkContext";
-import { Paintbrush, Settings, Share2, User } from "lucide-react";
+import { Paintbrush, Settings, Share2, User, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DeleteBranchButton from "./DeleteBranchButton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DashboardHeaderProps {
   activeTab: string;
@@ -21,7 +29,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const { activePage } = useLinks();
-
 
   return (
     <div
@@ -76,28 +83,42 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <Share2 className="h-4 w-4 mr-2" />
           <span className="hidden lg:inline">Share</span>
         </Button>
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            navigate(`/preview/${activePage.id}`);
-          }}
-          className="text-foreground hover:bg-foreground/10 transition-all duration-200"
-        >
-          <Eye className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Preview</span>
-        </Button> */}
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            navigate("/admin/settings");
-          }}
-          className="text-foreground hover:bg-foreground/10 transition-all duration-200"
-        >
-          <Settings className="h-4 w-4 mr-2" />
-          <span className="hidden lg:inline">Settings</span>
-        </Button> */}
+
+        {activePage && (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-foreground hover:bg-foreground/10 transition-all duration-200"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  <span className="hidden lg:inline">Settings</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => navigate(`/preview/${activePage.id}`)}
+                  className="cursor-pointer"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview Branch
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-red-600 focus:text-red-600 cursor-pointer p-0"
+                >
+                  <DeleteBranchButton
+                    branchId={activePage.id}
+                    branchName={activePage.title}
+                    className="w-full text-left"
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
       </div>
     </div>
   );

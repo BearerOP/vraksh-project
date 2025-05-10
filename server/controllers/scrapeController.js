@@ -1,4 +1,3 @@
-const playwright = require('playwright-aws-lambda');
 const metascraper = require('metascraper')([
   require('metascraper-author')(),
   require('metascraper-date')(),
@@ -11,18 +10,35 @@ const metascraper = require('metascraper')([
   require('metascraper-url')(),
 ]);
 
+const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+let chromium, executablePath, args, headless;
+
+if (isLambda) {
+  const playwrightAWS = require('playwright-aws-lambda');
+  chromium = playwrightAWS.chromium;
+  executablePath = playwrightAWS.executablePath;
+  args = playwrightAWS.args;
+  headless = playwrightAWS.headless;
+} else {
+  const playwright = require('playwright');
+  chromium = playwright.chromium;
+  executablePath = undefined;
+  args = [];
+  headless = true;
+}
+
 const scrapePage = async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   let browser;
+
   try {
-    // Use playwright-aws-lambda to launch Chromium
-    const executablePath = await playwright.executablePath();
-    browser = await playwright.launchChromium({
-      args: playwright.args,  // Use default arguments for headless mode
-      executablePath,         // Use the executablePath from playwright-aws-lambda
-      headless: playwright.headless,  // Ensures it runs headlessly
+    browser = await chromium.launch({
+      args,
+      headless,
+      ...(executablePath && { executablePath }),
     });
 
     const context = await browser.newContext({
@@ -32,7 +48,8 @@ const scrapePage = async (req, res) => {
     });
 
     const page = await context.newPage();
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.waitForTimeout(1000); // Give JS time to render
 
     const isX = url.includes('x.com') || url.includes('twitter.com');
 
@@ -47,12 +64,11 @@ const scrapePage = async (req, res) => {
 
     if (isX) {
       if (/\/status\/\d+/.test(url)) {
-        // Tweet (post)
+        // Tweet
         await page.waitForTimeout(2000);
         data.title = await page
           .$eval('article div[lang]', el => el.innerText)
           .catch(() => '');
-
         data.description = data.title;
 
         data.image = await page
@@ -60,7 +76,7 @@ const scrapePage = async (req, res) => {
           .catch(() => '');
       } else {
         // Profile
-        await page.waitForTimeout(3000); // Allow rendering of dynamic elements
+        await page.waitForTimeout(3000);
 
         data.title =
           (await page
@@ -87,21 +103,23 @@ const scrapePage = async (req, res) => {
           })
           .catch(() => '');
 
-        // If nothing was found, try getting the page <title>
         if (!data.title) {
           data.title = await page.title().catch(() => '');
         }
       }
+
+      // ⛏️ Trim X.com description
+      data.description = data.description?.slice(0, 240);
     } else {
-      // Non-X.com fallback using metascraper
+      // Use metascraper
       const html = await page.content();
       const meta = await metascraper({ html, url });
 
       data = {
         title: meta.title || '',
-        description: meta.description || '',
+        description: (meta.description || '').slice(0, 240),
         logo: meta.logo || '',
-        url: url,
+        url,
         image: meta.image || '',
         publisher: meta.publisher || '',
       };

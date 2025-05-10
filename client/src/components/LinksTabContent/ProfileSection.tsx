@@ -246,7 +246,7 @@ export const ProfileSection = () => {
 
             <Button
               variant="link"
-              className="text-muted-foreground hover:underline-offset-1 p-0 h-auto"
+              className="text-muted-foreground hover:underline-offset-1 p-0 h-auto text-wrap"
               onClick={openEditDialog}
             >
               {activePage?.description || "Add description"}

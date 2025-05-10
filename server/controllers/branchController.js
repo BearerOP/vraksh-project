@@ -84,10 +84,25 @@ const getBranchByUsername = async (req, res) => {
 };
 
 const createBranch = async (req, res) => {
+  const session = await Branch.startSession();
+  session.startTransaction();
+
   try {
     const userId = req.user._id;
     const formData = req.body;
     const links = formData.links;
+
+    // Check if branch name already exists
+    const existingBranch = await Branch.findOne({ name: formData.name });
+    if (existingBranch) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: "Branch name already exists",
+      });
+    }
+
     let branch = {
       userId,
       name: formData.name,
@@ -97,29 +112,28 @@ const createBranch = async (req, res) => {
       imageUrl: formData.imageUrl,
     };
 
-    branch = await Branch.create({ ...branch });
+    branch = await Branch.create([{ ...branch }], { session });
 
-    const items = links.map((link) => {
-      return {
-        ...link,
-        branchId: branch._id,
-      };
-    });
-    branch.items = items;
-    const branchItems = await BranchItem.insertMany(items);
-    // console.log(branchItems);
-    branch.items = branchItems.map((item) => item._id);
+    const items = links.map((link) => ({
+      ...link,
+      branchId: branch[0]._id,
+    }));
 
-    await branch.save();
+    const branchItems = await BranchItem.insertMany(items, { session });
+    branch[0].items = branchItems.map((item) => item._id);
+
+    await branch[0].save({ session });
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(201).json({
       success: true,
-      // data: req.body,
-      data: branch,
+      data: branch[0],
     });
   } catch (error) {
-    console.log(error);
-
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error creating branch:", error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -165,13 +179,38 @@ const updateBranch = async (req, res) => {
 };
 
 const deleteBranch = async (req, res) => {
+  const session = await Branch.startSession();
+  session.startTransaction();
+
   try {
-    await Branch.findByIdAndDelete(req.params.branchId);
+    const branch = await Branch.findById(req.params.branchId);
+    
+    if (!branch) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
+
+    // Delete all items associated with the branch
+    await BranchItem.deleteMany({ branchId: branch._id }, { session });
+    
+    // Delete the branch
+    await Branch.findByIdAndDelete(req.params.branchId, { session });
+    
+    await session.commitTransaction();
+    session.endSession();
+
     res.status(200).json({
       success: true,
-      data: {},
+      message: "Branch and its items deleted successfully",
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error deleting branch:", error);
     res.status(500).json({
       success: false,
       message: error.message,

@@ -121,34 +121,64 @@ const checkUsername = async (req, res) => {
 //   }
 // };
 
-const login = async (req, res, email) => {
+const login = async (req, res) => {
   try {
-    const user = await User.findOne({ email });
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return {
+      return res.status(401).json({
         success: false,
         message: "Invalid credentials",
-      };
+      });
     }
 
-    const token = generateAccessToken(user._id);
+    const isMatch = await user.matchPassword(password);
 
-    return {
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Store refresh token in database
+    await RefreshToken.create({
+      userId: user._id,
+      token: refreshToken,
+    });
+
+    // Set access token cookie
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    });
+
+    res.status(200).json({
       success: true,
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
+      data: {
+        user: {
+          _id: user._id,
+          email: user.email,
+          username: user.username,
+          imageUrl: user.imageUrl,
+        },
+        access_token: accessToken,
       },
-    };
+    });
   } catch (error) {
     console.error(error);
-    return {
+    res.status(500).json({
       success: false,
       message: "Server error",
-    };
+    });
   }
 };
 
@@ -459,7 +489,7 @@ const googleCallback = async (req, res) => {
     }
 
     // Send tokens to client
-    const accessToken = await sendTokens(res, user._id);
+    const accessToken = await sendTokens(res, user._id, req);
     res.redirect(`${process.env.VRAKSH_APP_URL}/dashboard?access_token=${accessToken}`);
   } catch (error) {
     console.error("Google OAuth Callback Error:", error);
@@ -469,42 +499,64 @@ const googleCallback = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    console.log(req.headers.cookie, "cookie in headers");
+    // Get the access token from the Authorization header
+    const accessToken = req.headers.cookie.split("access_token=")[1].split(";")[0];
+    console.log("refresh token called with access token: ", accessToken);  
+    
 
-    if (!req.headers.cookie) {
-      return res.status(401).send("Unauthorized"); // No cookies, no token
+    try {
+      // Try to verify the access token
+      jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+      // If verification succeeds, token is still valid
+      return res.status(200).json({
+        success: true,
+        data: {
+          access_token: accessToken
+        }
+      });
+    } catch (accessTokenError) {
+      // Access token is expired, proceed with refresh
+      console.log("access token is expired, proceeding with refresh");
+      const decoded = jwt.decode(accessToken);
+      if (!decoded || !decoded.userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid access token"
+        });
+      }
+
+
+      const userId = decoded.userId;
+
+      // Find the refresh token in database
+      const storedToken = await RefreshToken.findOne({
+        userId,
+        createdAt: { $gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Check if token is less than 30 days old
+      });
+
+      if (!storedToken) {
+        return res.status(401).json({
+          success: false,
+          message: "No valid refresh token found"
+        });
+      }
+
+      // Generate new access token
+      const newAccessToken = generateAccessToken(userId);
+
+      res.json({
+        success: true,
+        data: {
+          access_token: newAccessToken
+        }
+      });
     }
-
-    const tokenCookie = req.headers.cookie
-      .split("; ")
-      .find((c) => c.startsWith("access_token="));
-
-    if (!tokenCookie) {
-      return res.status(401).send("Unauthorized"); // No access token in cookie
-    }
-
-    const token = tokenCookie.split("=")[1];
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    const userId = decoded.userId;
-
-    const storedToken = await RefreshToken.findOne({ userId });
-    if (!storedToken) {
-      return res.status(401).send("Unauthorized"); // Refresh token not found
-    }
-
-    const newAccessToken = generateAccessToken(userId);
-
-    res.cookie("access_token", newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 120 * 60 * 1000, // 120 minutes for access token
-      sameSite: "None"
-    });
-
-    res.json({ message: "Access token refreshed", success: true, access_token: newAccessToken });
   } catch (err) {
     console.error("Error refreshing token:", err);
-    res.status(403).send("Forbidden");
+    res.status(401).json({
+      success: false,
+      message: "Token refresh failed"
+    });
   }
 };
 
@@ -548,22 +600,42 @@ const protectedRoute = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  try{
-    console.log("Headers under logout",req.headers);
-    const token = req.access_token
-    if (!token) return res.sendStatus(401); // Unauthorized if no token
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-      
-      const userId = decoded.userId;
-      await RefreshToken.deleteOne({ userId }); // Delete refresh token from DB
+  try {
+    const token = req.access_token;
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No access token found"
+      });
     }
-    res.clearCookie("access_token");
-    res.json({ message: "Logged out successfully", success: true });
-  }
-  catch (error) {
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      const userId = decoded.userId;
+      
+      // Delete refresh token from database
+      await RefreshToken.deleteOne({ userId });
+    } catch (error) {
+      console.error("Error verifying token during logout:", error);
+    }
+
+    // Clear access token cookie
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax"
+    });
+
+    res.json({
+      success: true,
+      message: "Logged out successfully"
+    });
+  } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({ message: "Internal server error", success: false });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 };
 
