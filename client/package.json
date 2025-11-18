@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:prod": "vite build --mode production",
+    "start": "NODE_ENV=development vite preview",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -46,6 +47,7 @@
     "@uiw/react-color-chrome": "^2.5.0",
     "axios": "^1.8.4",
     "browser-image-compression": "^2.0.2",
+    "caniuse-lite": "^1.0.30001748",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",

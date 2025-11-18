@@ -501,8 +501,7 @@ const refreshToken = async (req, res) => {
   try {
     // Get the access token from the Authorization header
     const accessToken = req.headers.cookie.split("access_token=")[1].split(";")[0];
-    console.log("refresh token called with access token: ", accessToken);  
-    
+    console.log("refresh token called with access token at: ", new Date().toLocaleString(), accessToken);  
 
     try {
       // Try to verify the access token
